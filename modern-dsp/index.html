@@ -1,11 +1,5 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light">
-<title>现代数字信号处理｜课程笔记目录</title>
-<style>:root{--ink:#20303d;--muted:#627385;--line:#dce5ed;--paper:#fff;--soft:#f6f9fc;--blue:#1f6fb2;--blue2:#315f91;--orange:#c96d25;--shadow:0 12px 34px rgba(41,63,82,.08);}
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>现代数字信号处理｜课程目录</title><style>:root{--ink:#20303d;--muted:#627385;--line:#dce5ed;--paper:#fff;--soft:#f6f9fc;--blue:#1f6fb2;--blue2:#315f91;--orange:#c96d25;--shadow:0 12px 34px rgba(41,63,82,.08);}
 *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:#f3f6f9;color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;line-height:1.82;font-size:16px}
 #progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;z-index:50}
 .layout{display:grid;grid-template-columns:280px minmax(0,860px);gap:32px;max-width:1210px;margin:0 auto;padding:34px 24px 80px}
@@ -24,54 +18,4 @@ table{width:100%;border-collapse:collapse;margin:20px 0 28px;font-size:14.5px} t
 @media(max-width:980px){.layout{grid-template-columns:1fr;max-width:900px}.sidebar{position:relative;top:0;height:auto;max-height:340px}.article{padding:42px 34px}}
 @media(max-width:600px){body{font-size:15px}.layout{padding:12px 8px 50px}.sidebar{display:none}.article{padding:30px 20px;border-radius:12px}h1{font-size:28px}h2{font-size:22px}.diagram{padding:5px}mjx-container[display="true"]{font-size:.96em;margin:1.1em 0!important}}
 @media print{body{background:white;font-size:10.5pt}#progress,.sidebar{display:none!important}.layout{display:block;max-width:none;padding:0}.article{border:0;box-shadow:none;padding:0}.hero{margin-top:0}h2,h3{break-after:avoid-page}.diagram,table,blockquote,mjx-container[display="true"]{break-inside:avoid}mjx-container[display="true"]{overflow:visible}a{color:inherit;text-decoration:none}}
-
-.course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:28px 0}
-.course-card{display:block;padding:24px;border:1px solid var(--line,#dce6f0);border-radius:16px;background:#fbfdff;text-decoration:none;color:inherit;box-shadow:0 8px 24px rgba(31,57,82,.05)}
-.course-card:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(31,57,82,.09)}
-.course-card h2{margin:0 0 10px;font-size:1.28rem}
-.course-card p{margin:0 0 12px;color:#526778}
-.course-card .tag{display:inline-block;margin-right:7px;margin-top:6px;padding:4px 9px;border-radius:999px;background:#eef5fb;color:#315f91;font-size:.82rem}
-.pending{border-style:dashed;background:#fafafa}
-@media(max-width:760px){.course-grid{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px;margin:auto">
-<main class="article">
-<header class="hero">
-<div class="eyebrow">MODERN DIGITAL SIGNAL PROCESSING · COURSE NOTES</div>
-<h1>现代数字信号处理</h1>
-<p class="lead">把随机信号统计、时间序列建模与最优线性估计连成一条主线。当前根目录资料已整理为第一章和第二章，两章均保留来源追溯并通过桌面/手机公式与图表 QA。</p>
-<div class="meta"><span class="chip">多源课程资料</span><span class="chip">专业公式</span><span class="chip">知识结构重构</span><span class="chip">响应式 HTML</span></div>
-</header>
-
-<h2>当前可阅读章节</h2>
-<div class="course-grid">
-<a class="course-card" href="现代数字信号处理_第一章_时域离散随机信号的分析.html">
-<h2>第一章　时域离散随机信号的分析</h2>
-<p>从随机变量、WSS、遍历性与 Wiener–Khinchin，一路到有限样本估计、随机序列通过 LTI 系统以及 AR/MA/ARMA 时间序列模型。</p>
-<span class="tag">128 页 PPT</span><span class="tag">180 个 MathJax 容器</span><span class="tag">6 张教学图</span>
-</a>
-<a class="course-card" href="现代数字信号处理_第二章_维纳滤波与线性预测.html">
-<h2>第二章　维纳滤波与线性预测</h2>
-<p>从 MMSE 与正交性原理出发，串起 Wiener–Hopf、FIR 时域解、频域谱比值、白化/谱因子化、因果 Wiener 与线性预测。</p>
-<span class="tag">106 页课件</span><span class="tag">108 个 MathJax 容器</span><span class="tag">6 张教学图</span>
-</a>
-</div>
-
-<h2>资料覆盖状态</h2>
-<table>
-<thead><tr><th>资料</th><th>当前用途</th><th>状态</th></tr></thead>
-<tbody>
-<tr><td><code>Chapter 1(2).pptx</code></td><td>第一章主线；含 128 张幻灯片与授课备注</td><td>已整理</td></tr>
-<tr><td><code>时域离散随机信号处理.pdf</code></td><td>260 页扫描型教材；按需做公式/图形核验</td><td>保留为核验源</td></tr>
-<tr><td><code>维纳滤波(1).pdf</code></td><td>第二章主线：Wiener 时域、z 域、白化与预测</td><td>已整理</td></tr>
-</tbody>
-</table>
-
-<blockquote class="callout"><p><strong>卡尔曼滤波资料缺口：</strong>《维纳滤波(1).pdf》的目录列出了 2.5 卡尔曼滤波，但当前 106 页文件在维纳预测与作业后即结束，没有完整 2.5 正文。因此这里不补造卡尔曼推导；后续把真实卡尔曼课件或教材放进项目后，再沿本课程结构继续。</p></blockquote>
-
-<section class="source-panel"><strong>制作规则</strong><br>课程笔记按知识依赖重构，而不是逐页抄录；PPT 幻灯片号和 PDF 页码保留在工作区的 trace map 中。最终公式统一按项目 <code>config/formula.toml</code> 规范渲染，图占位符失败会直接阻断构建，最终 HTML 还需经过真实 Chrome 桌面端与 390 px 手机端 QA。</section>
-<div class="footer">学习笔记项目 · 现代数字信号处理 · 2026-09-25</div>
-</main></div>
-</body></html>
+pre{overflow:auto;padding:16px;background:#f3f7fa;border-radius:10px}pre code{border:0;padding:0;background:none}code{overflow-wrap:anywhere}a{color:#1f6fb2}.table-wrap{overflow-x:auto}.math-display{overflow-x:auto;overflow-y:hidden;margin:24px 0;text-align:center}.math-inline{display:inline-block;vertical-align:middle;max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container{display:inline-block;max-width:none}mjx-container[display="true"]{display:block;overflow:visible;margin:0!important}.diagram svg{font-family:"Microsoft YaHei",sans-serif}.diagram text{dominant-baseline:auto}.course-nav{margin:0 0 22px;font-size:14px}.source-ref{font-size:13px;color:#627385}@media(max-width:600px){.article{padding:28px 15px}.math-display{font-size:88%}table{font-size:13px}th,td{padding:8px}.diagram{padding:6px}}.cards{display:grid;gap:18px;margin:25px 0}.card{display:block;padding:23px;border:1px solid var(--line);border-radius:14px;background:#fbfdff;text-decoration:none}.card h2{margin:0 0 8px;font-size:22px}.card p{margin:0;color:#53697c}.tag{font-size:13px;color:#315f91}</style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="article"><header class="hero"><div class="eyebrow">学习笔记 · 2026-10-19更新</div><h1>现代数字信号处理</h1><p class="lead">随机信号 → Wiener/预测 → Kalman → LMS</p></header><p><a class="hub-link" href="../index.html">所有课程</a></p><div class="cards"><a class="card" href="现代数字信号处理_第一章_时域离散随机信号的分析.html"><h2>第一章：时域离散随机信号的分析</h2><p>统计量、相关、谱估计及模型</p></a><a class="card" href="现代数字信号处理_第二章_维纳滤波与线性预测.html"><h2>第二章：维纳滤波与线性预测</h2><p>正交性、Wiener–Hopf与预测</p></a><a class="card" href="现代数字信号处理_第二章_卡尔曼滤波.html"><h2>2.5 卡尔曼滤波</h2><p>状态模型、递推、协方差与稳态</p></a><a class="card" href="现代数字信号处理_第三章_LMS自适应滤波.html"><h2>3.1–3.2 LMS自适应滤波</h2><p>性能曲面、最陡下降、梯度噪声与失调</p></a></div><p class="source-ref">依据已收到材料持续更新。新笔记公式已预渲染为SVG；旧笔记保留原有路径和内容。原始课件未上传到本次发布。</p></main></div></body></html>
