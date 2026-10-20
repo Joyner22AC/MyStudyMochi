@@ -46,7 +46,40 @@ body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 @media(max-width:980px){.note-navigation-controls{left:12px}.note-navigation-ready .layout{padding-top:62px}}
 @media(max-width:600px){.note-navigation-controls{top:8px;left:10px}.note-navigation-ready .layout{padding-top:58px}.note-navigation-ready .layout{padding-left:8px;padding-right:8px}.note-navigation-ready .sidebar{display:none}.note-navigation-ready.note-toc-drawer-open{overflow:hidden}.note-toc-drawer-open::before{content:"";position:fixed;z-index:80;inset:0;background:rgba(19,43,62,.38)}.note-navigation-ready.note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:85;inset:54px 10px 10px;width:auto;height:auto;max-height:none;overflow:auto;box-shadow:0 14px 40px rgba(17,43,65,.25)}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
-</style></head><body><div id="note-navigation-controls" class="note-navigation-controls"><button id="note-toc-toggle" type="button" aria-controls="note-sidebar" aria-expanded="true">收起目录</button><a id="note-course-home" href="../index.html" aria-label="返回课程选择主页">⌂ 课程首页</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理 · 第二章</div><nav class="toc"><a class="toc-main" href="#0-从-滤波-重新理解成-估计">0. 从“滤波”重新理解成“估计”</a>
+</style><style id="modern-dsp-learning-sidebar-styles">
+.study-guide{margin:18px 0 4px;border-top:1px solid #e1eaf1;padding-top:14px;font-size:12px;line-height:1.55;color:#425a6d}
+.study-guide-title{margin:0 6px 8px;color:#244d6c;font-size:13px}
+.study-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0 0 9px}
+.study-tabs button{border:1px solid #d7e3ed;border-radius:7px;padding:6px 2px;background:#f7fafc;color:#547086;font:inherit;cursor:pointer}
+.study-tabs button[aria-selected="true"]{background:#e8f2fa;border-color:#9fc0d9;color:#174e7e;font-weight:700}
+.study-tabs button:focus-visible,.study-guide a:focus-visible,.study-exercises summary:focus-visible{outline:2px solid #397eae;outline-offset:2px}
+.study-panel[hidden]{display:none!important}
+.study-flow{display:grid;gap:6px;margin:0;padding:0;list-style:none;counter-reset:route}
+.study-flow li{position:relative;padding:7px 8px 7px 29px;border:1px solid #e1eaf1;border-radius:8px;background:#fbfdff}
+.study-flow li:before{counter-increment:route;content:counter(route);position:absolute;left:8px;top:7px;width:15px;height:15px;border-radius:50%;background:#e8f2fa;color:#245a83;text-align:center;font-size:10px;font-weight:700;line-height:15px}
+.study-flow a,.study-guide a{color:#23669a;text-decoration:none}.study-flow a:hover,.study-guide a:hover{text-decoration:underline}
+.study-bridge{margin:9px 2px;padding:8px 9px;border-left:3px solid #e3a05a;background:#fff8f0;border-radius:0 7px 7px 0;color:#6c563f}
+.study-principle{margin:8px 2px;padding:8px 9px;border-left:3px solid #4384b1;background:#f2f8fc;border-radius:0 7px 7px 0}
+.study-exercises{display:grid;gap:5px}
+.study-exercises details{border:1px solid #dfe8ef;border-radius:8px;background:#fff;overflow:hidden}
+.study-exercises summary{padding:7px 8px;cursor:pointer;color:#315a79;font-weight:650;list-style:none}
+.study-exercises summary::-webkit-details-marker{display:none}.study-exercises summary:after{content:'＋';float:right;color:#7391a8}.study-exercises details[open]>summary:after{content:'−'}
+.study-exercise-body{padding:0 9px 9px;border-top:1px solid #edf1f5;color:#4c6071}
+.study-exercise-body p{margin:7px 0}.study-exercise-body strong{color:#244d6c}.study-source{color:#718293;font-size:11px}.study-warning{color:#8a4f25;background:#fff6ed;border-radius:6px;padding:6px 7px}
+.study-badge{display:inline-block;margin:3px 3px 0 0;padding:2px 6px;border-radius:999px;background:#edf4fa;color:#456b89;font-size:10px}
+@media(max-width:980px){.study-guide{max-height:300px;overflow:auto;overscroll-behavior:contain}}
+@media(max-width:600px){.note-navigation-ready .sidebar{max-height:none!important}.study-guide{max-height:none}}
+</style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" id="note-toc-toggle" type="button">收起目录</button><a aria-label="返回课程选择主页" href="../index.html" id="note-course-home">⌂ 课程首页</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理 · 第二章</div><section class="study-guide" id="modern-dsp-learning-sidebar"><h3 class="study-guide-title">学习导航</h3><div aria-label="本章学习导航" class="study-tabs" role="tablist"><button aria-selected="true" data-study-tab="route" role="tab" type="button">知识主线</button><button aria-selected="false" data-study-tab="exercises" role="tab" type="button">课后习题</button><button aria-selected="false" data-study-tab="toc" role="tab" type="button">章节目录</button></div><div class="study-panel" data-study-panel="route" role="tabpanel">
+<h4 class="study-guide-title">第二章：同一个估计问题的两种做法</h4>
+<ol class="study-flow">
+<li><a href="#0-从-滤波-重新理解成-估计">先定义目标与观测</a>：想估计什么、手里有哪些数据？</li>
+<li><a href="#2-正交性原理-最优估计的几何本质">固定统计规律时</a>，令误差与可用数据正交，得到 Wiener–Hopf 方程。</li>
+<li><a href="#6-谱因子化与白化-因果-wiener-的关键桥梁">若只能用过去数据</a>，再加因果约束，需谱因子化/白化。</li>
+<li><a href="#8-一步线性预测-wiener-ar-和-yule-walker-在这里汇合">预测是估计的特例</a>：把“未来样本”当目标、把过去样本当观测，AR/Yule–Walker 会合进来。</li>
+<li><a href="现代数字信号处理_第二章_卡尔曼滤波.html">统计量未知、数据逐帧到达时</a>，Kalman 用状态模型递推保存估计和误差协方差。</li>
+</ol>
+<p class="study-principle"><strong>记住问题，不背孤立公式：</strong>Wiener 解“已知统计规律下最优权值”；Kalman 解“状态随时间演化、观测逐步到达时怎样递推”。线性最小均方、误差正交，是两者的共同底层。</p>
+</div><div class="study-panel" data-study-panel="exercises" hidden="" role="tabpanel"><h4 class="study-guide-title">第二章习题：Wiener 与预测</h4><div class="study-exercises"><details><summary>2｜Yule–Walker 为什么比一般 Wiener 方程更好用？</summary><div class="study-exercise-body"><p class="study-source">书 p.60 · PDF 第69页</p><p><strong>用到：</strong>对应 Wiener 8、第一章 10.6：平稳 AR 预测中，自相关矩阵是 Toeplitz 结构。</p><p><strong>怎么下手：</strong>两者都来自误差正交条件。Yule–Walker 把平稳性与 AR 结构显式利用起来，方程只含自相关，适合估计 AR 系数、递推求解；一般 Wiener 方程适用范围更广，但不自动利用这种结构。</p><p><strong>检查点：</strong>它不是“更正确”，而是模型更专门、结构利用更多。</p></div></details><details><summary>3｜连续时间因果 Wiener 滤波器</summary><div class="study-exercise-body"><p class="study-source">书 p.60 · PDF 第69页</p><p><strong>用到：</strong>对应 Wiener 5–6：先写目标/观测互谱，谱分解后取因果部分。</p><p><strong>怎么下手：</strong>把给定的 r_ss、r_vv、r_sv 变成 S_ss、S_vv、S_sv；形成观测谱 S_xx 与目标—观测互谱 S_sx；对 S_xx 做最小相位谱因子分解，代入因果 Wiener 公式并取正时间部分。</p><p><strong>检查点：</strong>指数相关的双边谱要保留绝对值和双边因子；没有把题面函数先定义清楚就直接套频域比值，会得到非因果解。</p></div></details><details><summary>4｜离散因果 Wiener：从独立信号与噪声求滤波器</summary><div class="study-exercise-body"><p class="study-source">书 p.60 · PDF 第69页</p><p><strong>用到：</strong>对应 Wiener 6：先由 x=s+v 和互不相关条件求观测统计量，再解因果估计；也可用等价稳态Kalman方程核验。</p><p><strong>怎么下手：</strong>题给 Sₛₛ=0.92/[(1−0.4z⁻¹)(1−0.4z)]，x=s+v，Sₛᵥ=0、Sᵥᵥ=1。把 s 看成状态：s(n+1)=0.4s(n)+w(n)，Q=0.92，观测噪声方差 R=1。稳态预测误差方差 P⁻ 满足 P⁻=0.16P⁻/(P⁻+1)+0.92，解得 P⁻=1，K=P⁻/(P⁻+R)=0.5。于是从 x 到当前估计 ŝ 的因果滤波器 H(z)=K/[1−0.4(1−K)z⁻¹]=0.5/(1−0.2z⁻¹)。</p><p><strong>检查点：</strong>可将 H 展开为 h[k]=0.5·0.2ᵏ(k≥0)，代回 Wiener 正交条件 E[(s(n)−ŝ(n))x(n−m)]=0（m≥0）检查；这里测的是 s，不是检测能量。</p></div></details><details><summary>7｜AR(1) 状态模型下的因果滤波与一步预测</summary><div class="study-exercise-body"><p class="study-source">书 p.60–61 · PDF 第69–70页</p><p><strong>用到：</strong>对应 Wiener 7–8；同一个AR(1)模型可分别问“含噪当前估计”和“无噪一步预测”，两者不可混为一谈。</p><p><strong>怎么下手：</strong>题给 x=s+v，s(n+1)=0.6s(n)+w(n)，w 为白噪声且方差0.82，v 为与 s 不相关的单位方差白噪声。(1)稳态预测误差方差 P⁻ 满足 P⁻=0.36P⁻/(P⁻+1)+0.82，解得 P⁻=1、K=0.5；故从含噪 x 到当前 ŝ 的因果Wiener滤波器 H(z)=0.5/(1−0.3z⁻¹)。(2)题目令 v=0 后，x=s；用 n−1 时刻样本预测 s(n)，ŝ(n|n−1)=0.6x(n−1)，故一步预测器为 0.6z⁻¹。</p><p><strong>检查点：</strong>滤波器使用当前及过去含噪观测；一步预测只用过去样本。题目确认噪声记号为 v，已按此统一。</p></div></details><details><summary>8｜用过去 p 个样本做 Wiener 纯预测</summary><div class="study-exercise-body"><p class="study-source">书 p.61 · PDF 第70页</p><p><strong>用到：</strong>对应 Wiener 7–8：期望信号是 x(n)，输入向量是 [x(n−1),…,x(n−p)]ᵀ。</p><p><strong>怎么下手：</strong>构造 R_ij=r_xx(i−j)，p_i=r_xx(i)，解 Rw=p；预测为 x̂(n)=wᵀ[x(n−1),…,x(n−p)]ᵀ，误差为 x(n)−x̂(n)。若已知 AR(p)，也可直接用 AR 递推系数。</p><p><strong>检查点：</strong>索引方向要一致；矩阵里的延迟样本不能包含正在预测的 x(n)。</p></div></details></div></div><div class="study-panel" data-study-panel="toc" hidden="" role="tabpanel"><nav class="toc"><a class="toc-main" href="#0-从-滤波-重新理解成-估计">0. 从“滤波”重新理解成“估计”</a>
 <a class="toc-main" href="#1-fir-维纳滤波-先把问题写成向量形式">1. FIR 维纳滤波：先把问题写成向量形式</a>
 <a class="toc-sub" href="#1-1-数据向量和权向量">1.1 数据向量和权向量</a>
 <a class="toc-sub" href="#1-2-mse-展开">1.2 MSE 展开</a>
@@ -77,7 +110,7 @@ body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 <a class="toc-sub" href="#9-1-实验里最容易踩的坑">9.1 实验里最容易踩的坑</a>
 <a class="toc-main" href="#10-wiener-与-kalman-当前资料能说到哪里">10. Wiener 与 Kalman：当前资料能说到哪里</a>
 <a class="toc-main" href="#11-第二章总复盘-真正要记住的是一条主线">11. 第二章总复盘：真正要记住的是一条主线</a>
-<a class="toc-main" href="#来源说明">来源说明</a></nav></aside><main class="article"><header class="hero"><div class="eyebrow">Modern Digital Signal Processing · Chapter 02</div><h1>维纳滤波与线性预测</h1><p class="lead">从 MMSE 与正交投影出发，串起 Wiener–Hopf、FIR 时域解、非因果谱比值、谱因子化与白化、因果 Wiener，以及线性预测与 Yule–Walker。</p><div class="meta"><span class="chip">106 页维纳课件</span><span class="chip">MMSE · 正交性</span><span class="chip">6 张教学示意图</span><span class="chip">Wiener · Prediction</span></div></header><blockquote class="callout">
+<a class="toc-main" href="#来源说明">来源说明</a></nav></div></section></aside><main class="article"><header class="hero"><div class="eyebrow">Modern Digital Signal Processing · Chapter 02</div><h1>维纳滤波与线性预测</h1><p class="lead">从 MMSE 与正交投影出发，串起 Wiener–Hopf、FIR 时域解、非因果谱比值、谱因子化与白化、因果 Wiener，以及线性预测与 Yule–Walker。</p><div class="meta"><span class="chip">106 页维纳课件</span><span class="chip">MMSE · 正交性</span><span class="chip">6 张教学示意图</span><span class="chip">Wiener · Prediction</span></div></header><blockquote class="callout">
 <p>第一章解决的是“怎样描述随机信号”；第二章开始解决“怎样利用这些统计规律做最优估计”。维纳滤波的核心并不是某一条逆矩阵公式，而是一个贯穿后续 Kalman、自适应滤波与线性预测的思想：<strong>在所有允许的线性估计器中，选择均方误差最小的那个。</strong></p>
 </blockquote>
 <h2 id="0-从-滤波-重新理解成-估计">0. 从“滤波”重新理解成“估计”</h2>
@@ -1024,4 +1057,11 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
     announce(smallScreen() ? false : desktopOpen());
   }, {passive:true});
 })();
-</script></body></html>
+</script><script id="modern-dsp-learning-sidebar-script">(()=>{
+ const root=document.getElementById('modern-dsp-learning-sidebar');if(!root)return;
+ const tabs=[...root.querySelectorAll('[data-study-tab]')],panels=[...root.querySelectorAll('[data-study-panel]')];
+ function activate(name){for(const tab of tabs){const on=tab.dataset.studyTab===name;tab.setAttribute('aria-selected',String(on));tab.tabIndex=on?0:-1;}for(const panel of panels)panel.hidden=panel.dataset.studyPanel!==name;try{localStorage.setItem('modern-dsp-study-tab',name)}catch(_){}}
+ let initial='route';try{const saved=localStorage.getItem('modern-dsp-study-tab');if(['route','exercises','toc'].includes(saved))initial=saved}catch(_){}
+ for(const tab of tabs){tab.addEventListener('click',()=>activate(tab.dataset.studyTab));tab.addEventListener('keydown',event=>{if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();const i=tabs.indexOf(tab),n=(i+(event.key==='ArrowRight'?1:tabs.length-1))%tabs.length;tabs[n].focus();activate(tabs[n].dataset.studyTab)}})}
+ activate(initial);
+})();</script></body></html>

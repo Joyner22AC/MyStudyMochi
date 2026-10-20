@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>现代数字信号处理｜2.5 卡尔曼滤波：状态与递推估计</title><style>:root{--ink:#20303d;--muted:#627385;--line:#dce5ed;--paper:#fff;--soft:#f6f9fc;--blue:#1f6fb2;--blue2:#315f91;--orange:#c96d25;--shadow:0 12px 34px rgba(41,63,82,.08);}
 *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:#f3f6f9;color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;line-height:1.82;font-size:16px}
 #progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;z-index:50}
@@ -45,7 +46,40 @@ body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 @media(max-width:980px){.note-navigation-controls{left:12px}.note-navigation-ready .layout{padding-top:62px}}
 @media(max-width:600px){.note-navigation-controls{top:8px;left:10px}.note-navigation-ready .layout{padding-top:58px}.note-navigation-ready .layout{padding-left:8px;padding-right:8px}.note-navigation-ready .sidebar{display:none}.note-navigation-ready.note-toc-drawer-open{overflow:hidden}.note-toc-drawer-open::before{content:"";position:fixed;z-index:80;inset:0;background:rgba(19,43,62,.38)}.note-navigation-ready.note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:85;inset:54px 10px 10px;width:auto;height:auto;max-height:none;overflow:auto;box-shadow:0 14px 40px rgba(17,43,65,.25)}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
-</style></head><body><div id="note-navigation-controls" class="note-navigation-controls"><button id="note-toc-toggle" type="button" aria-controls="note-sidebar" aria-expanded="true">收起目录</button><a id="note-course-home" href="../index.html" aria-label="返回课程选择主页">⌂ 课程首页</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar" id="note-sidebar"><div class="brand">现代数字信号处理</div><nav class="toc"><a class="toc-main" href="#1-估计对象与观测对象先分清">1. 估计对象与观测对象先分清</a><a class="toc-main" href="#2-每一帧保存两样东西">2. 每一帧保存两样东西</a><a class="toc-main" href="#3-创新告诉我们观测带来了多少新信息">3. 创新告诉我们观测带来了多少新信息</a><a class="toc-main" href="#4-kalman-增益为什么长这样">4. Kalman 增益为什么长这样</a><a class="toc-sub" href="#标量增益最直观">标量增益最直观</a><a class="toc-main" href="#5-两个可以完整算出的例子">5. 两个可以完整算出的例子</a><a class="toc-sub" href="#常量被重复带噪测量">常量被重复带噪测量</a><a class="toc-sub" href="#ar-1-信号与稳态滤波">AR(1) 信号与稳态滤波</a><a class="toc-main" href="#6-跟踪问题的状态怎么搭">6. 跟踪问题的状态怎么搭</a><a class="toc-main" href="#7-由相关函数或差分方程构造模型">7. 由相关函数或差分方程构造模型</a><a class="toc-main" href="#8-使用边界与排错顺序">8. 使用边界与排错顺序</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代数字信号处理 · 2026-10-19</div><h1>2.5 卡尔曼滤波：状态与递推估计</h1><p class="lead">先建状态与量测模型，再推导预测、创新、增益、误差协方差及稳态例题。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
+</style><style id="modern-dsp-learning-sidebar-styles">
+.study-guide{margin:18px 0 4px;border-top:1px solid #e1eaf1;padding-top:14px;font-size:12px;line-height:1.55;color:#425a6d}
+.study-guide-title{margin:0 6px 8px;color:#244d6c;font-size:13px}
+.study-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0 0 9px}
+.study-tabs button{border:1px solid #d7e3ed;border-radius:7px;padding:6px 2px;background:#f7fafc;color:#547086;font:inherit;cursor:pointer}
+.study-tabs button[aria-selected="true"]{background:#e8f2fa;border-color:#9fc0d9;color:#174e7e;font-weight:700}
+.study-tabs button:focus-visible,.study-guide a:focus-visible,.study-exercises summary:focus-visible{outline:2px solid #397eae;outline-offset:2px}
+.study-panel[hidden]{display:none!important}
+.study-flow{display:grid;gap:6px;margin:0;padding:0;list-style:none;counter-reset:route}
+.study-flow li{position:relative;padding:7px 8px 7px 29px;border:1px solid #e1eaf1;border-radius:8px;background:#fbfdff}
+.study-flow li:before{counter-increment:route;content:counter(route);position:absolute;left:8px;top:7px;width:15px;height:15px;border-radius:50%;background:#e8f2fa;color:#245a83;text-align:center;font-size:10px;font-weight:700;line-height:15px}
+.study-flow a,.study-guide a{color:#23669a;text-decoration:none}.study-flow a:hover,.study-guide a:hover{text-decoration:underline}
+.study-bridge{margin:9px 2px;padding:8px 9px;border-left:3px solid #e3a05a;background:#fff8f0;border-radius:0 7px 7px 0;color:#6c563f}
+.study-principle{margin:8px 2px;padding:8px 9px;border-left:3px solid #4384b1;background:#f2f8fc;border-radius:0 7px 7px 0}
+.study-exercises{display:grid;gap:5px}
+.study-exercises details{border:1px solid #dfe8ef;border-radius:8px;background:#fff;overflow:hidden}
+.study-exercises summary{padding:7px 8px;cursor:pointer;color:#315a79;font-weight:650;list-style:none}
+.study-exercises summary::-webkit-details-marker{display:none}.study-exercises summary:after{content:'＋';float:right;color:#7391a8}.study-exercises details[open]>summary:after{content:'−'}
+.study-exercise-body{padding:0 9px 9px;border-top:1px solid #edf1f5;color:#4c6071}
+.study-exercise-body p{margin:7px 0}.study-exercise-body strong{color:#244d6c}.study-source{color:#718293;font-size:11px}.study-warning{color:#8a4f25;background:#fff6ed;border-radius:6px;padding:6px 7px}
+.study-badge{display:inline-block;margin:3px 3px 0 0;padding:2px 6px;border-radius:999px;background:#edf4fa;color:#456b89;font-size:10px}
+@media(max-width:980px){.study-guide{max-height:300px;overflow:auto;overscroll-behavior:contain}}
+@media(max-width:600px){.note-navigation-ready .sidebar{max-height:none!important}.study-guide{max-height:none}}
+</style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" id="note-toc-toggle" type="button">收起目录</button><a aria-label="返回课程选择主页" href="../index.html" id="note-course-home">⌂ 课程首页</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理</div><section class="study-guide" id="modern-dsp-learning-sidebar"><h3 class="study-guide-title">学习导航</h3><div aria-label="本章学习导航" class="study-tabs" role="tablist"><button aria-selected="true" data-study-tab="route" role="tab" type="button">知识主线</button><button aria-selected="false" data-study-tab="exercises" role="tab" type="button">课后习题</button><button aria-selected="false" data-study-tab="toc" role="tab" type="button">章节目录</button></div><div class="study-panel" data-study-panel="route" role="tabpanel">
+<h4 class="study-guide-title">卡尔曼不是另一条孤立公式</h4>
+<ol class="study-flow">
+<li><a href="#1-估计对象与观测对象先分清">先写状态模型</a>：状态怎样从上一时刻走到下一时刻？</li>
+<li><a href="#2-每一帧保存两样东西">预测一步</a>：保存状态估计和误差协方差。</li>
+<li><a href="#3-创新告诉我们观测带来了多少新信息">算创新</a>：实际观测减去预测观测，量出新信息。</li>
+<li><a href="#4-kalman-增益为什么长这样">按不确定度加权修正</a>：观测越吵，越信模型；模型越不准，越信观测。</li>
+<li><a href="#8-使用边界与排错顺序">检查模型和可观测性</a>：不合理的噪声/状态模型会让滤波失效，不是调一个增益就能修好。</li>
+</ol>
+<p class="study-bridge"><strong>与 Wiener 的桥：</strong>Kalman 每步仍在做线性最小均方估计；它额外利用“状态转移模型”把历史信息压缩到当前估计与协方差里。</p>
+</div><div class="study-panel" data-study-panel="exercises" hidden="" role="tabpanel"><h4 class="study-guide-title">第二章习题：Kalman 与状态空间</h4><div class="study-exercises"><details><summary>1｜比较 Wiener 与 Kalman</summary><div class="study-exercise-body"><p class="study-source">书 p.60 · PDF 第69页</p><p><strong>用到：</strong>对应本页第1–8节与 Wiener 笔记第10节。</p><p><strong>怎么下手：</strong>共同点：线性最小均方估计，最优条件最终都可写成误差正交。差别：Wiener 通常一次求固定滤波器，要求统计量已知；Kalman 用状态空间模型逐时刻预测—更新，显式传播误差协方差。线性高斯时 Kalman 还给出条件均值意义下的最优估计。</p><p><strong>检查点：</strong>不是“一个频域、一个时域”这么简单；核心区别是静态批量解 vs. 状态递推，以及两者依赖的信息组织方式。</p></div></details><details><summary>5｜把差分方程改写成状态方程</summary><div class="study-exercise-body"><p class="study-source">书 p.60 · PDF 第69页</p><p><strong>用到：</strong>对应第6–7节：把延迟变量放进状态向量，让状态只依赖前一拍。</p><p><strong>怎么下手：</strong>两组题都先令状态含有输出/输入的必要历史量，写 xₛ(n+1)=Axₛ(n)+Bu(n)，再按原差分式整理 y(n)=Cxₛ(n)+Du(n)。代回去核验传递关系；不同状态选取可以得到不同 A,B,C,D，但系统输入输出必须相同。</p><p><strong>检查点：</strong>教材第(1)式四阶系数较多，别凭背诵硬套伴随矩阵；按状态定义逐行移位、最后一行由差分方程给出。</p></div></details><details><summary>6｜由状态方程求系统函数和差分方程</summary><div class="study-exercise-body"><p class="study-source">书 p.60 · PDF 第69页</p><p><strong>用到：</strong>对应第7节：状态空间到传递函数的标准映射。</p><p><strong>怎么下手：</strong>对 x(n+1)=Ax(n)+Bu(n)、y(n)=Cx(n)+Du(n)，H(z)=C(zI−A)⁻¹B+D。按扫描读到 A=[[2,1/2],[0,1]]、B=[4,4]ᵀ、C=[1,0]、D=1，得 H(z)=z(z+1)/[(z−1)(z−2)]=(1+z⁻¹)/(1−3z⁻¹+2z⁻²)，故 y(n)−3y(n−1)+2y(n−2)=x(n)+x(n−1)。</p><p><strong>检查点：</strong>一定保留 D=1 的直通项；结果可代回分子/分母复核。</p></div></details><details><summary>7｜AR(1) 隐状态的估计与预测</summary><div class="study-exercise-body"><p class="study-source">书 p.60–61 · PDF 第69–70页</p><p><strong>用到：</strong>本题的滤波部分接 Wiener；状态递推部分对应本笔记的预测、创新、增益和协方差。</p><p><strong>怎么下手：</strong>统一采用题面 x(n)=s(n)+v(n)、F=0.6、H=1、Q=0.82、R=1。稳态预测误差方差 P⁻=1，K=0.5；状态估计为 ŝ(n|n)=0.5x(n)+0.3ŝ(n−1|n−1)，对应传函 0.5/(1−0.3z⁻¹)。若题目(2)令 v=0，则 x=s，过去样本的一步预测为 ŝ(n|n−1)=0.6x(n−1)，即 0.6z⁻¹。</p><p><strong>检查点：</strong>题目确认噪声记号为 v；注意含噪观测滤波和无噪一步预测是两问、两个不同传函。</p></div></details></div></div><div class="study-panel" data-study-panel="toc" hidden="" role="tabpanel"><nav class="toc"><a class="toc-main" href="#1-估计对象与观测对象先分清">1. 估计对象与观测对象先分清</a><a class="toc-main" href="#2-每一帧保存两样东西">2. 每一帧保存两样东西</a><a class="toc-main" href="#3-创新告诉我们观测带来了多少新信息">3. 创新告诉我们观测带来了多少新信息</a><a class="toc-main" href="#4-kalman-增益为什么长这样">4. Kalman 增益为什么长这样</a><a class="toc-sub" href="#标量增益最直观">标量增益最直观</a><a class="toc-main" href="#5-两个可以完整算出的例子">5. 两个可以完整算出的例子</a><a class="toc-sub" href="#常量被重复带噪测量">常量被重复带噪测量</a><a class="toc-sub" href="#ar-1-信号与稳态滤波">AR(1) 信号与稳态滤波</a><a class="toc-main" href="#6-跟踪问题的状态怎么搭">6. 跟踪问题的状态怎么搭</a><a class="toc-main" href="#7-由相关函数或差分方程构造模型">7. 由相关函数或差分方程构造模型</a><a class="toc-main" href="#8-使用边界与排错顺序">8. 使用边界与排错顺序</a></nav></div></section></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代数字信号处理 · 2026-10-19</div><h1>2.5 卡尔曼滤波：状态与递推估计</h1><p class="lead">先建状态与量测模型，再推导预测、创新、增益、误差协方差及稳态例题。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
 <p>本篇补足此前第二章笔记没有来源支撑的2.5部分。主线为《卡尔曼滤波.pdf》61页。课件把量测矩阵记为C、Kalman增益记为H；本篇统一用H表示量测矩阵、K表示增益，并用−/＋区分先验与后验，避免同一个字母承担两种角色。</p>
 </blockquote>
 <h2 id="1-估计对象与观测对象先分清">1. 估计对象与观测对象先分清</h2>
@@ -413,4 +447,11 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
     announce(smallScreen() ? false : desktopOpen());
   }, {passive:true});
 })();
-</script></body></html>
+</script><script id="modern-dsp-learning-sidebar-script">(()=>{
+ const root=document.getElementById('modern-dsp-learning-sidebar');if(!root)return;
+ const tabs=[...root.querySelectorAll('[data-study-tab]')],panels=[...root.querySelectorAll('[data-study-panel]')];
+ function activate(name){for(const tab of tabs){const on=tab.dataset.studyTab===name;tab.setAttribute('aria-selected',String(on));tab.tabIndex=on?0:-1;}for(const panel of panels)panel.hidden=panel.dataset.studyPanel!==name;try{localStorage.setItem('modern-dsp-study-tab',name)}catch(_){}}
+ let initial='route';try{const saved=localStorage.getItem('modern-dsp-study-tab');if(['route','exercises','toc'].includes(saved))initial=saved}catch(_){}
+ for(const tab of tabs){tab.addEventListener('click',()=>activate(tab.dataset.studyTab));tab.addEventListener('keydown',event=>{if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();const i=tabs.indexOf(tab),n=(i+(event.key==='ArrowRight'?1:tabs.length-1))%tabs.length;tabs[n].focus();activate(tabs[n].dataset.studyTab)}})}
+ activate(initial);
+})();</script></body></html>

@@ -57,11 +57,46 @@ body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 @media(max-width:980px){.note-navigation-controls{left:12px}.note-navigation-ready .layout{padding-top:62px}}
 @media(max-width:600px){.note-navigation-controls{top:8px;left:10px}.note-navigation-ready .layout{padding-top:58px}.note-navigation-ready .layout{padding-left:8px;padding-right:8px}.note-navigation-ready .sidebar{display:none}.note-navigation-ready.note-toc-drawer-open{overflow:hidden}.note-toc-drawer-open::before{content:"";position:fixed;z-index:80;inset:0;background:rgba(19,43,62,.38)}.note-navigation-ready.note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:85;inset:54px 10px 10px;width:auto;height:auto;max-height:none;overflow:auto;box-shadow:0 14px 40px rgba(17,43,65,.25)}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
+</style><style id="modern-dsp-learning-sidebar-styles">
+.study-guide{margin:18px 0 4px;border-top:1px solid #e1eaf1;padding-top:14px;font-size:12px;line-height:1.55;color:#425a6d}
+.study-guide-title{margin:0 6px 8px;color:#244d6c;font-size:13px}
+.study-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0 0 9px}
+.study-tabs button{border:1px solid #d7e3ed;border-radius:7px;padding:6px 2px;background:#f7fafc;color:#547086;font:inherit;cursor:pointer}
+.study-tabs button[aria-selected="true"]{background:#e8f2fa;border-color:#9fc0d9;color:#174e7e;font-weight:700}
+.study-tabs button:focus-visible,.study-guide a:focus-visible,.study-exercises summary:focus-visible{outline:2px solid #397eae;outline-offset:2px}
+.study-panel[hidden]{display:none!important}
+.study-flow{display:grid;gap:6px;margin:0;padding:0;list-style:none;counter-reset:route}
+.study-flow li{position:relative;padding:7px 8px 7px 29px;border:1px solid #e1eaf1;border-radius:8px;background:#fbfdff}
+.study-flow li:before{counter-increment:route;content:counter(route);position:absolute;left:8px;top:7px;width:15px;height:15px;border-radius:50%;background:#e8f2fa;color:#245a83;text-align:center;font-size:10px;font-weight:700;line-height:15px}
+.study-flow a,.study-guide a{color:#23669a;text-decoration:none}.study-flow a:hover,.study-guide a:hover{text-decoration:underline}
+.study-bridge{margin:9px 2px;padding:8px 9px;border-left:3px solid #e3a05a;background:#fff8f0;border-radius:0 7px 7px 0;color:#6c563f}
+.study-principle{margin:8px 2px;padding:8px 9px;border-left:3px solid #4384b1;background:#f2f8fc;border-radius:0 7px 7px 0}
+.study-exercises{display:grid;gap:5px}
+.study-exercises details{border:1px solid #dfe8ef;border-radius:8px;background:#fff;overflow:hidden}
+.study-exercises summary{padding:7px 8px;cursor:pointer;color:#315a79;font-weight:650;list-style:none}
+.study-exercises summary::-webkit-details-marker{display:none}.study-exercises summary:after{content:'＋';float:right;color:#7391a8}.study-exercises details[open]>summary:after{content:'−'}
+.study-exercise-body{padding:0 9px 9px;border-top:1px solid #edf1f5;color:#4c6071}
+.study-exercise-body p{margin:7px 0}.study-exercise-body strong{color:#244d6c}.study-source{color:#718293;font-size:11px}.study-warning{color:#8a4f25;background:#fff6ed;border-radius:6px;padding:6px 7px}
+.study-badge{display:inline-block;margin:3px 3px 0 0;padding:2px 6px;border-radius:999px;background:#edf4fa;color:#456b89;font-size:10px}
+@media(max-width:980px){.study-guide{max-height:300px;overflow:auto;overscroll-behavior:contain}}
+@media(max-width:600px){.note-navigation-ready .sidebar{max-height:none!important}.study-guide{max-height:none}}
 </style></head>
-<body><div id="note-navigation-controls" class="note-navigation-controls"><button id="note-toc-toggle" type="button" aria-controls="note-sidebar" aria-expanded="true">收起目录</button><a id="note-course-home" href="../index.html" aria-label="返回课程选择主页">⌂ 课程首页</a></div>
+<body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" id="note-toc-toggle" type="button">收起目录</button><a aria-label="返回课程选择主页" href="../index.html" id="note-course-home">⌂ 课程首页</a></div>
 <div id="progress"></div>
 <div class="layout">
-<aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理 · 第一章</div><nav class="toc"><a class="toc-main" href="#0-为什么先学随机信号">0. 为什么先学随机信号</a>
+<aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理 · 第一章</div><section class="study-guide" id="modern-dsp-learning-sidebar"><h3 class="study-guide-title">学习导航</h3><div aria-label="本章学习导航" class="study-tabs" role="tablist"><button aria-selected="true" data-study-tab="route" role="tab" type="button">知识主线</button><button aria-selected="false" data-study-tab="exercises" role="tab" type="button">课后习题</button><button aria-selected="false" data-study-tab="toc" role="tab" type="button">章节目录</button></div><div class="study-panel" data-study-panel="route" role="tabpanel">
+<h4 class="study-guide-title">先看懂这一章在做什么</h4>
+<ol class="study-flow">
+<li><a href="#1-随机变量-随机信号的-单点语言">先描述单个时刻</a>：均值、方差告诉我们信号通常多大、波动多强。</li>
+<li><a href="#2-从随机变量到随机过程-再到随机序列">再描述整条序列</a>：随机过程是“每个时刻都有随机变量”，一次实验只看到一条样本记录。</li>
+<li><a href="#3-二阶统计量-后续整门课的共同语言">看时间之间的关系</a>：相关函数衡量隔开若干拍后，信号还保留多少联系。</li>
+<li><a href="#4-平稳性-为什么过去的统计规律可以用于未来">用平稳假设简化</a>：把依赖绝对时刻的统计量，变成只依赖时间差。</li>
+<li><a href="#7-从相关函数到功率谱-wiener-khinchin-定理">换到频率视角</a>：相关描述“隔几拍有关”，功率谱描述“能量分布在哪些频率”。</li>
+<li><a href="#9-平稳随机序列通过-lti-系统">经过系统并做估计</a>：相关/谱可预测滤波器输出；<a href="#10-时间序列模型-把统计规律变成-生成系统">AR/MA模型</a>则把统计规律变成生成信号的系统。</li>
+</ol>
+<p class="study-bridge"><strong>贯穿全章的一句话：</strong>从“一个样本有多大”→“不同时间样本如何相关”→“相关如何变成频谱”→“系统怎样改变它”→“怎样由统计量估计或建模”。</p>
+<p class="study-principle"><strong>公式别死背：</strong>先问它输入什么、输出什么、依赖什么假设。均值/方差是单点统计；自相关多一个延迟量；WSS让统计量只看延迟；PSD是自相关的频域表示。</p>
+</div><div class="study-panel" data-study-panel="exercises" hidden="" role="tabpanel"><h4 class="study-guide-title">第一章：从统计量到模型</h4><div class="study-exercises"><details><summary>1｜白噪声过一阶系统，求输出方差</summary><div class="study-exercise-body"><p class="study-source">书 p.27 · PDF 第36页</p><p><strong>用到：</strong>对应 9.3–9.4：白噪声的平坦谱经系统后乘 |H|²。方差就是输出 PSD 的总面积。</p><p><strong>怎么下手：</strong>一般式 σᵧ²=σₓ²∑|h[n]|²。H(z)=1/(1−az⁻¹) 的冲激响应是 aⁿu[n]，故 σᵧ²/σₓ²=∑a²ⁿ=1/(1−a²)。</p><p><strong>检查点：</strong>不要把幅频响应的峰值当方差；要对整个频带功率积分/对冲激响应平方求和。</p></div></details><details><summary>2｜证明 LTI 系统输入/输出互谱关系</summary><div class="study-exercise-body"><p class="study-source">书 p.27 · PDF 第36页</p><p><strong>用到：</strong>对应 3.3、7.2、9.3：时域卷积在频域变乘法；互谱对不同端的滤波分别乘 H 或其共轭反向项。</p><p><strong>怎么下手：</strong>先写 y₁=h₁*x₁、y₂=h₂*x₂，再把互相关定义代入求和；对第二个变量滤波会出现 H₂(Z)，对第一个变量滤波会出现 H₁*(1/Z*)。四条式子用这一条规则逐条替换即可。</p><p><strong>检查点：</strong>先固定教材 P_xy 的定义方向，再放共轭；交换 x、y 次序时不能漏掉共轭/反向项。</p></div></details><details><summary>3｜有偏样本自相关估计的一致性</summary><div class="study-exercise-body"><p class="study-source">书 p.27 · PDF 第36页</p><p><strong>用到：</strong>对应 5.2–5.3 与 8.1、8.4：有限记录的时间平均要逼近总体相关。</p><p><strong>怎么下手：</strong>先算期望：正延迟 m 时 E[r̂(m)]=(N−m)r(m)/N，偏差随 N 增大趋零；再讨论方差是否趋零。第二步需要遍历性/混合性或足够的相关衰减等条件，单凭 WSS 一般不能保证。</p><p><strong>检查点：</strong>题干没有清楚写出一致性所需的遍历/衰减假设；答题应把条件单独注明，不能把“渐近无偏”直接等同“一致”。</p></div></details><details><summary>4｜AR(2) 求 H(z)、自相关和功率谱</summary><div class="study-exercise-body"><p class="study-source">书 p.27 · PDF 第36页</p><p><strong>用到：</strong>对应 10.3、10.6：先把差分方程看成白噪声驱动的生成系统，再用 Yule–Walker 求相关。</p><p><strong>怎么下手：</strong>H(z)=1/(1−0.6z⁻¹+0.08z⁻²)=1/[(1−0.4z⁻¹)(1−0.2z⁻¹)]。r(1)/r(0)=5/9，r(2)/r(0)=19/75，r(0)=1875σᵥ²/1288；对 |m|≥0，r(m)=r(0)[(16/9)0.4^|m|−(7/9)0.2^|m|]。Pₓₓ(z)=σᵥ²/[A(z)A*(1/z*)]。</p><p><strong>检查点：</strong>先检查极点是否在单位圆内；再用 r(0)=φ₁r(1)+φ₂r(2)+σᵥ²，避免漏掉创新方差。</p></div></details><details><summary>5｜按题面检验 AR(3) 与 ARMA(1,1) 的等价性</summary><div class="study-exercise-body"><p class="study-source">书 p.28 · PDF 第37页</p><p><strong>用到：</strong>对应 10.1、10.7：等价模型要有相同功率谱；先检查 AR 模型是否满足平稳因果条件，再判断能否降阶。</p><p><strong>怎么下手：</strong>题面照录：xₙ+0.9xₙ₋₁−0.36xₙ₋₂+0.145xₙ₋₃=ωₙ。令 A(z)=1+0.9z⁻¹−0.36z⁻²+0.145z⁻³；按滞后多项式求根得 z≈−0.785875、1.634317±2.470758j。标准因果AR模型要求 A(z)=0 的根都在单位圆外；这里有一个根在圆内。因此不能直接把它当作稳定因果AR(3)，也不能在未证明谱相等前报出ARMA(1,1)参数。</p><p><strong>检查点：</strong>解题顺序：先按书上系数构造 A(z)，检查根的位置；若题目另有非因果/谱等价约定，再明确该约定并比较完整 PSD，而不是只匹配几个系数。系数按原书保留，不再要求你核对；当前不编造ARMA参数。</p></div></details><details><summary>6｜由有理 PSD 反求信号模型</summary><div class="study-exercise-body"><p class="study-source">书 p.28 · PDF 第37页</p><p><strong>用到：</strong>对应 10.7：把谱写成 σ_ω²|B(z)|²/|A(z)|²。注意题头给的是驱动白噪声 ω 的方差，不是 x 的方差。</p><p><strong>怎么下手：</strong>题给 σ_ω²=1，Pₓₓ(z)=(2.18−0.6(z+z⁻¹))/(1.25−0.5(z+z⁻¹))。分母是 |1−0.5z⁻¹|²，分子是 2|1−0.3z⁻¹|²。把分子常数增益并入系统函数：H(z)=√2(1−0.3z⁻¹)/(1−0.5z⁻¹)，于是 x(n)−0.5x(n−1)=√2ω(n)−0.3√2ω(n−1)，其中 σ_ω²=1。</p><p><strong>检查点：</strong>将 σ_ω²|H(z)|² 重新展开，必须同时还原分子常数2.18和交叉项−0.6；不要把题头的驱动噪声方差误写成信号方差。</p></div></details><details><summary>7｜给定自相关，构造 AR 模型</summary><div class="study-exercise-body"><p class="study-source">书 p.28 · PDF 第37页</p><p><strong>用到：</strong>对应 10.3、10.6、10.7：从相关递推看 AR 阶数，再由谱因子检查创新方差。</p><p><strong>怎么下手：</strong>(1) r(k)=0.5^|k|：AR(1) 为 x(n)−0.5x(n−1)=v(n)，σᵥ²=0.75。(2) r(k)=0.5^|k|+(−0.5)^|k|：AR(2) 为 x(n)−0.25x(n−2)=v(n)，σᵥ²=1.875。</p><p><strong>检查点：</strong>把 k=0 单独代入核验方差；第二问奇数延迟相关为零，不能误判为白噪声。</p></div></details><details><summary>8｜把一阶系统展开成 MA(∞)</summary><div class="study-exercise-body"><p class="study-source">书 p.28 · PDF 第37页</p><p><strong>用到：</strong>对应 10.2：对分母作几何级数展开。</p><p><strong>怎么下手：</strong>H(z)=(1+bz⁻¹)/(1+az⁻¹)=[1+bz⁻¹]∑ₙ₌₀∞(−a)ⁿz⁻ⁿ。于是 d(0)=1，k≥1 时 d(k)=(b−a)(−a)^(k−1)，收敛条件 |a|&lt;1。</p><p><strong>检查点：</strong>前两项先验算：d(1)=b−a，d(2)=−a(b−a)，据此检查符号。</p></div></details><details><summary>9｜从余弦形式 PSD 做谱因子分解</summary><div class="study-exercise-body"><p class="study-source">书 p.28 · PDF 第37页</p><p><strong>用到：</strong>对应 10.7：把 z+z⁻¹ 换成 2cosω，分别配成模平方。</p><p><strong>怎么下手：</strong>Pₓₓ(eʲω)=(1.04+0.4cosω)/(1.25+cosω)=|1+0.2e⁻ʲω|²/|1+0.5e⁻ʲω|²。因此 x(n)+0.5x(n−1)=v(n)+0.2v(n−1)，创新方差为 1。</p><p><strong>检查点：</strong>谱因子可以乘全通因子而不改变功率谱；题目通常要稳定、最小相位的标准代表。</p></div></details></div></div><div class="study-panel" data-study-panel="toc" hidden="" role="tabpanel"><nav class="toc"><a class="toc-main" href="#0-为什么先学随机信号">0. 为什么先学随机信号</a>
 <a class="toc-main" href="#1-随机变量-随机信号的-单点语言">1. 随机变量：随机信号的“单点语言”</a>
 <a class="toc-sub" href="#1-1-分布函数与概率密度">1.1 分布函数与概率密度</a>
 <a class="toc-sub" href="#1-2-均值-均方值与方差">1.2 均值、均方值与方差</a>
@@ -112,7 +147,7 @@ body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 <a class="toc-sub" href="#10-6-ar-的相关方程-yule-walker">10.6 AR 的相关方程：Yule–Walker</a>
 <a class="toc-sub" href="#10-7-从功率谱反推模型-谱分解">10.7 从功率谱反推模型：谱分解</a>
 <a class="toc-main" href="#11-第一章总复盘-把概念放回一张地图">11. 第一章总复盘：把概念放回一张地图</a>
-<a class="toc-main" href="#来源说明">来源说明</a></nav></aside>
+<a class="toc-main" href="#来源说明">来源说明</a></nav></div></section></aside>
 <main class="article">
 <header class="hero">
 <div class="eyebrow">Modern Digital Signal Processing · Chapter 01</div>
@@ -1248,4 +1283,11 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
     announce(smallScreen() ? false : desktopOpen());
   }, {passive:true});
 })();
-</script></body></html>
+</script><script id="modern-dsp-learning-sidebar-script">(()=>{
+ const root=document.getElementById('modern-dsp-learning-sidebar');if(!root)return;
+ const tabs=[...root.querySelectorAll('[data-study-tab]')],panels=[...root.querySelectorAll('[data-study-panel]')];
+ function activate(name){for(const tab of tabs){const on=tab.dataset.studyTab===name;tab.setAttribute('aria-selected',String(on));tab.tabIndex=on?0:-1;}for(const panel of panels)panel.hidden=panel.dataset.studyPanel!==name;try{localStorage.setItem('modern-dsp-study-tab',name)}catch(_){}}
+ let initial='route';try{const saved=localStorage.getItem('modern-dsp-study-tab');if(['route','exercises','toc'].includes(saved))initial=saved}catch(_){}
+ for(const tab of tabs){tab.addEventListener('click',()=>activate(tab.dataset.studyTab));tab.addEventListener('keydown',event=>{if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();const i=tabs.indexOf(tab),n=(i+(event.key==='ArrowRight'?1:tabs.length-1))%tabs.length;tabs[n].focus();activate(tabs[n].dataset.studyTab)}})}
+ activate(initial);
+})();</script></body></html>
