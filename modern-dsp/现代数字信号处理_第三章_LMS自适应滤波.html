@@ -18,7 +18,24 @@ table{width:100%;border-collapse:collapse;margin:20px 0 28px;font-size:14.5px} t
 @media(max-width:980px){.layout{grid-template-columns:1fr;max-width:900px}.sidebar{position:relative;top:0;height:auto;max-height:340px}.article{padding:42px 34px}}
 @media(max-width:600px){body{font-size:15px}.layout{padding:12px 8px 50px}.sidebar{display:none}.article{padding:30px 20px;border-radius:12px}h1{font-size:28px}h2{font-size:22px}.diagram{padding:5px}mjx-container[display="true"]{font-size:.96em;margin:1.1em 0!important}}
 @media print{body{background:white;font-size:10.5pt}#progress,.sidebar{display:none!important}.layout{display:block;max-width:none;padding:0}.article{border:0;box-shadow:none;padding:0}.hero{margin-top:0}h2,h3{break-after:avoid-page}.diagram,table,blockquote,mjx-container[display="true"]{break-inside:avoid}mjx-container[display="true"]{overflow:visible}a{color:inherit;text-decoration:none}}
-pre{overflow:auto;padding:16px;background:#f3f7fa;border-radius:10px}pre code{border:0;padding:0;background:none}code{overflow-wrap:anywhere}a{color:#1f6fb2}.table-wrap{overflow-x:auto}.math-display{overflow-x:auto;overflow-y:hidden;margin:24px 0;text-align:center}.math-inline{display:inline-block;vertical-align:middle;max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container{display:inline-block;max-width:none}mjx-container[display="true"]{display:block;overflow:visible;margin:0!important}.diagram svg{font-family:"Microsoft YaHei",sans-serif}.diagram text{dominant-baseline:auto}.course-nav{margin:0 0 22px;font-size:14px}.source-ref{font-size:13px;color:#627385}@media(max-width:600px){.article{padding:28px 15px}.math-display{font-size:88%}table{font-size:13px}th,td{padding:8px}.diagram{padding:6px}}.figure-scroll{overflow-x:auto;max-width:100%}.figure-scroll>svg{display:block;width:100%;max-width:none}@media(max-width:600px){.figure-scroll>svg{min-width:660px}.figure-scroll:before{content:"图表可横向滑动查看";display:block;font-size:12px;color:#627385;margin-bottom:8px}}</style></head><body><div id="progress"></div><div class="layout"><aside class="sidebar"><div class="brand">现代数字信号处理</div><nav class="toc"><a class="toc-main" href="#1-为什么有-wiener-解还需要自适应滤波">1. 为什么有 Wiener 解还需要自适应滤波</a><a class="toc-main" href="#2-性能曲面与最优点">2. 性能曲面与最优点</a><a class="toc-main" href="#3-最陡下降-先理解精确梯度">3. 最陡下降：先理解精确梯度</a><a class="toc-main" href="#4-lms-用单个样本替换期望梯度">4. LMS：用单个样本替换期望梯度</a><a class="toc-main" href="#5-收敛-失调与跟踪之间的关系">5. 收敛、失调与跟踪之间的关系</a><a class="toc-main" href="#6-课件正弦例子-先求理论权值-再看迭代">6. 课件正弦例子：先求理论权值，再看迭代</a><a class="toc-main" href="#7-设计与自检">7. 设计与自检</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代数字信号处理 · 2026-10-19</div><h1>3.1–3.2 自适应滤波与LMS横向结构</h1><p class="lead">从Wiener性能曲面、最陡下降走到随机梯度，理解步长、收敛模态、失调与跟踪。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
+pre{overflow:auto;padding:16px;background:#f3f7fa;border-radius:10px}pre code{border:0;padding:0;background:none}code{overflow-wrap:anywhere}a{color:#1f6fb2}.table-wrap{overflow-x:auto}.math-display{overflow-x:auto;overflow-y:hidden;margin:24px 0;text-align:center}.math-inline{display:inline-block;vertical-align:middle;max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container{display:inline-block;max-width:none}mjx-container[display="true"]{display:block;overflow:visible;margin:0!important}.diagram svg{font-family:"Microsoft YaHei",sans-serif}.diagram text{dominant-baseline:auto}.course-nav{margin:0 0 22px;font-size:14px}.source-ref{font-size:13px;color:#627385}@media(max-width:600px){.article{padding:28px 15px}.math-display{font-size:88%}table{font-size:13px}th,td{padding:8px}.diagram{padding:6px}}.figure-scroll{overflow-x:auto;max-width:100%}.figure-scroll>svg{display:block;width:100%;max-width:none}@media(max-width:600px){.figure-scroll>svg{min-width:660px}.figure-scroll:before{content:"图表可横向滑动查看";display:block;font-size:12px;color:#627385;margin-bottom:8px}}</style><style data-reference-reader-widget="true">:root{--manual-width:clamp(400px,45vw,760px)}
+#manual-toggle{position:fixed;right:18px;bottom:24px;z-index:90;border:1px solid #1f6fb2;border-radius:12px;padding:12px 17px;background:#1f6fb2;color:white;box-shadow:0 5px 24px #17344d30;font:600 14px "Microsoft YaHei",sans-serif;cursor:pointer}
+#manual-panel[hidden]{display:none!important}#manual-panel{position:fixed;inset:0 0 0 auto;width:var(--manual-width);height:100vh;height:100dvh;z-index:100;display:flex;flex-direction:column;background:#f3f6fa;border-left:1px solid #cbd9e6;box-shadow:-10px 0 35px #17344d14;color:#20303d;overscroll-behavior:contain;overflow:hidden;font-size:14px;line-height:1.55}
+.manual-header{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;box-sizing:border-box;padding:7px 12px;background:white;border-bottom:1px solid #dce5ed;flex:none}.manual-header strong{font-size:15px}.manual-header-actions{display:flex;align-items:center;gap:8px}.manual-header-actions a{font-size:12px;color:#1f6fb2}
+#manual-panel button,#manual-panel select,#manual-page{font:inherit;border:1px solid #cbd9e6;border-radius:7px;background:white;color:#244e70;padding:5px 8px}#manual-panel button{cursor:pointer}#manual-panel button:disabled{opacity:.4;cursor:default}#manual-panel button:focus-visible,#manual-toggle:focus-visible,#manual-pages:focus-visible,#manual-resize:focus-visible{outline:3px solid #e99f49;outline-offset:2px}
+.manual-source{flex:none;background:#fff;border-bottom:1px solid #dce5ed;font-size:12px}.manual-source summary{padding:6px 12px;color:#38688e;cursor:pointer;user-select:none}.manual-source summary:hover{background:#f7fafc}.manual-source-content{display:flex;align-items:center;gap:10px;padding:4px 12px 10px}.manual-file-label{position:relative;flex:none;overflow:hidden;border:1px solid #cbd9e6;padding:5px 9px;border-radius:7px;color:#244e70;cursor:pointer}.manual-file-label:focus-within{outline:2px solid #1f6fb2}.manual-file-label input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.manual-unlock{display:flex;align-items:center;gap:7px;min-width:0;flex:1;font-size:12px}.manual-unlock label{white-space:nowrap}.manual-unlock input{min-width:0;flex:1;border:1px solid #cbd9e6;border-radius:7px;padding:6px 8px;font:inherit;color:#20303d}.manual-unlock input:focus-visible{outline:2px solid #1f6fb2;outline-offset:1px}
+.manual-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:5px 10px;background:white;border-bottom:1px solid #dce5ed;flex:none;font-size:12px}#manual-page{width:48px;padding:4px;text-align:center}.manual-zoom-label{margin-left:auto;white-space:nowrap}.manual-zoom-label select{padding:4px 6px!important}.manual-zoom-caption{color:#526779}
+#manual-status{margin:0;padding:5px 12px;font-size:11px;color:#526779;background:#edf4fa;flex:none}#manual-status[hidden]{display:none!important}
+#manual-pages{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scroll-behavior:auto;touch-action:pan-x pan-y;scrollbar-gutter:stable;padding:10px 8px;position:relative}.manual-empty{padding:22px 18px;max-width:430px;margin:30px auto;color:#53697c}.manual-empty strong{font-size:18px}.manual-pdf-page{position:relative;background:white;margin:0 auto 16px;box-shadow:0 2px 10px #17344d12;flex:none}.manual-pdf-page canvas{display:block}.manual-pdf-page::after{content:attr(data-page);position:absolute;bottom:3px;right:8px;font-size:10px;color:#60788d;background:#ffffffe0;padding:1px 4px;border-radius:3px}.manual-footer{flex:none;background:white;padding:5px 10px;font-size:10px;color:#627385;border-top:1px solid #dce5ed}
+#manual-resize{display:none}
+.manual-open #manual-toggle{visibility:hidden}
+body.manual-resizing,body.manual-resizing *{cursor:col-resize!important;user-select:none!important}
+@media(min-width:1000px){.manual-open .layout{grid-template-columns:minmax(0,1fr);max-width:none;margin-left:0;margin-right:var(--manual-width);padding:24px 20px 80px;gap:0}.manual-open .sidebar{display:none}.manual-open .article{padding:38px 32px;max-width:950px;margin:0 auto;width:100%}#manual-resize{position:fixed;z-index:101;top:0;bottom:0;right:calc(var(--manual-width) - 5px);width:10px;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;cursor:col-resize;touch-action:none}#manual-resize::after{content:"";position:absolute;top:0;bottom:0;left:4px;width:2px;background:#cbd9e6;transition:background .15s,width .15s,left .15s}#manual-resize:hover::after,#manual-resize:focus-visible::after,#manual-resize[aria-valuenow]:active::after{left:2px;width:6px;background:#397eae}.manual-open #manual-resize{display:block}}
+@media(max-width:999px){body.manual-open{overflow:hidden}#manual-panel{width:min(94vw,680px)}.manual-header{padding:7px 10px;min-height:44px}.manual-header strong{font-size:14px}.manual-source-content{align-items:flex-start;flex-direction:column}.manual-unlock{width:100%}.manual-toolbar{gap:4px;padding:5px 7px}}
+@media(max-width:600px){#manual-panel{width:100vw}#manual-toggle{right:12px;bottom:16px;font-size:12px;padding:10px 12px}.manual-footer{font-size:9px}#manual-pages{padding:8px 5px}.manual-zoom-caption{display:none}}
+@media print{#manual-toggle,#manual-panel,#manual-resize{display:none!important}.manual-open .layout{display:block;margin:0;padding:0}.manual-open .article{padding:0;max-width:none}}
+</style></head><body><div id="progress"></div><div class="layout"><aside class="sidebar"><div class="brand">现代数字信号处理</div><nav class="toc"><a class="toc-main" href="#1-为什么有-wiener-解还需要自适应滤波">1. 为什么有 Wiener 解还需要自适应滤波</a><a class="toc-main" href="#2-性能曲面与最优点">2. 性能曲面与最优点</a><a class="toc-main" href="#3-最陡下降-先理解精确梯度">3. 最陡下降：先理解精确梯度</a><a class="toc-main" href="#4-lms-用单个样本替换期望梯度">4. LMS：用单个样本替换期望梯度</a><a class="toc-main" href="#5-收敛-失调与跟踪之间的关系">5. 收敛、失调与跟踪之间的关系</a><a class="toc-main" href="#6-课件正弦例子-先求理论权值-再看迭代">6. 课件正弦例子：先求理论权值，再看迭代</a><a class="toc-main" href="#7-设计与自检">7. 设计与自检</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代数字信号处理 · 2026-10-19</div><h1>3.1–3.2 自适应滤波与LMS横向结构</h1><p class="lead">从Wiener性能曲面、最陡下降走到随机梯度，理解步长、收敛模态、失调与跟踪。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
 <p>主线为《3.1-3.2.pdf》70页。首页列有格型、LS及应用等整章目录，但本文件正文实际展开的是引言与LMS横向滤波；本篇不把目录中尚未讲授的算法写成已收到的完整内容。</p>
 </blockquote>
 <h2 id="1-为什么有-wiener-解还需要自适应滤波">1. 为什么有 Wiener 解还需要自适应滤波</h2>
@@ -62,4 +79,278 @@ function update(){const d=document.documentElement;const m=d.scrollHeight-d.clie
 window.addEventListener('scroll',update,{passive:true});update();
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));}})},{rootMargin:'-15% 0px -72% 0px'});
 document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
+</script><button aria-controls="manual-panel" aria-expanded="false" id="manual-toggle" type="button"><span id="manual-toggle-label">时域离散随机信号处理教材</span> <span aria-hidden="true">↗</span></button>
+<button aria-controls="manual-panel" aria-label="调整笔记与手册宽度" aria-orientation="vertical" aria-valuemax="75" aria-valuemin="360" aria-valuenow="45" id="manual-resize" role="separator" tabindex="0" type="button"></button>
+<aside aria-label="时域离散随机信号处理教材 阅读侧栏" data-document-title="时域离散随机信号处理教材" data-encrypted-url="books/时域离散随机信号处理.pdf.enc" data-pdf-url="" data-viewer-base="../radar-board/manual-viewer/" hidden="" id="manual-panel">
+<header class="manual-header"><strong id="manual-heading">时域离散随机信号处理教材</strong><div class="manual-header-actions"><a hidden="" id="manual-original" rel="noopener" target="_blank">单独打开</a><button aria-label="收起阅读侧栏" id="manual-close" type="button">收起 ×</button></div></header>
+<details class="manual-source"><summary>打开或解锁手册</summary><div class="manual-source-content">
+<label class="manual-file-label">选择本机 PDF<input accept=".pdf,application/pdf" id="manual-file" type="file"/></label>
+<div class="manual-unlock"><label for="manual-key">在线手册密钥</label><input aria-label="手册解锁密钥" autocapitalize="off" autocomplete="off" id="manual-key" placeholder="粘贴桌面密钥" spellcheck="false" type="password"/><button id="manual-unlock" type="button">解锁</button></div>
+</div></details>
+<div class="manual-toolbar"><button aria-label="手册上一页" disabled="" id="manual-prev" type="button">‹</button><label>第 <input aria-label="手册页码" disabled="" id="manual-page" min="1" type="number" value="1"/> 页</label><span id="manual-total">/ —</span><button disabled="" id="manual-go" type="button">前往</button><button aria-label="手册下一页" disabled="" id="manual-next" type="button">›</button><label class="manual-zoom-label"><span class="manual-zoom-caption">缩放</span> <select aria-label="手册缩放" id="manual-zoom"><option value="fit">适合宽度</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option></select></label></div>
+<p aria-live="polite" hidden="" id="manual-status" role="status">在线文件以 AES-GCM 加密保存。输入本机密钥后在当前浏览器解密；密钥不会上传或保存。</p>
+<div aria-label="参考资料内容，滚动不影响笔记" id="manual-pages" tabindex="0"><div class="manual-empty"><strong id="manual-empty-title">笔记与参考资料，并排阅读</strong><p>在这里滚动、翻页或放大 PDF，不会带动笔记。收起侧栏后，笔记保留在刚才的位置。</p><p>输入本机密钥解锁在线密文，或选择本机 PDF；PDF 内容仅在浏览器内存中处理。</p></div></div>
+<footer class="manual-footer">原文档版权归原作者所有。侧栏阅读状态只在本次页面保留。</footer>
+</aside>
+<script data-reference-reader-widget="true">// A separate PDF canvas scroller; never sends local file bytes to a server.
+(() => {
+  const panel = document.getElementById('manual-panel');
+  if (!panel) return;
+  const byId = id => document.getElementById(id);
+  const toggle = byId('manual-toggle'), close = byId('manual-close'), resizeHandle = byId('manual-resize');
+  const pages = byId('manual-pages'), status = byId('manual-status');
+  const pageInput = byId('manual-page'), zoom = byId('manual-zoom');
+  const previous = byId('manual-prev'), next = byId('manual-next');
+  const original = byId('manual-original');
+  const setStatus = (message, visible = true) => { status.textContent = message; status.hidden = !visible; };
+  const documentTitle = panel.dataset.documentTitle || '参考 PDF';
+  byId('manual-toggle-label').textContent = documentTitle;
+  byId('manual-heading').textContent = documentTitle;
+  byId('manual-empty-title').textContent = `笔记与${documentTitle}，并排阅读`;
+  panel.setAttribute('aria-label', `${documentTitle} 阅读侧栏`);
+  pages.setAttribute('aria-label', `${documentTitle}内容，滚动不影响笔记`);
+  close.setAttribute('aria-label', `收起${documentTitle}阅读侧栏`);
+  let library, pdf, current = 1, generation = 0, observer, blobUrl;
+  let pageViews = [], rendering = new Set(), tasks = new Set(), loadGeneration = 0;
+  let autoAttempted = false, resizeTimer, lastWidth = 0;
+
+  function widthBounds() {
+    const max = Math.max(360, Math.min(Math.round(innerWidth * .75), innerWidth - 600));
+    return {min:Math.min(360,max),max};
+  }
+  function applyPanelWidth(width, persist = false) {
+    const {min,max} = widthBounds(), value = Math.max(min, Math.min(max, Math.round(width)));
+    document.body.style.setProperty('--manual-width', `${value}px`);
+    resizeHandle.setAttribute('aria-valuemin', min);
+    resizeHandle.setAttribute('aria-valuemax', max);
+    resizeHandle.setAttribute('aria-valuenow', value);
+    resizeHandle.setAttribute('aria-valuetext', `手册侧栏宽度 ${value} 像素`);
+    if (persist) { try { localStorage.setItem('radar-manual-panel-width', String(value)); } catch {} }
+    return value;
+  }
+  applyPanelWidth(Math.min(760, Math.max(400, innerWidth * .45)));
+  try {
+    const savedWidth = Number(localStorage.getItem('radar-manual-panel-width'));
+    if (savedWidth > 0) applyPanelWidth(savedWidth);
+  } catch {}
+  resizeHandle.addEventListener('pointerdown', event => {
+    if (innerWidth < 1000 || event.button !== 0) return;
+    event.preventDefault();
+    resizeHandle.setPointerCapture(event.pointerId);
+    document.body.classList.add('manual-resizing');
+    applyPanelWidth(innerWidth - event.clientX);
+  });
+  resizeHandle.addEventListener('pointermove', event => {
+    if (resizeHandle.hasPointerCapture(event.pointerId)) applyPanelWidth(innerWidth - event.clientX);
+  });
+  const stopResize = event => {
+    if (!resizeHandle.hasPointerCapture(event.pointerId)) return;
+    resizeHandle.releasePointerCapture(event.pointerId);
+    document.body.classList.remove('manual-resizing');
+    applyPanelWidth(innerWidth - event.clientX, true);
+  };
+  resizeHandle.addEventListener('pointerup', stopResize);
+  resizeHandle.addEventListener('pointercancel', stopResize);
+  resizeHandle.addEventListener('keydown', event => {
+    if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    const currentWidth = Number(resizeHandle.getAttribute('aria-valuenow')) || 600;
+    const {min,max} = widthBounds();
+    const nextWidth = event.key === 'Home' ? min : event.key === 'End' ? max : currentWidth + (event.key === 'ArrowLeft' ? 24 : -24);
+    applyPanelWidth(nextWidth, true);
+  });
+
+  function readingAnchor() {
+    const article = document.querySelector('.article');
+    const candidates = [...article.querySelectorAll('h1,h2,h3,p,li,figure,table')];
+    const node = candidates.find(e => { const r = e.getBoundingClientRect(); return r.bottom > 95 && r.top < innerHeight; });
+    return {node, top:node?.getBoundingClientRect().top, y:scrollY};
+  }
+  function restoreAnchor(anchor) {
+    requestAnimationFrame(() => {
+      const delta = anchor.node?.isConnected ? anchor.node.getBoundingClientRect().top - anchor.top : 0;
+      window.scrollTo({top:anchor.y + delta, behavior:'instant'});
+    });
+  }
+  function setOpen(open) {
+    if (open === !panel.hidden) return;
+    const anchor = readingAnchor();
+    panel.hidden = !open;
+    document.body.classList.toggle('manual-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    restoreAnchor(anchor);
+    (open ? close : toggle).focus({preventScroll:true});
+    if (open) {
+      if (pdf && zoom.value === 'fit') requestAnimationFrame(() => {
+        if (Math.abs(pages.clientWidth - lastWidth) > 1) rebuildPages(current);
+      });
+      if (!autoAttempted && panel.dataset.pdfUrl) {
+        autoAttempted = true;
+        loadPdf(panel.dataset.pdfUrl, documentTitle);
+      }
+    }
+  }
+  toggle.addEventListener('click', () => setOpen(true));
+  close.addEventListener('click', () => setOpen(false));
+  panel.addEventListener('keydown', e => { if (e.key === 'Escape') {e.preventDefault();setOpen(false);} });
+  // Contain wheel input even at the first/last PDF page and over the toolbar.
+  panel.addEventListener('wheel', e => {
+    if (e.ctrlKey) return;
+    e.stopPropagation();
+    const inside = pages.contains(e.target);
+    const atTop = pages.scrollTop <= 0, atBottom = pages.scrollTop + pages.clientHeight >= pages.scrollHeight - 1;
+    if (!inside || (e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) e.preventDefault();
+  }, {passive:false});
+
+  async function getLibrary() {
+    if (!library) library = import(viewerAsset('pdf.mjs').href).then(lib => {
+      lib.GlobalWorkerOptions.workerSrc = viewerAsset('pdf.worker.mjs').href;
+      return lib;
+    }).catch(error => {library = undefined;throw error;});
+    return library;
+  }
+  function viewerAsset(path) {
+    const base = panel.dataset.viewerBase || 'manual-viewer/';
+    return new URL(`${base}${path}`, location.href);
+  }
+  function setPage(value, navigate = false) {
+    if (!pdf) return;
+    current = Math.max(1, Math.min(pdf.numPages, Math.round(Number(value) || 1)));
+    pageInput.value = current;
+    previous.disabled = current === 1; next.disabled = current === pdf.numPages;
+    if (navigate) {
+      const target = pages.querySelector(`[data-page="${current}"]`);
+      if (target) pages.scrollTo({top:target.offsetTop - 10, behavior:'instant'});
+    }
+  }
+  async function renderPage(index, token) {
+    const key = `${token}:${index}`;
+    if (rendering.has(key) || token !== generation || !pdf) return;
+    const holder = pages.querySelector(`[data-page="${index + 1}"]`);
+    if (!holder || holder.querySelector('canvas')) return;
+    rendering.add(key);
+    try {
+      const page = await pdf.getPage(index + 1);
+      if (token !== generation) return;
+      const raw = pageViews[index], scale = Number(holder.dataset.width) / raw.width;
+      const viewport = page.getViewport({scale});
+      const ratio = Math.min(devicePixelRatio || 1, 1.75);
+      const canvas = document.createElement('canvas');
+      canvas.setAttribute('aria-label', `手册第 ${index + 1} 页`);
+      canvas.width = Math.ceil(viewport.width * ratio); canvas.height = Math.ceil(viewport.height * ratio);
+      canvas.style.width = `${viewport.width}px`; canvas.style.height = `${viewport.height}px`;
+      holder.append(canvas);
+      const task = page.render({canvasContext:canvas.getContext('2d'), viewport, transform:ratio === 1 ? null : [ratio,0,0,ratio,0,0]});
+      tasks.add(task);
+      try { await task.promise; canvas.dataset.rendered = 'true'; } finally {tasks.delete(task);}
+    } catch (error) {
+      if (token === generation && error.name !== 'RenderingCancelledException') {
+        holder?.querySelector('canvas')?.remove();
+        setStatus(`第${index + 1}页预览失败，可用“单独打开 PDF”查看原件。`);
+      }
+    } finally {rendering.delete(key);}
+  }
+  function rebuildPages(keepPage = current) {
+    if (!pdf || panel.hidden) return;
+    const token = ++generation;
+    observer?.disconnect(); tasks.forEach(task => task.cancel()); tasks.clear();
+    pages.replaceChildren();
+    const available = Math.max(200, pages.clientWidth - 24);
+    lastWidth = pages.clientWidth;
+    pageViews.forEach((view, index) => {
+      const width = zoom.value === 'fit' ? available : view.width * Number(zoom.value);
+      const section = document.createElement('section');
+      section.className = 'manual-pdf-page'; section.dataset.page = index + 1;
+      section.dataset.width = width; section.style.width = `${width}px`;
+      section.style.height = `${width * view.height / view.width}px`;
+      pages.append(section);
+    });
+    observer = new IntersectionObserver(entries => {
+      entries.filter(entry => entry.isIntersecting).forEach(entry => renderPage(Number(entry.target.dataset.page) - 1, token));
+    }, {root:pages, rootMargin:'600px 0px'});
+    pages.querySelectorAll('.manual-pdf-page').forEach(element => observer.observe(element));
+    setPage(keepPage, true);
+  }
+  async function loadPdf(source, label) {
+    const request = ++loadGeneration;
+    setStatus('正在打开手册…');
+    try {
+      const lib = await getLibrary();
+      const options = typeof source === 'string' ? {url:source} : {data:source};
+      const loading = lib.getDocument({...options, isEvalSupported:false,
+        cMapUrl:viewerAsset('cmaps/').href, cMapPacked:true,
+        standardFontDataUrl:viewerAsset('standard_fonts/').href,
+        wasmUrl:viewerAsset('wasm/').href});
+      const doc = await loading.promise;
+      if (request !== loadGeneration) { await doc.loadingTask.destroy(); return; }
+      const views = await Promise.all(Array.from({length:doc.numPages}, async (_, i) => (await doc.getPage(i + 1)).getViewport({scale:1})));
+      if (request !== loadGeneration) { await doc.loadingTask.destroy(); return; }
+      const old = pdf;
+      observer?.disconnect(); tasks.forEach(task => task.cancel()); tasks.clear();
+      pdf = doc; pageViews = views; current = 1;
+      await old?.loadingTask.destroy();
+      byId('manual-total').textContent = `/ ${pdf.numPages}`;
+      pageInput.disabled = false; pageInput.max = pdf.numPages; byId('manual-go').disabled = false;
+      setStatus(`${label} · ${pdf.numPages}页 · 在此滚动，不带动笔记`, false);
+      rebuildPages(1);
+    } catch (error) {
+      if (request === loadGeneration) setStatus('无法打开这份 PDF。请确认文件有效，或使用“单独打开 PDF”；笔记阅读不受影响。');
+    }
+  }
+  byId('manual-unlock').addEventListener('click', async () => {
+    const keyText = byId('manual-key').value.trim();
+    byId('manual-key').value = '';
+    if (!panel.dataset.encryptedUrl) { setStatus('此页面没有配置加密手册地址。'); return; }
+    try {
+      const keyBytes = Uint8Array.from(atob(keyText.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(keyText.length / 4) * 4,'=')), ch => ch.charCodeAt(0));
+      if (keyBytes.length !== 32) throw new Error('Invalid key length');
+      setStatus('正在读取并在本机解密手册…');
+      const response = await fetch(new URL(panel.dataset.encryptedUrl, location.href), {cache:'no-store'});
+      if (!response.ok) throw new Error('Encrypted file unavailable');
+      const sealed = new Uint8Array(await response.arrayBuffer());
+      const magic = new TextDecoder().decode(sealed.subarray(0,8));
+      if (magic !== 'CSPMENC1' || sealed.length < 36) throw new Error('Invalid encrypted file');
+      const key = await crypto.subtle.importKey('raw', keyBytes, {name:'AES-GCM'}, false, ['decrypt']);
+      const plain = await crypto.subtle.decrypt({name:'AES-GCM',iv:sealed.subarray(8,20),tagLength:128},key,sealed.subarray(20));
+      await loadPdf(new Uint8Array(plain), `${documentTitle}（本机解密）`);
+    } catch (error) {
+      setStatus(error.name === 'OperationError' ? '密钥不正确，或加密文件已损坏。密钥仅在本机浏览器处理。' : '无法解锁手册；请检查密钥与网络连接。密钥没有发送或保存。');
+    }
+  });
+  byId('manual-file').addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!/\.pdf$/i.test(file.name) || file.size > 50 * 1024 * 1024) {
+      setStatus('请选择不超过50MB的PDF文件。'); return;
+    }
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    blobUrl = URL.createObjectURL(file);
+    original.href = blobUrl; original.hidden = false;
+    await loadPdf(new Uint8Array(await file.arrayBuffer()), file.name);
+  });
+  if (panel.dataset.pdfUrl) {original.href = panel.dataset.pdfUrl;original.hidden = false;}
+  previous.addEventListener('click', () => setPage(current - 1, true));
+  next.addEventListener('click', () => setPage(current + 1, true));
+  pageInput.addEventListener('change', () => setPage(pageInput.value, true));
+  byId('manual-go').addEventListener('click', () => setPage(pageInput.value, true));
+  pageInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {event.preventDefault();setPage(pageInput.value,true);}
+  });
+  zoom.addEventListener('change', () => rebuildPages(current));
+  let scrollScheduled = false;
+  pages.addEventListener('scroll', () => {
+    if (scrollScheduled || !pdf) return;
+    scrollScheduled = true;
+    requestAnimationFrame(() => {
+      scrollScheduled = false;
+      const top = pages.getBoundingClientRect().top;
+      const candidate = [...pages.querySelectorAll('.manual-pdf-page')].find(e => e.getBoundingClientRect().bottom > top + 30);
+      if (candidate) setPage(candidate.dataset.page);
+    });
+  }, {passive:true});
+  new ResizeObserver(() => {
+    if (!pdf || panel.hidden || zoom.value !== 'fit' || Math.abs(pages.clientWidth - lastWidth) < 2) return;
+    clearTimeout(resizeTimer); resizeTimer = setTimeout(() => rebuildPages(current), 180);
+  }).observe(pages);
+})();
 </script></body></html>
