@@ -47,11 +47,21 @@ body.manual-resizing,body.manual-resizing *{cursor:col-resize!important;user-sel
 @media(max-width:999px){body.manual-open{overflow:hidden}#manual-panel{width:min(94vw,680px)}.manual-header{padding:7px 10px;min-height:44px}.manual-header strong{font-size:14px}.manual-source-content{align-items:flex-start;flex-direction:column}.manual-unlock{width:100%}.manual-toolbar{gap:4px;padding:5px 7px}}
 @media(max-width:600px){#manual-panel{width:100vw}#manual-toggle{right:12px;bottom:16px;font-size:12px;padding:10px 12px}.manual-footer{font-size:9px}#manual-pages{padding:8px 5px}.manual-zoom-caption{display:none}}
 @media print{#manual-toggle,#manual-panel,#manual-resize{display:none!important}.manual-open .layout{display:block;margin:0;padding:0}.manual-open .article{padding:0;max-width:none}}
+</style><style id="note-navigation-styles">.note-navigation-controls{position:fixed;z-index:95;top:10px;left:max(12px,calc((100vw - 1210px)/2 + 24px));display:flex;align-items:center;gap:7px;font:600 13px/1.2 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+.note-navigation-controls button,.note-navigation-controls a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 11px;border:1px solid #cbd9e6;border-radius:9px;background:rgba(255,255,255,.96);color:#315f91;text-decoration:none;box-shadow:0 3px 12px rgba(41,63,82,.08);cursor:pointer}
+.note-navigation-controls button:hover,.note-navigation-controls a:hover{background:#edf5fb;border-color:#9dbbd3;color:#174e7e}
+.note-navigation-controls button:focus-visible,.note-navigation-controls a:focus-visible{outline:3px solid #87b9df;outline-offset:2px}
+body.note-navigation-ready .sidebar{padding-top:55px}
+body.note-toc-collapsed .sidebar{display:none!important}
+body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
+@media(max-width:980px){.note-navigation-controls{left:12px}.note-navigation-ready .layout{padding-top:62px}}
+@media(max-width:600px){.note-navigation-controls{top:8px;left:10px}.note-navigation-ready .layout{padding-top:58px}.note-navigation-ready .layout{padding-left:8px;padding-right:8px}.note-navigation-ready .sidebar{display:none}.note-navigation-ready.note-toc-drawer-open{overflow:hidden}.note-toc-drawer-open::before{content:"";position:fixed;z-index:80;inset:0;background:rgba(19,43,62,.38)}.note-navigation-ready.note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:85;inset:54px 10px 10px;width:auto;height:auto;max-height:none;overflow:auto;box-shadow:0 14px 40px rgba(17,43,65,.25)}}
+@media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
 </style></head>
-<body>
+<body><div id="note-navigation-controls" class="note-navigation-controls"><button id="note-toc-toggle" type="button" aria-controls="note-sidebar" aria-expanded="true">收起目录</button><a id="note-course-home" href="../index.html" aria-label="返回课程选择主页">⌂ 课程首页</a></div>
 <div id="progress"></div>
 <div class="layout">
-<aside class="sidebar"><div class="brand">现代数字信号处理 · 第一章</div><nav class="toc"><a class="toc-main" href="#0-为什么先学随机信号">0. 为什么先学随机信号</a>
+<aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理 · 第一章</div><nav class="toc"><a class="toc-main" href="#0-为什么先学随机信号">0. 为什么先学随机信号</a>
 <a class="toc-main" href="#1-随机变量-随机信号的-单点语言">1. 随机变量：随机信号的“单点语言”</a>
 <a class="toc-sub" href="#1-1-分布函数与概率密度">1.1 分布函数与概率密度</a>
 <a class="toc-sub" href="#1-2-均值-均方值与方差">1.2 均值、均方值与方差</a>
@@ -1194,5 +1204,48 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
     if (!pdf || panel.hidden || zoom.value !== 'fit' || Math.abs(pages.clientWidth - lastWidth) < 2) return;
     clearTimeout(resizeTimer); resizeTimer = setTimeout(() => rebuildPages(current), 180);
   }).observe(pages);
+})();
+</script><script id="note-navigation-script">(() => {
+  const body = document.body;
+  const toggle = document.getElementById('note-toc-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (!toggle || !sidebar) return;
+
+  const smallScreen = () => window.matchMedia('(max-width: 600px)').matches;
+  const mobileOpen = () => body.classList.contains('note-toc-drawer-open');
+  const desktopOpen = () => !body.classList.contains('note-toc-collapsed');
+  const announce = open => {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = smallScreen() ? (open ? '关闭目录' : '☷ 目录') : (open ? '收起目录' : '展开目录');
+  };
+
+  body.classList.add('note-navigation-ready');
+  let saved = null;
+  try { saved = localStorage.getItem('study-notes-toc-collapsed'); } catch (_) {}
+  if (saved === 'true' && !smallScreen()) body.classList.add('note-toc-collapsed');
+  announce(smallScreen() ? mobileOpen() : desktopOpen());
+
+  toggle.addEventListener('click', () => {
+    if (smallScreen()) {
+      body.classList.toggle('note-toc-drawer-open');
+      announce(mobileOpen());
+      return;
+    }
+    body.classList.toggle('note-toc-collapsed');
+    const open = desktopOpen();
+    try { localStorage.setItem('study-notes-toc-collapsed', String(!open)); } catch (_) {}
+    announce(open);
+  });
+
+  sidebar.querySelectorAll('.toc a').forEach(link => link.addEventListener('click', () => {
+    if (!smallScreen() || !mobileOpen()) return;
+    body.classList.remove('note-toc-drawer-open');
+    announce(false);
+  }));
+
+  window.addEventListener('resize', () => {
+    body.classList.remove('note-toc-drawer-open');
+    announce(smallScreen() ? false : desktopOpen());
+  }, {passive:true});
 })();
 </script></body></html>
