@@ -89,13 +89,13 @@ body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 
 /* A quiet return-to-top affordance appears only after the reader has scrolled. */
 #note-back-to-top{
-  position:fixed;z-index:80;right:20px;bottom:76px;min-width:44px;min-height:44px;padding:0 14px;
-  border:1px solid rgba(210,220,228,.78);border-radius:14px;background:rgba(250,252,253,.78);
-  color:var(--note-ui-ink);box-shadow:0 4px 18px rgba(24,39,52,.09);backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
-  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;
-  transition:background-color .16s ease,border-color .16s ease,transform .16s ease
+  position:fixed;z-index:80;right:20px;bottom:76px;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;
+  border:1px solid rgba(135,151,164,.28);border-radius:50%;background:rgba(250,252,253,.42);
+  color:rgba(62,78,91,.72);box-shadow:none;backdrop-filter:blur(12px) saturate(1.15);-webkit-backdrop-filter:blur(12px) saturate(1.15);
+  font:400 19px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;opacity:.64;
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease,opacity .16s ease
 }
-#note-back-to-top:hover{background:rgba(255,255,255,.96);border-color:#cad9e3;transform:translateY(-2px)}
+#note-back-to-top:hover{background:rgba(250,252,253,.78);border-color:rgba(111,133,149,.48);color:#344957;opacity:1}
 #note-back-to-top:focus-visible{outline:3px solid var(--note-ui-focus);outline-offset:3px}
 #note-back-to-top[hidden]{display:none!important}
 
@@ -161,8 +161,8 @@ html[data-theme="dark"] mjx-container{color:#e4eaf0}
 html[data-theme="dark"] .note-navigation-controls{border-color:rgba(81,91,102,.72);background:rgba(38,42,48,.70);box-shadow:0 4px 18px rgba(0,0,0,.18)}
 html[data-theme="dark"] .note-navigation-controls button,html[data-theme="dark"] .note-navigation-controls a{color:#e2e8ed}
 html[data-theme="dark"] .note-navigation-controls button:hover,html[data-theme="dark"] .note-navigation-controls a:hover{background:#303d48;color:#c5e5fa}
-html[data-theme="dark"] #note-back-to-top{background:rgba(38,42,48,.82);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.26)}
-html[data-theme="dark"] #note-back-to-top:hover{background:rgba(55,61,69,.96)}
+html[data-theme="dark"] #note-back-to-top{background:rgba(38,42,48,.48);border-color:rgba(153,168,181,.24);color:rgba(211,220,228,.72)}
+html[data-theme="dark"] #note-back-to-top:hover{background:rgba(48,54,62,.78);border-color:rgba(169,184,197,.48);color:#edf2f6}
 html[data-theme="dark"] #manual-toggle,html[data-theme="dark"] #study-toggle{background:rgba(38,42,48,.72);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.24)}
 html[data-theme="dark"] #manual-toggle:hover,html[data-theme="dark"] #study-toggle:hover{background:rgba(55,61,69,.94)}
 html[data-theme="dark"] #manual-panel,html[data-theme="dark"] #modern-dsp-learning-sidebar{background:#191c21;color:#e0e5ea}
@@ -206,7 +206,7 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
   .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:var(--note-ui-paper);box-shadow:var(--note-ui-shadow)}
   #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:42px;padding:0 13px}
   #manual-toggle{right:12px}#study-toggle{left:12px}
-  #note-back-to-top{right:12px;bottom:max(68px,calc(env(safe-area-inset-bottom) + 62px));min-height:42px}
+  #note-back-to-top{right:12px;bottom:max(68px,calc(env(safe-area-inset-bottom) + 62px));width:34px;height:34px;min-width:34px;min-height:34px;font-size:18px}
 }
 @media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle,#note-back-to-top{transition:none}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
@@ -1204,7 +1204,7 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
  toggle.addEventListener('click',()=>setOpen(true));close.addEventListener('click',()=>setOpen(false));panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();setOpen(false)}});
  panel.addEventListener('wheel',e=>{if(e.ctrlKey)return;e.stopPropagation();const active=panel.querySelector('.study-dock-content:not([hidden])'),inside=active?.contains(e.target),top=active?.scrollTop<=0,bottom=active?.scrollTop+active?.clientHeight>=active?.scrollHeight-1;if(!inside||(e.deltaY<0&&top)||(e.deltaY>0&&bottom))e.preventDefault()},{passive:false});
  handle.addEventListener('pointerdown',e=>{if(innerWidth<1000||e.button!==0)return;e.preventDefault();handle.setPointerCapture(e.pointerId);document.body.classList.add('study-resizing');width(e.clientX)});handle.addEventListener('pointermove',e=>{if(handle.hasPointerCapture(e.pointerId))width(e.clientX)});function stop(e){if(!handle.hasPointerCapture(e.pointerId))return;handle.releasePointerCapture(e.pointerId);document.body.classList.remove('study-resizing');width(e.clientX,true)}handle.addEventListener('pointerup',stop);handle.addEventListener('pointercancel',stop);handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const v=Number(handle.getAttribute('aria-valuenow'))||600,b=bounds();width(e.key==='Home'?b.min:e.key==='End'?b.max:v+(e.key==='ArrowRight'?24:-24),true)});
-})();</script><button aria-hidden="true" id="note-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" tabindex="-1" hidden>↑ 回到顶部</button><script id="note-navigation-script">(() => {
+})();</script><button aria-hidden="true" id="note-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" tabindex="-1" hidden>↑</button><script id="note-navigation-script">(() => {
   const body = document.body;
   const toggle = document.getElementById('note-toc-toggle');
   const themeToggle = document.getElementById('note-theme-toggle');
