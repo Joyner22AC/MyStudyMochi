@@ -18,17 +18,79 @@ table{width:100%;border-collapse:collapse;margin:20px 0 28px;font-size:14.5px} t
 @media(max-width:980px){.layout{grid-template-columns:1fr;max-width:900px}.sidebar{position:relative;top:0;height:auto;max-height:340px}.article{padding:42px 34px}}
 @media(max-width:600px){body{font-size:15px}.layout{padding:12px 8px 50px}.sidebar{display:none}.article{padding:30px 20px;border-radius:12px}h1{font-size:28px}h2{font-size:22px}.diagram{padding:5px}mjx-container[display="true"]{font-size:.96em;margin:1.1em 0!important}}
 @media print{body{background:white;font-size:10.5pt}#progress,.sidebar{display:none!important}.layout{display:block;max-width:none;padding:0}.article{border:0;box-shadow:none;padding:0}.hero{margin-top:0}h2,h3{break-after:avoid-page}.diagram,table,blockquote,mjx-container[display="true"]{break-inside:avoid}mjx-container[display="true"]{overflow:visible}a{color:inherit;text-decoration:none}}
-pre{overflow:auto;padding:16px;background:#f3f7fa;border-radius:10px}pre code{border:0;padding:0;background:none}code{overflow-wrap:anywhere}a{color:#1f6fb2}.table-wrap{overflow-x:auto}.math-display{overflow-x:auto;overflow-y:hidden;margin:24px 0;text-align:center}.math-inline{display:inline-block;vertical-align:middle;max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container{display:inline-block;max-width:none}mjx-container[display="true"]{display:block;overflow:visible;margin:0!important}.diagram svg{font-family:"Microsoft YaHei",sans-serif}.diagram text{dominant-baseline:auto}.course-nav{margin:0 0 22px;font-size:14px}.source-ref{font-size:13px;color:#627385}@media(max-width:600px){.article{padding:28px 15px}.math-display{font-size:88%}table{font-size:13px}th,td{padding:8px}.diagram{padding:6px}}.figure-scroll{overflow-x:auto;max-width:100%}.figure-scroll>svg{display:block;width:100%;max-width:none}@media(max-width:600px){.figure-scroll>svg{min-width:660px}.figure-scroll:before{content:"图表可横向滑动查看";display:block;font-size:12px;color:#627385;margin-bottom:8px}}</style><style id="note-navigation-styles">.note-navigation-controls{position:fixed;z-index:95;top:10px;left:max(12px,calc((100vw - 1210px)/2 + 24px));display:flex;align-items:center;gap:7px;font:600 13px/1.2 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
-.note-navigation-controls button,.note-navigation-controls a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 11px;border:1px solid #cbd9e6;border-radius:9px;background:rgba(255,255,255,.96);color:#315f91;text-decoration:none;box-shadow:0 3px 12px rgba(41,63,82,.08);cursor:pointer}
-.note-navigation-controls button:hover,.note-navigation-controls a:hover{background:#edf5fb;border-color:#9dbbd3;color:#174e7e}
-.note-navigation-controls button:focus-visible,.note-navigation-controls a:focus-visible{outline:3px solid #87b9df;outline-offset:2px}
-body.note-navigation-ready .sidebar{padding-top:55px}
+pre{overflow:auto;padding:16px;background:#f3f7fa;border-radius:10px}pre code{border:0;padding:0;background:none}code{overflow-wrap:anywhere}a{color:#1f6fb2}.table-wrap{overflow-x:auto}.math-display{overflow-x:auto;overflow-y:hidden;margin:24px 0;text-align:center}.math-inline{display:inline-block;vertical-align:middle;max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container{display:inline-block;max-width:none}mjx-container[display="true"]{display:block;overflow:visible;margin:0!important}.diagram svg{font-family:"Microsoft YaHei",sans-serif}.diagram text{dominant-baseline:auto}.course-nav{margin:0 0 22px;font-size:14px}.source-ref{font-size:13px;color:#627385}@media(max-width:600px){.article{padding:28px 15px}.math-display{font-size:88%}table{font-size:13px}th,td{padding:8px}.diagram{padding:6px}}.figure-scroll{overflow-x:auto;max-width:100%}.figure-scroll>svg{display:block;width:100%;max-width:none}@media(max-width:600px){.figure-scroll>svg{min-width:660px}.figure-scroll:before{content:"图表可横向滑动查看";display:block;font-size:12px;color:#627385;margin-bottom:8px}}</style><style id="note-navigation-styles">:root{
+  --note-ui-paper:#fff;
+  --note-ui-canvas:#f6f7f8;
+  --note-ui-ink:#26323b;
+  --note-ui-muted:#6c7a85;
+  --note-ui-border:#e2e7eb;
+  --note-ui-accent:#397aa8;
+  --note-ui-accent-soft:#edf4f8;
+  --note-ui-shadow:0 12px 36px rgba(24,39,52,.12);
+  --note-ui-focus:rgba(57,122,168,.52);
+}
+.note-navigation-controls{
+  position:fixed;z-index:110;top:max(12px,env(safe-area-inset-top));left:max(16px,calc((100vw - 1210px)/2 + 24px));
+  display:flex;align-items:center;gap:2px;padding:4px;border:1px solid rgba(220,226,231,.9);border-radius:14px;
+  background:rgba(255,255,255,.88);box-shadow:0 3px 16px rgba(24,39,52,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+.note-navigation-controls button,.note-navigation-controls a{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:0 12px;border:0;border-radius:10px;
+  background:transparent;color:var(--note-ui-ink);text-decoration:none;white-space:nowrap;cursor:pointer;transition:background-color .16s ease,color .16s ease;
+}
+.note-navigation-controls button:hover,.note-navigation-controls a:hover{background:var(--note-ui-accent-soft);color:#245f86}
+.note-navigation-controls button:focus-visible,.note-navigation-controls a:focus-visible,
+#manual-toggle:focus-visible,#study-toggle:focus-visible,#manual-panel button:focus-visible,#manual-panel select:focus-visible,#manual-page:focus-visible,
+#modern-dsp-learning-sidebar button:focus-visible,#manual-resize:focus-visible,#study-resize:focus-visible{
+  outline:3px solid var(--note-ui-focus);outline-offset:2px
+}
+.note-navigation-controls a{border-left:1px solid var(--note-ui-border);border-radius:0 10px 10px 0}
+body.note-navigation-ready .sidebar{padding-top:62px}
 body.note-toc-collapsed .sidebar{display:none!important}
 body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
-@media(max-width:980px){.note-navigation-controls{left:12px}.note-navigation-ready .layout{padding-top:62px}}
-@media(max-width:600px){.note-navigation-controls{top:8px;left:10px}.note-navigation-ready .layout{padding-top:58px}.note-navigation-ready .layout{padding-left:8px;padding-right:8px}.note-navigation-ready .sidebar{display:none}.note-navigation-ready.note-toc-drawer-open{overflow:hidden}.note-toc-drawer-open::before{content:"";position:fixed;z-index:80;inset:0;background:rgba(19,43,62,.38)}.note-navigation-ready.note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:85;inset:54px 10px 10px;width:auto;height:auto;max-height:none;overflow:auto;box-shadow:0 14px 40px rgba(17,43,65,.25)}}
+
+/* The same quiet, compact launch control for optional reading/learning panels. */
+#manual-toggle,#study-toggle{
+  position:fixed;z-index:90;bottom:max(20px,env(safe-area-inset-bottom));min-height:44px;padding:0 16px;border:1px solid var(--note-ui-border);border-radius:14px;
+  background:rgba(255,255,255,.94);color:var(--note-ui-ink);box-shadow:0 4px 18px rgba(24,39,52,.10);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
+}
+#manual-toggle{right:20px}#study-toggle{left:20px}
+#manual-toggle:hover,#study-toggle:hover{background:var(--note-ui-accent-soft);border-color:#cad9e3;transform:translateY(-1px)}
+#manual-panel,#modern-dsp-learning-sidebar{background:var(--note-ui-canvas);color:var(--note-ui-ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+#manual-panel{border-left-color:var(--note-ui-border);box-shadow:-12px 0 36px rgba(24,39,52,.10)}
+#modern-dsp-learning-sidebar{border-right-color:var(--note-ui-border);box-shadow:12px 0 36px rgba(24,39,52,.10)}
+.manual-header,.study-header{background:rgba(255,255,255,.96);border-color:var(--note-ui-border)}
+.manual-header strong,.study-header strong{color:var(--note-ui-ink)}
+#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button{
+  border-color:var(--note-ui-border);border-radius:9px;color:var(--note-ui-ink);background:var(--note-ui-paper)
+}
+#manual-panel button:hover:not(:disabled),.study-header button:hover,.study-tabs button:hover,.study-exercises button:hover{background:var(--note-ui-accent-soft)}
+#manual-source,.manual-source,.manual-toolbar,.study-tabs{border-color:var(--note-ui-border)}
+#manual-pages,.manual-pdf-page,.study-dock-content{overscroll-behavior:contain}
+#manual-resize::after,.study-resize::after{background:#d6dee4}
+#manual-resize:hover::after,#manual-resize:focus-visible::after,#study-resize:hover::after,#study-resize:focus-visible::after{background:var(--note-ui-accent)}
+
+@media(max-width:980px){
+  .note-navigation-controls{left:12px}
+  .note-navigation-ready .layout{padding-top:66px}
+}
+@media(max-width:600px){
+  .note-navigation-controls{top:max(8px,env(safe-area-inset-top));left:10px;padding:3px;border-radius:13px}
+  .note-navigation-controls button,.note-navigation-controls a{min-height:42px;padding:0 11px}
+  .note-navigation-ready .layout{padding:64px 8px 20px}
+  .note-navigation-ready .sidebar{display:none}
+  .note-navigation-ready.note-toc-drawer-open{overflow:hidden}
+  .note-toc-drawer-open::before{content:"";position:fixed;z-index:100;inset:0;background:rgba(25,37,47,.28);backdrop-filter:blur(2px)}
+  .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:#fff;box-shadow:var(--note-ui-shadow)}
+  #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:44px;padding:0 14px}
+  #manual-toggle{right:12px}#study-toggle{left:12px}
+}
+@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle{transition:none}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
-</style></head><body><div id="note-navigation-controls" class="note-navigation-controls"><button id="note-toc-toggle" type="button" aria-controls="note-sidebar" aria-expanded="true">收起目录</button><a id="note-course-home" href="../index.html" aria-label="返回课程选择主页">⌂ 课程首页</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar" id="note-sidebar"><div class="brand">现代信号处理</div><nav class="toc"><a class="toc-main" href="#1-采样为何产生频谱副本">1. 采样为何产生频谱副本</a><a class="toc-main" href="#2-带通采样-最低采样率不是只看最高频率">2. 带通采样：最低采样率不是只看最高频率</a><a class="toc-main" href="#3-抽取-插值与有理数变采样">3. 抽取、插值与有理数变采样</a><a class="toc-sub" href="#抽取-先滤波-再减少样本">抽取：先滤波，再减少样本</a><a class="toc-sub" href="#插值-补零产生镜像-滤波恢复平滑序列">插值：补零产生镜像，滤波恢复平滑序列</a><a class="toc-main" href="#4-高速多通道采样-理想时序与真实失配">4. 高速多通道采样：理想时序与真实失配</a><a class="toc-main" href="#5-压缩感知-欠定方程靠模型恢复可辨识性">5. 压缩感知：欠定方程靠模型恢复可辨识性</a><a class="toc-sub" href="#四类恢复思路">四类恢复思路</a><a class="toc-main" href="#6-mwc-先模拟混频-再低速采样">6. MWC：先模拟混频，再低速采样</a><a class="toc-sub" href="#675-mhz-80-mhz-例子的边界检查">675 MHz、80 MHz 例子的边界检查</a><a class="toc-main" href="#7-多陪集采样-采样位置也决定能否恢复">7. 多陪集采样：采样位置也决定能否恢复</a><a class="toc-main" href="#8-课堂练习-100-msps-芯片怎样选方案">8. 课堂练习：100 MSPS 芯片怎样选方案</a><a class="toc-sub" href="#图一-低通频谱覆盖-200-至-200-mhz">图一：低通频谱覆盖 −200 至 200 MHz</a><a class="toc-sub" href="#图二-基带与-200-mhz-附近的三个窄带">图二：基带与 ±200 MHz 附近的三个窄带</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代信号处理 · 2026-10-19</div><h1>第二章：信号采样与压缩感知</h1><p class="lead">频谱复制、带通采样、多速率、TIADC、稀疏恢复与模拟压缩采样组成同一条采样设计主线。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
+</style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" aria-label="关闭目录" id="note-toc-toggle" type="button">目录</button><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">现代信号处理</div><nav class="toc"><a class="toc-main" href="#1-采样为何产生频谱副本">1. 采样为何产生频谱副本</a><a class="toc-main" href="#2-带通采样-最低采样率不是只看最高频率">2. 带通采样：最低采样率不是只看最高频率</a><a class="toc-main" href="#3-抽取-插值与有理数变采样">3. 抽取、插值与有理数变采样</a><a class="toc-sub" href="#抽取-先滤波-再减少样本">抽取：先滤波，再减少样本</a><a class="toc-sub" href="#插值-补零产生镜像-滤波恢复平滑序列">插值：补零产生镜像，滤波恢复平滑序列</a><a class="toc-main" href="#4-高速多通道采样-理想时序与真实失配">4. 高速多通道采样：理想时序与真实失配</a><a class="toc-main" href="#5-压缩感知-欠定方程靠模型恢复可辨识性">5. 压缩感知：欠定方程靠模型恢复可辨识性</a><a class="toc-sub" href="#四类恢复思路">四类恢复思路</a><a class="toc-main" href="#6-mwc-先模拟混频-再低速采样">6. MWC：先模拟混频，再低速采样</a><a class="toc-sub" href="#675-mhz-80-mhz-例子的边界检查">675 MHz、80 MHz 例子的边界检查</a><a class="toc-main" href="#7-多陪集采样-采样位置也决定能否恢复">7. 多陪集采样：采样位置也决定能否恢复</a><a class="toc-main" href="#8-课堂练习-100-msps-芯片怎样选方案">8. 课堂练习：100 MSPS 芯片怎样选方案</a><a class="toc-sub" href="#图一-低通频谱覆盖-200-至-200-mhz">图一：低通频谱覆盖 −200 至 200 MHz</a><a class="toc-sub" href="#图二-基带与-200-mhz-附近的三个窄带">图二：基带与 ±200 MHz 附近的三个窄带</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代信号处理 · 2026-10-19</div><h1>第二章：信号采样与压缩感知</h1><p class="lead">频谱复制、带通采样、多速率、TIADC、稀疏恢复与模拟压缩采样组成同一条采样设计主线。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
 <p>主线采用2026-10-18的《第二章(2)(1).pdf》127页，并与旧版123页逐页比对。新版新增/改写OMP、ROMP、IHT、MWC及多陪集例题；旧版末尾的随机信号例题与第一章已有内容重合，已归入第一章，避免采样章重复。新版并不是旧版简单加四页。</p>
 </blockquote>
 <h2 id="1-采样为何产生频谱副本">1. 采样为何产生频谱副本</h2>
@@ -133,7 +195,14 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
   const desktopOpen = () => !body.classList.contains('note-toc-collapsed');
   const announce = open => {
     toggle.setAttribute('aria-expanded', String(open));
-    toggle.textContent = smallScreen() ? (open ? '关闭目录' : '☷ 目录') : (open ? '收起目录' : '展开目录');
+    toggle.setAttribute('aria-label', open ? '关闭目录' : '打开目录');
+    toggle.textContent = smallScreen() ? '☰ 目录' : '目录';
+  };
+  const closeDrawer = restoreFocus => {
+    if (!mobileOpen()) return;
+    body.classList.remove('note-toc-drawer-open');
+    announce(false);
+    if (restoreFocus) toggle.focus({ preventScroll:true });
   };
 
   body.classList.add('note-navigation-ready');
@@ -144,7 +213,8 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
 
   toggle.addEventListener('click', () => {
     if (smallScreen()) {
-      body.classList.toggle('note-toc-drawer-open');
+      if (mobileOpen()) closeDrawer(false);
+      else body.classList.add('note-toc-drawer-open');
       announce(mobileOpen());
       return;
     }
@@ -156,12 +226,22 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
 
   sidebar.querySelectorAll('.toc a').forEach(link => link.addEventListener('click', () => {
     if (!smallScreen() || !mobileOpen()) return;
-    body.classList.remove('note-toc-drawer-open');
-    announce(false);
+    closeDrawer(false);
   }));
 
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && smallScreen() && mobileOpen()) {
+      event.preventDefault();
+      closeDrawer(true);
+    }
+  });
+  document.addEventListener('click', event => {
+    // The dimmed backdrop is the body pseudo-element; close only when it is hit.
+    if (smallScreen() && mobileOpen() && event.target === body) closeDrawer(true);
+  });
+
   window.addEventListener('resize', () => {
-    body.classList.remove('note-toc-drawer-open');
+    closeDrawer(false);
     announce(smallScreen() ? false : desktopOpen());
   }, {passive:true});
 })();

@@ -36,16 +36,6 @@ body.manual-resizing,body.manual-resizing *{cursor:col-resize!important;user-sel
 @media(max-width:999px){body.manual-open{overflow:hidden}#manual-panel{width:min(94vw,680px)}.manual-header{padding:7px 10px;min-height:44px}.manual-header strong{font-size:14px}.manual-source-content{align-items:flex-start;flex-direction:column}.manual-unlock{width:100%}.manual-toolbar{gap:4px;padding:5px 7px}}
 @media(max-width:600px){#manual-panel{width:100vw}#manual-toggle{right:12px;bottom:16px;font-size:12px;padding:10px 12px}.manual-footer{font-size:9px}#manual-pages{padding:8px 5px}.manual-zoom-caption{display:none}}
 @media print{#manual-toggle,#manual-panel,#manual-resize{display:none!important}.manual-open .layout{display:block;margin:0;padding:0}.manual-open .article{padding:0;max-width:none}}
-</style><style id="note-navigation-styles">.note-navigation-controls{position:fixed;z-index:95;top:10px;left:max(12px,calc((100vw - 1210px)/2 + 24px));display:flex;align-items:center;gap:7px;font:600 13px/1.2 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
-.note-navigation-controls button,.note-navigation-controls a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 11px;border:1px solid #cbd9e6;border-radius:9px;background:rgba(255,255,255,.96);color:#315f91;text-decoration:none;box-shadow:0 3px 12px rgba(41,63,82,.08);cursor:pointer}
-.note-navigation-controls button:hover,.note-navigation-controls a:hover{background:#edf5fb;border-color:#9dbbd3;color:#174e7e}
-.note-navigation-controls button:focus-visible,.note-navigation-controls a:focus-visible{outline:3px solid #87b9df;outline-offset:2px}
-body.note-navigation-ready .sidebar{padding-top:55px}
-body.note-toc-collapsed .sidebar{display:none!important}
-body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
-@media(max-width:980px){.note-navigation-controls{left:12px}.note-navigation-ready .layout{padding-top:62px}}
-@media(max-width:600px){.note-navigation-controls{top:8px;left:10px}.note-navigation-ready .layout{padding-top:58px}.note-navigation-ready .layout{padding-left:8px;padding-right:8px}.note-navigation-ready .sidebar{display:none}.note-navigation-ready.note-toc-drawer-open{overflow:hidden}.note-toc-drawer-open::before{content:"";position:fixed;z-index:80;inset:0;background:rgba(19,43,62,.38)}.note-navigation-ready.note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:85;inset:54px 10px 10px;width:auto;height:auto;max-height:none;overflow:auto;box-shadow:0 14px 40px rgba(17,43,65,.25)}}
-@media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
 </style><style id="modern-dsp-learning-sidebar-styles">
 :root{--study-width:clamp(400px,44vw,760px)}
 #study-toggle{position:fixed;left:18px;bottom:24px;z-index:90;border:1px solid #1f6fb2;border-radius:12px;padding:12px 17px;background:#1f6fb2;color:white;box-shadow:0 5px 24px #17344d30;font:600 14px "Microsoft YaHei",sans-serif;cursor:pointer}
@@ -62,7 +52,79 @@ body.study-resizing,body.study-resizing *{cursor:col-resize!important;user-selec
 @media(max-width:999px){body.study-open{overflow:hidden}#modern-dsp-learning-sidebar{width:min(94vw,680px)}.study-header{min-height:48px;padding:7px 10px}.study-dock-content{padding:12px}.study-resize{display:none!important}}
 @media(max-width:600px){#modern-dsp-learning-sidebar{width:100vw}.study-tabs{padding:7px}.study-tabs button{flex:1;padding:6px 4px}#study-toggle{left:12px;bottom:16px;font-size:12px;padding:10px 12px}.study-dock-content{padding:11px}.study-footer{font-size:9px}}
 @media print{#study-toggle,#modern-dsp-learning-sidebar,#study-resize{display:none!important}.study-open .layout{display:block;margin:0;padding:0}.study-open .article{padding:0;max-width:none}}
-</style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" id="note-toc-toggle" type="button">收起目录</button><a aria-label="返回课程选择主页" href="../index.html" id="note-course-home">⌂ 课程首页</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理</div><nav class="toc"><a class="toc-main" href="#1-估计对象与观测对象先分清">1. 估计对象与观测对象先分清</a><a class="toc-main" href="#2-每一帧保存两样东西">2. 每一帧保存两样东西</a><a class="toc-main" href="#3-创新告诉我们观测带来了多少新信息">3. 创新告诉我们观测带来了多少新信息</a><a class="toc-main" href="#4-kalman-增益为什么长这样">4. Kalman 增益为什么长这样</a><a class="toc-sub" href="#标量增益最直观">标量增益最直观</a><a class="toc-main" href="#5-两个可以完整算出的例子">5. 两个可以完整算出的例子</a><a class="toc-sub" href="#常量被重复带噪测量">常量被重复带噪测量</a><a class="toc-sub" href="#ar-1-信号与稳态滤波">AR(1) 信号与稳态滤波</a><a class="toc-main" href="#6-跟踪问题的状态怎么搭">6. 跟踪问题的状态怎么搭</a><a class="toc-main" href="#7-由相关函数或差分方程构造模型">7. 由相关函数或差分方程构造模型</a><a class="toc-main" href="#8-使用边界与排错顺序">8. 使用边界与排错顺序</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代数字信号处理 · 2026-10-19</div><h1>2.5 卡尔曼滤波：状态与递推估计</h1><p class="lead">先建状态与量测模型，再推导预测、创新、增益、误差协方差及稳态例题。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
+</style><style id="note-navigation-styles">:root{
+  --note-ui-paper:#fff;
+  --note-ui-canvas:#f6f7f8;
+  --note-ui-ink:#26323b;
+  --note-ui-muted:#6c7a85;
+  --note-ui-border:#e2e7eb;
+  --note-ui-accent:#397aa8;
+  --note-ui-accent-soft:#edf4f8;
+  --note-ui-shadow:0 12px 36px rgba(24,39,52,.12);
+  --note-ui-focus:rgba(57,122,168,.52);
+}
+.note-navigation-controls{
+  position:fixed;z-index:110;top:max(12px,env(safe-area-inset-top));left:max(16px,calc((100vw - 1210px)/2 + 24px));
+  display:flex;align-items:center;gap:2px;padding:4px;border:1px solid rgba(220,226,231,.9);border-radius:14px;
+  background:rgba(255,255,255,.88);box-shadow:0 3px 16px rgba(24,39,52,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+.note-navigation-controls button,.note-navigation-controls a{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:0 12px;border:0;border-radius:10px;
+  background:transparent;color:var(--note-ui-ink);text-decoration:none;white-space:nowrap;cursor:pointer;transition:background-color .16s ease,color .16s ease;
+}
+.note-navigation-controls button:hover,.note-navigation-controls a:hover{background:var(--note-ui-accent-soft);color:#245f86}
+.note-navigation-controls button:focus-visible,.note-navigation-controls a:focus-visible,
+#manual-toggle:focus-visible,#study-toggle:focus-visible,#manual-panel button:focus-visible,#manual-panel select:focus-visible,#manual-page:focus-visible,
+#modern-dsp-learning-sidebar button:focus-visible,#manual-resize:focus-visible,#study-resize:focus-visible{
+  outline:3px solid var(--note-ui-focus);outline-offset:2px
+}
+.note-navigation-controls a{border-left:1px solid var(--note-ui-border);border-radius:0 10px 10px 0}
+body.note-navigation-ready .sidebar{padding-top:62px}
+body.note-toc-collapsed .sidebar{display:none!important}
+body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
+
+/* The same quiet, compact launch control for optional reading/learning panels. */
+#manual-toggle,#study-toggle{
+  position:fixed;z-index:90;bottom:max(20px,env(safe-area-inset-bottom));min-height:44px;padding:0 16px;border:1px solid var(--note-ui-border);border-radius:14px;
+  background:rgba(255,255,255,.94);color:var(--note-ui-ink);box-shadow:0 4px 18px rgba(24,39,52,.10);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
+}
+#manual-toggle{right:20px}#study-toggle{left:20px}
+#manual-toggle:hover,#study-toggle:hover{background:var(--note-ui-accent-soft);border-color:#cad9e3;transform:translateY(-1px)}
+#manual-panel,#modern-dsp-learning-sidebar{background:var(--note-ui-canvas);color:var(--note-ui-ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+#manual-panel{border-left-color:var(--note-ui-border);box-shadow:-12px 0 36px rgba(24,39,52,.10)}
+#modern-dsp-learning-sidebar{border-right-color:var(--note-ui-border);box-shadow:12px 0 36px rgba(24,39,52,.10)}
+.manual-header,.study-header{background:rgba(255,255,255,.96);border-color:var(--note-ui-border)}
+.manual-header strong,.study-header strong{color:var(--note-ui-ink)}
+#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button{
+  border-color:var(--note-ui-border);border-radius:9px;color:var(--note-ui-ink);background:var(--note-ui-paper)
+}
+#manual-panel button:hover:not(:disabled),.study-header button:hover,.study-tabs button:hover,.study-exercises button:hover{background:var(--note-ui-accent-soft)}
+#manual-source,.manual-source,.manual-toolbar,.study-tabs{border-color:var(--note-ui-border)}
+#manual-pages,.manual-pdf-page,.study-dock-content{overscroll-behavior:contain}
+#manual-resize::after,.study-resize::after{background:#d6dee4}
+#manual-resize:hover::after,#manual-resize:focus-visible::after,#study-resize:hover::after,#study-resize:focus-visible::after{background:var(--note-ui-accent)}
+
+@media(max-width:980px){
+  .note-navigation-controls{left:12px}
+  .note-navigation-ready .layout{padding-top:66px}
+}
+@media(max-width:600px){
+  .note-navigation-controls{top:max(8px,env(safe-area-inset-top));left:10px;padding:3px;border-radius:13px}
+  .note-navigation-controls button,.note-navigation-controls a{min-height:42px;padding:0 11px}
+  .note-navigation-ready .layout{padding:64px 8px 20px}
+  .note-navigation-ready .sidebar{display:none}
+  .note-navigation-ready.note-toc-drawer-open{overflow:hidden}
+  .note-toc-drawer-open::before{content:"";position:fixed;z-index:100;inset:0;background:rgba(25,37,47,.28);backdrop-filter:blur(2px)}
+  .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:#fff;box-shadow:var(--note-ui-shadow)}
+  #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:44px;padding:0 14px}
+  #manual-toggle{right:12px}#study-toggle{left:12px}
+}
+@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle{transition:none}}
+@media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
+</style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" aria-label="关闭目录" id="note-toc-toggle" type="button">目录</button><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">现代数字信号处理</div><nav class="toc"><a class="toc-main" href="#1-估计对象与观测对象先分清">1. 估计对象与观测对象先分清</a><a class="toc-main" href="#2-每一帧保存两样东西">2. 每一帧保存两样东西</a><a class="toc-main" href="#3-创新告诉我们观测带来了多少新信息">3. 创新告诉我们观测带来了多少新信息</a><a class="toc-main" href="#4-kalman-增益为什么长这样">4. Kalman 增益为什么长这样</a><a class="toc-sub" href="#标量增益最直观">标量增益最直观</a><a class="toc-main" href="#5-两个可以完整算出的例子">5. 两个可以完整算出的例子</a><a class="toc-sub" href="#常量被重复带噪测量">常量被重复带噪测量</a><a class="toc-sub" href="#ar-1-信号与稳态滤波">AR(1) 信号与稳态滤波</a><a class="toc-main" href="#6-跟踪问题的状态怎么搭">6. 跟踪问题的状态怎么搭</a><a class="toc-main" href="#7-由相关函数或差分方程构造模型">7. 由相关函数或差分方程构造模型</a><a class="toc-main" href="#8-使用边界与排错顺序">8. 使用边界与排错顺序</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">现代数字信号处理 · 2026-10-19</div><h1>2.5 卡尔曼滤波：状态与递推估计</h1><p class="lead">先建状态与量测模型，再推导预测、创新、增益、误差协方差及稳态例题。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
 <p>本篇补足此前第二章笔记没有来源支撑的2.5部分。主线为《卡尔曼滤波.pdf》61页。课件把量测矩阵记为C、Kalman增益记为H；本篇统一用H表示量测矩阵、K表示增益，并用−/＋区分先验与后验，避免同一个字母承担两种角色。</p>
 </blockquote>
 <h2 id="1-估计对象与观测对象先分清">1. 估计对象与观测对象先分清</h2>
@@ -113,7 +175,7 @@ function update(){const d=document.documentElement;const m=d.scrollHeight-d.clie
 window.addEventListener('scroll',update,{passive:true});update();
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));}})},{rootMargin:'-15% 0px -72% 0px'});
 document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
-</script><button aria-controls="manual-panel" aria-expanded="false" id="manual-toggle" type="button"><span id="manual-toggle-label">时域离散随机信号处理教材</span> <span aria-hidden="true">↗</span></button>
+</script><button aria-controls="manual-panel" aria-expanded="false" aria-label="打开时域离散随机信号处理教材" id="manual-toggle" type="button"><span id="manual-toggle-label">时域离散随机信号处理教材</span></button>
 <button aria-controls="manual-panel" aria-label="调整笔记与手册宽度" aria-orientation="vertical" aria-valuemax="75" aria-valuemin="360" aria-valuenow="45" id="manual-resize" role="separator" tabindex="0" type="button"></button>
 <aside aria-label="时域离散随机信号处理教材 阅读侧栏" data-document-title="时域离散随机信号处理教材" data-encrypted-url="books/时域离散随机信号处理.pdf.enc" data-pdf-url="" data-viewer-base="../radar-board/manual-viewer/" hidden="" id="manual-panel">
 <header class="manual-header"><strong id="manual-heading">时域离散随机信号处理教材</strong><div class="manual-header-actions"><a hidden="" id="manual-original" rel="noopener" target="_blank">单独打开</a><button aria-label="收起阅读侧栏" id="manual-close" type="button">收起 ×</button></div></header>
@@ -138,7 +200,9 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
   const original = byId('manual-original');
   const setStatus = (message, visible = true) => { status.textContent = message; status.hidden = !visible; };
   const documentTitle = panel.dataset.documentTitle || '参考 PDF';
-  byId('manual-toggle-label').textContent = documentTitle;
+  const shortTitle = documentTitle.includes('CSP2025T') ? '用户手册' : '教材 PDF';
+  byId('manual-toggle-label').textContent = shortTitle;
+  toggle.setAttribute('aria-label', `打开${documentTitle}`);
   byId('manual-heading').textContent = documentTitle;
   byId('manual-empty-title').textContent = `笔记与${documentTitle}，并排阅读`;
   panel.setAttribute('aria-label', `${documentTitle} 阅读侧栏`);
@@ -212,6 +276,7 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
     panel.hidden = !open;
     document.body.classList.toggle('manual-open', open);
     toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', `${open ? '收起' : '打开'}${documentTitle}阅读侧栏`);
     restoreAnchor(anchor);
     (open ? close : toggle).focus({preventScroll:true});
     if (open) {
@@ -387,50 +452,7 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
     clearTimeout(resizeTimer); resizeTimer = setTimeout(() => rebuildPages(current), 180);
   }).observe(pages);
 })();
-</script><script id="note-navigation-script">(() => {
-  const body = document.body;
-  const toggle = document.getElementById('note-toc-toggle');
-  const sidebar = document.querySelector('.sidebar');
-  if (!toggle || !sidebar) return;
-
-  const smallScreen = () => window.matchMedia('(max-width: 600px)').matches;
-  const mobileOpen = () => body.classList.contains('note-toc-drawer-open');
-  const desktopOpen = () => !body.classList.contains('note-toc-collapsed');
-  const announce = open => {
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.textContent = smallScreen() ? (open ? '关闭目录' : '☷ 目录') : (open ? '收起目录' : '展开目录');
-  };
-
-  body.classList.add('note-navigation-ready');
-  let saved = null;
-  try { saved = localStorage.getItem('study-notes-toc-collapsed'); } catch (_) {}
-  if (saved === 'true' && !smallScreen()) body.classList.add('note-toc-collapsed');
-  announce(smallScreen() ? mobileOpen() : desktopOpen());
-
-  toggle.addEventListener('click', () => {
-    if (smallScreen()) {
-      body.classList.toggle('note-toc-drawer-open');
-      announce(mobileOpen());
-      return;
-    }
-    body.classList.toggle('note-toc-collapsed');
-    const open = desktopOpen();
-    try { localStorage.setItem('study-notes-toc-collapsed', String(!open)); } catch (_) {}
-    announce(open);
-  });
-
-  sidebar.querySelectorAll('.toc a').forEach(link => link.addEventListener('click', () => {
-    if (!smallScreen() || !mobileOpen()) return;
-    body.classList.remove('note-toc-drawer-open');
-    announce(false);
-  }));
-
-  window.addEventListener('resize', () => {
-    body.classList.remove('note-toc-drawer-open');
-    announce(smallScreen() ? false : desktopOpen());
-  }, {passive:true});
-})();
-</script><button aria-controls="modern-dsp-learning-sidebar" aria-expanded="false" id="study-toggle" type="button">学习导航 <span aria-hidden="true">↗</span></button><button aria-label="调整学习侧栏与笔记宽度" aria-orientation="vertical" aria-valuemax="75" aria-valuemin="360" aria-valuenow="44" class="study-resize" id="study-resize" role="separator" tabindex="0" type="button"></button><aside aria-label="现代数字信号处理学习侧栏" hidden="" id="modern-dsp-learning-sidebar"><header class="study-header"><div><strong>学习主线与习题讲解</strong><small>第二章习题：Kalman 与状态空间</small></div><button aria-label="收起学习侧栏" id="study-close" type="button">收起 ×</button></header><div aria-label="本章学习导航" class="study-tabs" role="tablist"><button aria-selected="true" data-study-tab="route" role="tab" type="button">知识主线</button><button aria-selected="false" data-study-tab="exercises" role="tab" type="button">规范解题</button><button aria-selected="false" data-study-tab="toc" role="tab" type="button">章节目录</button></div><section class="study-dock-content" data-study-panel="route" role="tabpanel">
+</script><button aria-controls="modern-dsp-learning-sidebar" aria-expanded="false" aria-label="打开学习导航" id="study-toggle" type="button">学习导航</button><button aria-label="调整学习侧栏与笔记宽度" aria-orientation="vertical" aria-valuemax="75" aria-valuemin="360" aria-valuenow="44" class="study-resize" id="study-resize" role="separator" tabindex="0" type="button"></button><aside aria-label="现代数字信号处理学习侧栏" hidden="" id="modern-dsp-learning-sidebar"><header class="study-header"><div><strong>学习主线与习题讲解</strong><small>第二章习题：Kalman 与状态空间</small></div><button aria-label="收起学习侧栏" id="study-close" type="button">收起 ×</button></header><div aria-label="本章学习导航" class="study-tabs" role="tablist"><button aria-selected="true" data-study-tab="route" role="tab" type="button">知识主线</button><button aria-selected="false" data-study-tab="exercises" role="tab" type="button">规范解题</button><button aria-selected="false" data-study-tab="toc" role="tab" type="button">章节目录</button></div><section class="study-dock-content" data-study-panel="route" role="tabpanel">
 <h3>Kalman：每来一帧新观测，就把旧信息压缩并更新</h3>
 <p class="study-intro">它解决的是动态估计：目标状态看不见、随时间变化；传感器每一时刻给出带噪观测。Kalman不保存所有历史样本，而保存“当前估计 + 对它有多不确定”。</p>
 <ol class="study-flow">
@@ -455,4 +477,65 @@ document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
  toggle.addEventListener('click',()=>setOpen(true));close.addEventListener('click',()=>setOpen(false));panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();setOpen(false)}});
  panel.addEventListener('wheel',e=>{if(e.ctrlKey)return;e.stopPropagation();const active=panel.querySelector('.study-dock-content:not([hidden])'),inside=active?.contains(e.target),top=active?.scrollTop<=0,bottom=active?.scrollTop+active?.clientHeight>=active?.scrollHeight-1;if(!inside||(e.deltaY<0&&top)||(e.deltaY>0&&bottom))e.preventDefault()},{passive:false});
  handle.addEventListener('pointerdown',e=>{if(innerWidth<1000||e.button!==0)return;e.preventDefault();handle.setPointerCapture(e.pointerId);document.body.classList.add('study-resizing');width(e.clientX)});handle.addEventListener('pointermove',e=>{if(handle.hasPointerCapture(e.pointerId))width(e.clientX)});function stop(e){if(!handle.hasPointerCapture(e.pointerId))return;handle.releasePointerCapture(e.pointerId);document.body.classList.remove('study-resizing');width(e.clientX,true)}handle.addEventListener('pointerup',stop);handle.addEventListener('pointercancel',stop);handle.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const v=Number(handle.getAttribute('aria-valuenow'))||600,b=bounds();width(e.key==='Home'?b.min:e.key==='End'?b.max:v+(e.key==='ArrowRight'?24:-24),true)});
-})();</script></body></html>
+})();</script><script id="note-navigation-script">(() => {
+  const body = document.body;
+  const toggle = document.getElementById('note-toc-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (!toggle || !sidebar) return;
+
+  const smallScreen = () => window.matchMedia('(max-width: 600px)').matches;
+  const mobileOpen = () => body.classList.contains('note-toc-drawer-open');
+  const desktopOpen = () => !body.classList.contains('note-toc-collapsed');
+  const announce = open => {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? '关闭目录' : '打开目录');
+    toggle.textContent = smallScreen() ? '☰ 目录' : '目录';
+  };
+  const closeDrawer = restoreFocus => {
+    if (!mobileOpen()) return;
+    body.classList.remove('note-toc-drawer-open');
+    announce(false);
+    if (restoreFocus) toggle.focus({ preventScroll:true });
+  };
+
+  body.classList.add('note-navigation-ready');
+  let saved = null;
+  try { saved = localStorage.getItem('study-notes-toc-collapsed'); } catch (_) {}
+  if (saved === 'true' && !smallScreen()) body.classList.add('note-toc-collapsed');
+  announce(smallScreen() ? mobileOpen() : desktopOpen());
+
+  toggle.addEventListener('click', () => {
+    if (smallScreen()) {
+      if (mobileOpen()) closeDrawer(false);
+      else body.classList.add('note-toc-drawer-open');
+      announce(mobileOpen());
+      return;
+    }
+    body.classList.toggle('note-toc-collapsed');
+    const open = desktopOpen();
+    try { localStorage.setItem('study-notes-toc-collapsed', String(!open)); } catch (_) {}
+    announce(open);
+  });
+
+  sidebar.querySelectorAll('.toc a').forEach(link => link.addEventListener('click', () => {
+    if (!smallScreen() || !mobileOpen()) return;
+    closeDrawer(false);
+  }));
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && smallScreen() && mobileOpen()) {
+      event.preventDefault();
+      closeDrawer(true);
+    }
+  });
+  document.addEventListener('click', event => {
+    // The dimmed backdrop is the body pseudo-element; close only when it is hit.
+    if (smallScreen() && mobileOpen() && event.target === body) closeDrawer(true);
+  });
+
+  window.addEventListener('resize', () => {
+    closeDrawer(false);
+    announce(smallScreen() ? false : desktopOpen());
+  }, {passive:true});
+})();
+</script></body></html>
