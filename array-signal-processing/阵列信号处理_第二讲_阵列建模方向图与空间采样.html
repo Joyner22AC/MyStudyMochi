@@ -507,7 +507,58 @@ $$</p>
 =\frac{2\pi d}{\lambda}
 (\sin\theta-\sin\theta_0),
 $$</p>
-<p>则均匀加权 ULA 的归一化方向图为</p>
+<p>这个角度差如何变成方向图中的正弦比？关键是把每个阵元收到的相位逐项写出来，再求和。以下从阵元编号 $m=0$ 开始。</p>
+<h4>逐步推导：从阵元相位和到正弦比</h4>
+<p><strong>第 1 步：写出每个阵元的相位。</strong> 按前面采用的 ULA 正相位约定，方向 $\theta$ 上第 $m$ 个阵元的相位因子为 $e^{\mathrm jm\mu(\theta)}$，其中</p>
+<p>$$
+\mu(\theta)=\frac{2\pi d}{\lambda}\sin\theta,
+\qquad m=0,1,\ldots,M-1.
+$$</p>
+<p>所以导向矢量是</p>
+<p>$$
+\mathbf a(\theta)
+=\begin{bmatrix}
+1 &amp; e^{\mathrm j\mu(\theta)} &amp; e^{\mathrm j2\mu(\theta)} &amp; \cdots &amp; e^{\mathrm j(M-1)\mu(\theta)}
+\end{bmatrix}^{\mathsf T}.
+$$</p>
+<p><strong>第 2 步：把指向 $\theta_0$ 的权值代入响应。</strong> 使用均匀加权 $\mathbf w=\mathbf a(\theta_0)/M$，阵列对方向 $\theta$ 的复响应为</p>
+<p>$$
+\begin{aligned}
+B(\theta)
+&amp;=\mathbf w^{\mathrm H}\mathbf a(\theta)\\
+&amp;=\frac{1}{M}\mathbf a^{\mathrm H}(\theta_0)\mathbf a(\theta)\\
+&amp;=\frac{1}{M}\sum_{m=0}^{M-1}
+e^{-\mathrm jm\mu(\theta_0)}e^{\mathrm jm\mu(\theta)}.
+\end{aligned}
+$$</p>
+<p><strong>第 3 步：合并成相邻阵元的相位差。</strong> 两个指数相乘时指数相加，因此</p>
+<p>$$
+e^{-\mathrm jm\mu(\theta_0)}e^{\mathrm jm\mu(\theta)}
+=e^{\mathrm jm[\mu(\theta)-\mu(\theta_0)]}
+=e^{\mathrm jm\psi},
+$$</p>
+<p>于是</p>
+<p>$$
+B(\theta)=\frac{1}{M}\sum_{m=0}^{M-1}e^{\mathrm jm\psi}.
+$$</p>
+<p>现在问题变成：求 $M$ 个公比为 $e^{\mathrm j\psi}$ 的复数等比项之和。</p>
+<p><strong>第 4 步：用等比数列公式，并把相位因子提出。</strong> 当 $\psi\ne 2\pi q$（$q$ 为整数）时，</p>
+<p>$$
+\begin{aligned}
+\sum_{m=0}^{M-1}e^{\mathrm jm\psi}
+&amp;=\frac{1-e^{\mathrm jM\psi}}{1-e^{\mathrm j\psi}}\\
+&amp;=\frac{e^{\mathrm jM\psi/2}\left(-2\mathrm j\sin(M\psi/2)\right)}
+{e^{\mathrm j\psi/2}\left(-2\mathrm j\sin(\psi/2)\right)}\\
+&amp;=e^{\mathrm j(M-1)\psi/2}
+\frac{\sin(M\psi/2)}{\sin(\psi/2)}.
+\end{aligned}
+$$</p>
+<p>第二行使用恒等式 $1-e^{\mathrm jx}=-2\mathrm j e^{\mathrm jx/2}\sin(x/2)$；分子、分母中的 $-2\mathrm j$ 抵消，两个半相位相除后留下 $e^{\mathrm j(M-1)\psi/2}$。代回响应：</p>
+<p>$$
+B(\theta)=e^{\mathrm j(M-1)\psi/2}
+\frac{\sin(M\psi/2)}{M\sin(\psi/2)}.
+$$</p>
+<p><strong>第 5 步：取幅度并归一化。</strong> 前面的 $e^{\mathrm j(M-1)\psi/2}$ 是整体相位，模长为 $1$，所以不影响方向图幅度。在指向方向 $\theta=\theta_0$ 时，$\psi=0$，所有阵元同相；未归一化的相位和为 $M$，乘权值中的 $1/M$ 后响应幅度为 $1$。另一方面，由三角不等式，任意方向均有 $|B(\theta)|\le M^{-1}\sum_{m=0}^{M-1}|e^{\mathrm jm\psi}|=1$，所以这个同相响应确实达到最大值。因此均匀加权 ULA 的归一化方向图为</p>
 <p>$$
 \boxed{
 F(\theta)
@@ -517,6 +568,8 @@ F(\theta)
 \right|.
 }
 $$</p>
+<p>当 $\psi=2\pi q$（$q$ 为整数）时，正弦比表面上是 $0/0$；回到原始求和，每一项都等于 $1$，所以 $B=1$、$F=1$。这也等于在这些点取连续极限；其中 $q=0$ 就是指向方向 $\theta=\theta_0$ 的主瓣峰值。</p>
+<p><strong>直观上</strong>，朝向 $\theta_0$ 时，各阵元补偿后相位对齐，信号相加；偏离主瓣后，相邻阵元每隔一个 $\psi$ 逐渐转相位，矢量和发生部分抵消。分子描述 $M$ 个相位项的合成，除以 $M$ 则把主瓣峰值归一到 $1$。这正是有限长矩形窗 DTFT 的 Dirichlet 核形式。</p>
 <figure class="diagram"><svg aria-label="阵列方向图主瓣旁瓣和栅瓣" role="img" viewbox="0 0 960 410">
 <rect fill="#fbfdff" height="408" rx="18" stroke="#dce6f0" width="958" x="1" y="1"></rect><text class="svg-title" text-anchor="middle" x="480" y="42">阵列方向图：空间匹配响应的主瓣、旁瓣与栅瓣</text><line stroke="#60788f" stroke-width="2" x1="85" x2="880" y1="325" y2="325"></line><line stroke="#60788f" stroke-width="2" x1="85" x2="85" y1="325" y2="85"></line>
 <path d="M95 313 C145 312,170 300,205 285 C235 270,260 300,295 306 C345 315,370 270,405 235 C430 205,455 108,480 90 C505 108,530 205,555 235 C590 270,615 315,665 306 C700 300,725 270,755 285 C790 300,815 312,870 313" fill="none" stroke="#1f6fb2" stroke-width="4"></path>
