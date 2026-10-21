@@ -60,6 +60,7 @@ table{width:100%;border-collapse:collapse;margin:20px 0 28px;font-size:14.5px} t
 }
 .note-navigation-controls a{border-left:1px solid var(--note-ui-border);border-radius:0 10px 10px 0}
 .note-navigation-controls .note-theme-toggle{min-width:72px}
+.note-navigation-catalog-controls{width:max-content;max-width:100%;margin:0 0 22px;transform:none}
 body.note-navigation-ready .sidebar{scroll-margin-top:18px}
 body.note-toc-collapsed .sidebar{display:none!important}
 body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
@@ -97,6 +98,13 @@ html[data-theme="dark"]{
 html[data-theme="dark"] body{background:#14171b!important;color:#d9dee3!important}
 html[data-theme="dark"] .sidebar{background:rgba(29,32,37,.94);border-color:var(--note-ui-border);color:var(--note-ui-ink)}
 html[data-theme="dark"] .article{background:#1c1f24;border-color:#30363e;color:#d9dee3}
+html[data-theme="dark"] .card{background:#22262c;border-color:#383f48}
+html[data-theme="dark"] .card h2{color:#dce8f2}
+html[data-theme="dark"] .card p,html[data-theme="dark"] .source-ref{color:#aeb9c4}
+html[data-theme="dark"] .hero{background:linear-gradient(135deg,#202a34,#1c1f24);border-color:#383f48}
+html[data-theme="dark"] .title{color:#dce8f2}
+html[data-theme="dark"] .num{color:#8fc9f2}
+html[data-theme="dark"] .sub,html[data-theme="dark"] footer{color:#aeb9c4}
 html[data-theme="dark"] .brand,html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3,
 html[data-theme="dark"] h4,html[data-theme="dark"] h5,html[data-theme="dark"] strong{color:#dce8f2}
 html[data-theme="dark"] p,html[data-theme="dark"] li,html[data-theme="dark"] dd,html[data-theme="dark"] label{color:inherit}
@@ -142,10 +150,12 @@ html[data-theme="dark"] .study-flow li p,html[data-theme="dark"] .study-exercise
 html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-resize::after{background:#4b535d}
 
 @media(max-width:980px){.note-navigation-controls{margin:12px 16px -18px;transform:none}}
+@media(max-width:980px){.note-navigation-catalog-controls{margin:0 0 20px;transform:none}}
 @media(max-width:600px){
   .note-navigation-controls{margin:8px 10px -4px;padding:3px;border-radius:13px}
   .note-navigation-controls button,.note-navigation-controls a{min-height:40px;padding:0 10px}
   .note-navigation-controls .note-theme-toggle{min-width:62px}
+  .note-navigation-catalog-controls{margin-bottom:18px}
   .note-navigation-ready .layout{padding-top:12px}
   .note-navigation-ready .sidebar{display:none}
   .note-navigation-ready.note-toc-drawer-open{overflow:hidden}

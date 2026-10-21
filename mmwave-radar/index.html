@@ -11,8 +11,145 @@
 main{max-width:760px;margin:0 auto;padding:32px 18px 48px}.hero{background:linear-gradient(135deg,#edf6ff,#fff);border:1px solid var(--line);border-radius:20px;padding:28px 24px;margin-bottom:20px}h1{margin:0 0 10px;font-size:clamp(26px,7vw,42px)}p{color:var(--muted);line-height:1.7}.list{display:grid;gap:12px}.card{display:block;padding:18px 20px;background:var(--paper);border:1px solid var(--line);border-radius:14px;color:var(--ink);text-decoration:none;box-shadow:0 6px 18px #2940520d}.card:active{transform:scale(.99)}.num{color:var(--blue);font-weight:700;font-size:14px}.title{display:block;margin-top:5px;font-size:18px;font-weight:700}.sub{display:block;margin-top:6px;color:var(--muted);font-size:14px}
 footer{margin-top:22px;color:var(--muted);font-size:13px}
 </style>
-</head>
-<body><main>
+<script id="note-theme-bootstrap">(()=>{let theme=null;try{theme=localStorage.getItem("study-notes-theme")}catch(_){}if(theme!=="light"&&theme!=="dark")theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=theme;})();</script><style id="note-navigation-styles">:root{
+  --note-ui-paper:#fff;
+  --note-ui-canvas:#f6f7f8;
+  --note-ui-ink:#26323b;
+  --note-ui-muted:#6c7a85;
+  --note-ui-border:#e2e7eb;
+  --note-ui-accent:#397aa8;
+  --note-ui-accent-soft:#edf4f8;
+  --note-ui-shadow:0 12px 36px rgba(24,39,52,.12);
+  --note-ui-focus:rgba(57,122,168,.52);
+}
+/* Keep navigation in document flow: it can never sit on top of reading content. */
+.note-navigation-controls{
+  position:relative;z-index:2;display:flex;align-items:center;gap:2px;width:max-content;max-width:calc(100% - 32px);
+  margin:14px auto -18px;transform:translateX(calc((min(1210px,100vw) - 100%)/-2 + 8px));
+  padding:4px;border:1px solid rgba(220,226,231,.72);border-radius:14px;
+  background:rgba(255,255,255,.66);box-shadow:0 3px 16px rgba(24,39,52,.055);backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+.note-navigation-controls button,.note-navigation-controls a{
+  display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border:0;border-radius:10px;
+  background:transparent;color:var(--note-ui-ink);text-decoration:none;white-space:nowrap;cursor:pointer;transition:background-color .16s ease,color .16s ease;
+}
+.note-navigation-controls button:hover,.note-navigation-controls a:hover{background:var(--note-ui-accent-soft);color:#245f86}
+.note-navigation-controls button:focus-visible,.note-navigation-controls a:focus-visible,
+#manual-toggle:focus-visible,#study-toggle:focus-visible,#manual-panel button:focus-visible,#manual-panel select:focus-visible,#manual-page:focus-visible,
+#modern-dsp-learning-sidebar button:focus-visible,#manual-resize:focus-visible,#study-resize:focus-visible{
+  outline:3px solid var(--note-ui-focus);outline-offset:2px
+}
+.note-navigation-controls a{border-left:1px solid var(--note-ui-border);border-radius:0 10px 10px 0}
+.note-navigation-controls .note-theme-toggle{min-width:72px}
+.note-navigation-catalog-controls{width:max-content;max-width:100%;margin:0 0 22px;transform:none}
+body.note-navigation-ready .sidebar{scroll-margin-top:18px}
+body.note-toc-collapsed .sidebar{display:none!important}
+body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
+
+/* Optional readers stay available but recede visually until needed. */
+#manual-toggle,#study-toggle{
+  position:fixed;z-index:90;bottom:max(20px,env(safe-area-inset-bottom));min-height:42px;padding:0 15px;border:1px solid rgba(210,220,228,.78);border-radius:14px;
+  background:rgba(250,252,253,.70);color:var(--note-ui-ink);box-shadow:0 4px 18px rgba(24,39,52,.075);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
+}
+#manual-toggle{right:20px}#study-toggle{left:20px}
+#manual-toggle:hover,#study-toggle:hover{background:rgba(255,255,255,.92);border-color:#cad9e3;transform:translateY(-1px)}
+#manual-panel,#modern-dsp-learning-sidebar{background:var(--note-ui-canvas);color:var(--note-ui-ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+#manual-panel{border-left-color:var(--note-ui-border);box-shadow:-12px 0 36px rgba(24,39,52,.10)}
+#modern-dsp-learning-sidebar{border-right-color:var(--note-ui-border);box-shadow:12px 0 36px rgba(24,39,52,.10)}
+.manual-header,.study-header{background:rgba(255,255,255,.82);border-color:var(--note-ui-border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.manual-header strong,.study-header strong{color:var(--note-ui-ink)}
+#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button{
+  border-color:var(--note-ui-border);border-radius:9px;color:var(--note-ui-ink);background:var(--note-ui-paper)
+}
+#manual-panel button:hover:not(:disabled),.study-header button:hover,.study-tabs button:hover,.study-exercises button:hover{background:var(--note-ui-accent-soft)}
+#manual-source,.manual-source,.manual-toolbar,.study-tabs{border-color:var(--note-ui-border)}
+#manual-pages,.manual-pdf-page,.study-dock-content{overscroll-behavior:contain}
+#manual-resize::after,.study-resize::after{background:#d6dee4}
+#manual-resize:hover::after,#manual-resize:focus-visible::after,#study-resize:hover::after,#study-resize:focus-visible::after{background:var(--note-ui-accent)}
+
+/* Dark theme: calm charcoal surfaces, softened text, and restrained blue accents. */
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --note-ui-paper:#202329;--note-ui-canvas:#191c21;--note-ui-ink:#e5e9ed;--note-ui-muted:#a4adb7;
+  --note-ui-border:#363c44;--note-ui-accent:#83bce5;--note-ui-accent-soft:#283744;
+  --note-ui-shadow:0 14px 40px rgba(0,0,0,.30);--note-ui-focus:rgba(124,190,234,.68);
+}
+html[data-theme="dark"] body{background:#14171b!important;color:#d9dee3!important}
+html[data-theme="dark"] .sidebar{background:rgba(29,32,37,.94);border-color:var(--note-ui-border);color:var(--note-ui-ink)}
+html[data-theme="dark"] .article{background:#1c1f24;border-color:#30363e;color:#d9dee3}
+html[data-theme="dark"] .card{background:#22262c;border-color:#383f48}
+html[data-theme="dark"] .card h2{color:#dce8f2}
+html[data-theme="dark"] .card p,html[data-theme="dark"] .source-ref{color:#aeb9c4}
+html[data-theme="dark"] .hero{background:linear-gradient(135deg,#202a34,#1c1f24);border-color:#383f48}
+html[data-theme="dark"] .title{color:#dce8f2}
+html[data-theme="dark"] .num{color:#8fc9f2}
+html[data-theme="dark"] .sub,html[data-theme="dark"] footer{color:#aeb9c4}
+html[data-theme="dark"] .brand,html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,html[data-theme="dark"] h5,html[data-theme="dark"] strong{color:#dce8f2}
+html[data-theme="dark"] p,html[data-theme="dark"] li,html[data-theme="dark"] dd,html[data-theme="dark"] label{color:inherit}
+html[data-theme="dark"] .lead,html[data-theme="dark"] .footer,html[data-theme="dark"] figcaption,
+html[data-theme="dark"] .formula-note,html[data-theme="dark"] .meta,html[data-theme="dark"] .source-panel{color:#aeb9c4}
+html[data-theme="dark"] a{color:#8fc9f2}
+html[data-theme="dark"] .toc a{color:#b7c1ca}
+html[data-theme="dark"] .toc a:hover,html[data-theme="dark"] .toc a.active{background:#283744;color:#a9d7f5}
+html[data-theme="dark"] .eyebrow{color:#88c6f0}
+html[data-theme="dark"] .chip{background:#263542;border-color:#3a4c59;color:#b7dcf4}
+html[data-theme="dark"] code,html[data-theme="dark"] pre{background:#252a30;border-color:#3b424b;color:#dce5ec}
+html[data-theme="dark"] blockquote.callout,html[data-theme="dark"] .source-panel{background:#222b33;border-color:#394650}
+html[data-theme="dark"] hr,html[data-theme="dark"] .hero,html[data-theme="dark"] .footer{border-color:#353b43}
+html[data-theme="dark"] table{color:#d9dee3}
+html[data-theme="dark"] th,html[data-theme="dark"] td{border-color:#3b424a}
+html[data-theme="dark"] th{background:#27323c;color:#d7e8f5}
+html[data-theme="dark"] tr:nth-child(even) td{background:#22262c}
+html[data-theme="dark"] .diagram,html[data-theme="dark"] figure.diagram{background:#f7faff;border-color:#cfd9e2}
+html[data-theme="dark"] mjx-container{color:#e4eaf0}
+html[data-theme="dark"] .note-navigation-controls{border-color:rgba(81,91,102,.72);background:rgba(38,42,48,.70);box-shadow:0 4px 18px rgba(0,0,0,.18)}
+html[data-theme="dark"] .note-navigation-controls button,html[data-theme="dark"] .note-navigation-controls a{color:#e2e8ed}
+html[data-theme="dark"] .note-navigation-controls button:hover,html[data-theme="dark"] .note-navigation-controls a:hover{background:#303d48;color:#c5e5fa}
+html[data-theme="dark"] #manual-toggle,html[data-theme="dark"] #study-toggle{background:rgba(38,42,48,.72);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.24)}
+html[data-theme="dark"] #manual-toggle:hover,html[data-theme="dark"] #study-toggle:hover{background:rgba(55,61,69,.94)}
+html[data-theme="dark"] #manual-panel,html[data-theme="dark"] #modern-dsp-learning-sidebar{background:#191c21;color:#e0e5ea}
+html[data-theme="dark"] #manual-panel .manual-header,html[data-theme="dark"] #manual-panel .manual-source,
+html[data-theme="dark"] #manual-panel .manual-toolbar,html[data-theme="dark"] #manual-panel .manual-footer,
+html[data-theme="dark"] #modern-dsp-learning-sidebar .study-header,html[data-theme="dark"] #modern-dsp-learning-sidebar .study-tabs,
+html[data-theme="dark"] #modern-dsp-learning-sidebar .study-footer{background:#20242a;color:#cbd3db;border-color:#383e46}
+html[data-theme="dark"] #manual-panel button,html[data-theme="dark"] #manual-panel select,html[data-theme="dark"] #manual-page,
+html[data-theme="dark"] .study-header button,html[data-theme="dark"] .study-tabs button,html[data-theme="dark"] .study-exercises button{background:#292e35;color:#e0e6eb;border-color:#444b54}
+html[data-theme="dark"] #manual-panel input,html[data-theme="dark"] #modern-dsp-learning-sidebar input{background:#242930;color:#e5e9ed;border-color:#444b54}
+html[data-theme="dark"] #manual-status{background:#252d35;color:#b4c0ca}
+html[data-theme="dark"] .study-dock-content{color:#d5dce3}
+html[data-theme="dark"] .study-dock-content h3,html[data-theme="dark"] .study-dock-content h4,
+html[data-theme="dark"] .study-flow li>strong,html[data-theme="dark"] .study-exercises summary,
+html[data-theme="dark"] .study-exercise-body strong{color:#d7e8f5}
+html[data-theme="dark"] .study-intro,html[data-theme="dark"] .study-flow li,html[data-theme="dark"] .study-exercises details,
+html[data-theme="dark"] .study-exercise-body .study-answer{background:#242a31;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-bridge,html[data-theme="dark"] .study-warning{background:#332a22;color:#e5c8a8}
+html[data-theme="dark"] .study-exercise-body .study-check{background:#24312b;color:#d2e6d8}
+html[data-theme="dark"] .study-flow li p,html[data-theme="dark"] .study-exercise-body{color:#c4cdd5}
+html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-resize::after{background:#4b535d}
+
+@media(max-width:980px){.note-navigation-controls{margin:12px 16px -18px;transform:none}}
+@media(max-width:980px){.note-navigation-catalog-controls{margin:0 0 20px;transform:none}}
+@media(max-width:600px){
+  .note-navigation-controls{margin:8px 10px -4px;padding:3px;border-radius:13px}
+  .note-navigation-controls button,.note-navigation-controls a{min-height:40px;padding:0 10px}
+  .note-navigation-controls .note-theme-toggle{min-width:62px}
+  .note-navigation-catalog-controls{margin-bottom:18px}
+  .note-navigation-ready .layout{padding-top:12px}
+  .note-navigation-ready .sidebar{display:none}
+  .note-navigation-ready.note-toc-drawer-open{overflow:hidden}
+  .note-toc-drawer-open::before{content:"";position:fixed;z-index:100;inset:0;background:rgba(25,37,47,.28);backdrop-filter:blur(2px)}
+  .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:var(--note-ui-paper);box-shadow:var(--note-ui-shadow)}
+  #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:42px;padding:0 13px}
+  #manual-toggle{right:12px}#study-toggle{left:12px}
+}
+@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle{transition:none}}
+@media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
+</style></head>
+<body><main><div class="note-navigation-controls note-navigation-catalog-controls" id="note-navigation-controls"><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div>
 <section class="hero"><h1>毫米波雷达基础</h1><p>从 FMCW 距离、相位、速度、系统设计、角度估计，到检测与跟踪的六节系统化学习笔记。</p></section>
 <section class="list">
 <a class="card" href="../毫米波雷达基础_第1节_FMCW距离估计.html"><span class="num">第 1 节</span><span class="title">FMCW 距离估计</span><span class="sub">Chirp、IF 频率、FFT 与距离分辨率</span></a>
@@ -23,4 +160,82 @@ footer{margin-top:22px;color:var(--muted);font-size:13px}
 <a class="card" href="../毫米波雷达基础_第6节_FMCW雷达检测与跟踪.html"><span class="num">第 6 节</span><span class="title">FMCW 雷达检测与跟踪</span><span class="sub">CFAR、点云、聚类与 Kalman / EKF 跟踪</span></a>
 </section>
 <footer>配套资料：<a href="../references/ti_fmcw_slides.pdf">TI FMCW 官方讲义 PDF</a></footer>
-</main></body></html>
+</main><script id="note-navigation-script">(() => {
+  const body = document.body;
+  const toggle = document.getElementById('note-toc-toggle');
+  const themeToggle = document.getElementById('note-theme-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (themeToggle) {
+    const updateThemeButton = () => {
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      themeToggle.textContent = isDark ? '日间' : '夜间';
+      themeToggle.setAttribute('aria-label', isDark ? '切换到日间模式' : '切换到夜间模式');
+      themeToggle.setAttribute('aria-pressed', String(isDark));
+      themeToggle.title = isDark ? '切换到日间模式' : '切换到夜间模式';
+    };
+    updateThemeButton();
+    themeToggle.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('study-notes-theme', next); } catch (_) {}
+      updateThemeButton();
+    });
+  }
+  if (!toggle || !sidebar) return;
+
+  const smallScreen = () => window.matchMedia('(max-width: 600px)').matches;
+  const mobileOpen = () => body.classList.contains('note-toc-drawer-open');
+  const desktopOpen = () => !body.classList.contains('note-toc-collapsed');
+  const announce = open => {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? '关闭目录' : '打开目录');
+    toggle.textContent = smallScreen() ? '☰ 目录' : '目录';
+  };
+  const closeDrawer = restoreFocus => {
+    if (!mobileOpen()) return;
+    body.classList.remove('note-toc-drawer-open');
+    announce(false);
+    if (restoreFocus) toggle.focus({ preventScroll:true });
+  };
+
+  body.classList.add('note-navigation-ready');
+  let saved = null;
+  try { saved = localStorage.getItem('study-notes-toc-collapsed'); } catch (_) {}
+  if (saved === 'true' && !smallScreen()) body.classList.add('note-toc-collapsed');
+  announce(smallScreen() ? mobileOpen() : desktopOpen());
+
+  toggle.addEventListener('click', () => {
+    if (smallScreen()) {
+      if (mobileOpen()) closeDrawer(false);
+      else body.classList.add('note-toc-drawer-open');
+      announce(mobileOpen());
+      return;
+    }
+    body.classList.toggle('note-toc-collapsed');
+    const open = desktopOpen();
+    try { localStorage.setItem('study-notes-toc-collapsed', String(!open)); } catch (_) {}
+    announce(open);
+  });
+
+  sidebar.querySelectorAll('.toc a').forEach(link => link.addEventListener('click', () => {
+    if (!smallScreen() || !mobileOpen()) return;
+    closeDrawer(false);
+  }));
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && smallScreen() && mobileOpen()) {
+      event.preventDefault();
+      closeDrawer(true);
+    }
+  });
+  document.addEventListener('click', event => {
+    // The dimmed backdrop is the body pseudo-element; close only when it is hit.
+    if (smallScreen() && mobileOpen() && event.target === body) closeDrawer(true);
+  });
+
+  window.addEventListener('resize', () => {
+    closeDrawer(false);
+    announce(smallScreen() ? false : desktopOpen());
+  }, {passive:true});
+})();
+</script></body></html>
