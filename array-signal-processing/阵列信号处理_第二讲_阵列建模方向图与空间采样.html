@@ -53,6 +53,18 @@ body.note-navigation-ready .sidebar{scroll-margin-top:18px}
 body.note-toc-collapsed .sidebar{display:none!important}
 body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 
+/* A quiet return-to-top affordance appears only after the reader has scrolled. */
+#note-back-to-top{
+  position:fixed;z-index:80;right:20px;bottom:76px;min-width:44px;min-height:44px;padding:0 14px;
+  border:1px solid rgba(210,220,228,.78);border-radius:14px;background:rgba(250,252,253,.78);
+  color:var(--note-ui-ink);box-shadow:0 4px 18px rgba(24,39,52,.09);backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease
+}
+#note-back-to-top:hover{background:rgba(255,255,255,.96);border-color:#cad9e3;transform:translateY(-2px)}
+#note-back-to-top:focus-visible{outline:3px solid var(--note-ui-focus);outline-offset:3px}
+#note-back-to-top[hidden]{display:none!important}
+
 /* Optional readers stay available but recede visually until needed. */
 #manual-toggle,#study-toggle{
   position:fixed;z-index:90;bottom:max(20px,env(safe-area-inset-bottom));min-height:42px;padding:0 15px;border:1px solid rgba(210,220,228,.78);border-radius:14px;
@@ -115,6 +127,8 @@ html[data-theme="dark"] mjx-container{color:#e4eaf0}
 html[data-theme="dark"] .note-navigation-controls{border-color:rgba(81,91,102,.72);background:rgba(38,42,48,.70);box-shadow:0 4px 18px rgba(0,0,0,.18)}
 html[data-theme="dark"] .note-navigation-controls button,html[data-theme="dark"] .note-navigation-controls a{color:#e2e8ed}
 html[data-theme="dark"] .note-navigation-controls button:hover,html[data-theme="dark"] .note-navigation-controls a:hover{background:#303d48;color:#c5e5fa}
+html[data-theme="dark"] #note-back-to-top{background:rgba(38,42,48,.82);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.26)}
+html[data-theme="dark"] #note-back-to-top:hover{background:rgba(55,61,69,.96)}
 html[data-theme="dark"] #manual-toggle,html[data-theme="dark"] #study-toggle{background:rgba(38,42,48,.72);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.24)}
 html[data-theme="dark"] #manual-toggle:hover,html[data-theme="dark"] #study-toggle:hover{background:rgba(55,61,69,.94)}
 html[data-theme="dark"] #manual-panel,html[data-theme="dark"] #modern-dsp-learning-sidebar{background:#191c21;color:#e0e5ea}
@@ -132,6 +146,13 @@ html[data-theme="dark"] .study-flow li>strong,html[data-theme="dark"] .study-exe
 html[data-theme="dark"] .study-exercise-body strong{color:#d7e8f5}
 html[data-theme="dark"] .study-intro,html[data-theme="dark"] .study-flow li,html[data-theme="dark"] .study-exercises details,
 html[data-theme="dark"] .study-exercise-body .study-answer{background:#242a31;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-prompt{background:#222a31;border-color:#3b434c}
+html[data-theme="dark"] .study-solution-step{background:#20252b;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-solution-step--formula{background:#222a31;border-color:#3b434c;border-left-color:#6f9fbe}
+html[data-theme="dark"] .study-solution-step--formula:before,html[data-theme="dark"] .study-solution-title{color:#9fc9e4}
+html[data-theme="dark"] .study-solution-step--conclusion{background:#202c34;border-color:#496478}
+html[data-theme="dark"] .study-solution-step--conclusion p{color:#d8eaf5}
+html[data-theme="dark"] .study-exercise-body .study-source{background:#292f36;color:#b9c7d1}
 html[data-theme="dark"] .study-bridge,html[data-theme="dark"] .study-warning{background:#332a22;color:#e5c8a8}
 html[data-theme="dark"] .study-exercise-body .study-check{background:#24312b;color:#d2e6d8}
 html[data-theme="dark"] .study-flow li p,html[data-theme="dark"] .study-exercise-body{color:#c4cdd5}
@@ -151,8 +172,9 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
   .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:var(--note-ui-paper);box-shadow:var(--note-ui-shadow)}
   #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:42px;padding:0 13px}
   #manual-toggle{right:12px}#study-toggle{left:12px}
+  #note-back-to-top{right:12px;bottom:max(68px,calc(env(safe-area-inset-bottom) + 62px));min-height:42px}
 }
-@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle{transition:none}}
+@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle,#note-back-to-top{transition:none}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
 </style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" aria-label="关闭目录" id="note-toc-toggle" type="button">目录</button><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">阵列信号处理</div><nav class="toc"><a class="toc-main" href="#0-为什么阵列处理首先关心波长">0. 为什么阵列处理首先关心波长</a>
 <a class="toc-main" href="#1-窄带假设-为什么一个时延可以只写成一个相位">1. 窄带假设：为什么一个时延可以只写成一个相位</a>
@@ -656,11 +678,26 @@ function update(){const d=document.documentElement;const m=d.scrollHeight-d.clie
 window.addEventListener('scroll',update,{passive:true});update();
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));}})},{rootMargin:'-15% 0px -72% 0px'});
 document.querySelectorAll('h2[id],h3[id]').forEach(h=>obs.observe(h));
-</script><script id="note-navigation-script">(() => {
+</script><button aria-hidden="true" id="note-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" tabindex="-1" hidden>↑ 回到顶部</button><script id="note-navigation-script">(() => {
   const body = document.body;
   const toggle = document.getElementById('note-toc-toggle');
   const themeToggle = document.getElementById('note-theme-toggle');
+  const backToTop = document.getElementById('note-back-to-top');
   const sidebar = document.querySelector('.sidebar');
+  if (backToTop) {
+    const updateBackToTop = () => {
+      const visible = window.scrollY > 360;
+      backToTop.hidden = !visible;
+      backToTop.setAttribute('aria-hidden', String(!visible));
+      backToTop.tabIndex = visible ? 0 : -1;
+    };
+    updateBackToTop();
+    window.addEventListener('scroll', updateBackToTop, {passive:true});
+    backToTop.addEventListener('click', () => {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({top:0, behavior:reducedMotion ? 'auto' : 'smooth'});
+    });
+  }
   if (themeToggle) {
     const updateThemeButton = () => {
       const isDark = document.documentElement.dataset.theme === 'dark';
