@@ -1,0 +1,625 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="加密学习内容，仅在本机浏览器输入密钥后解锁。"><title>学习笔记 · 加密内容</title>
+<script>(()=>{let t=null;try{t=localStorage.getItem('study-notes-theme')}catch{}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;})();</script>
+<style>:root{--ink:#20303d;--muted:#627385;--line:#dce5ed;--paper:#fff;--soft:#f6f9fc;--blue:#1f6fb2;--blue2:#315f91;--orange:#c96d25;--shadow:0 12px 34px rgba(41,63,82,.08);}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:#f3f6f9;color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;line-height:1.82;font-size:16px}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;z-index:50}
+.layout{display:grid;grid-template-columns:280px minmax(0,860px);gap:32px;max-width:1210px;margin:0 auto;padding:34px 24px 80px}
+.sidebar{position:sticky;top:22px;height:calc(100vh - 44px);overflow:auto;padding:18px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.92);box-shadow:var(--shadow)}
+.brand{font-weight:700;color:#173c5c;margin:3px 8px 14px} .toc{display:flex;flex-direction:column;gap:2px} .toc a{text-decoration:none;color:#536779;border-radius:8px;padding:7px 9px;font-size:13px;line-height:1.4} .toc a:hover,.toc a.active{background:#edf4fa;color:#174e7e} .toc-sub{padding-left:22px!important;font-size:12.5px!important}
+.article{background:var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:54px 68px;min-width:0}
+.hero{border-bottom:1px solid var(--line);padding-bottom:30px;margin-bottom:36px} .eyebrow{color:var(--blue);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase} h1{font-size:35px;line-height:1.25;margin:10px 0 15px;color:#17344d} .lead{font-size:17px;color:#596d7f;max-width:720px;margin:0} .meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px} .chip{font-size:12px;padding:5px 9px;border-radius:999px;background:#edf4fa;color:#315f91;border:1px solid #d2e2ef}
+h2{font-size:25px;line-height:1.35;color:#183e5d;margin:54px 0 18px;padding-top:4px} h3{font-size:19px;line-height:1.4;color:#28516f;margin:34px 0 12px} p{margin:12px 0} strong{color:#193b56} code{font-family:"Cascadia Mono",Consolas,monospace;background:#f0f4f7;border:1px solid #e1e8ee;padding:.08em .34em;border-radius:5px;font-size:.92em}
+hr{border:0;border-top:1px solid var(--line);margin:42px 0} ul,ol{padding-left:1.55em} li{margin:.35em 0}
+blockquote.callout{margin:22px 0;padding:14px 18px;border-left:4px solid var(--blue);background:#f3f8fc;border-radius:0 10px 10px 0;color:#405669}
+table{width:100%;border-collapse:collapse;margin:20px 0 28px;font-size:14.5px} th,td{border:1px solid #dce5ed;padding:10px 12px;text-align:left;vertical-align:top} th{background:#eef5fa;color:#294f6d} tr:nth-child(even) td{background:#fbfcfd}
+.diagram{margin:28px 0 34px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fbfdff;overflow:hidden} .diagram svg{width:100%;height:auto;display:block} figcaption{text-align:center;color:#657889;font-size:13px;margin-top:10px} .svg-label{font:16px "Segoe UI","Microsoft YaHei",sans-serif;fill:#415466} .svg-title{font:600 17px "Segoe UI","Microsoft YaHei",sans-serif;fill:#294f6d} .svg-accent{font:600 16px "Segoe UI","Microsoft YaHei",sans-serif;fill:#315f91} .svg-blue{font:600 16px "Segoe UI","Microsoft YaHei",sans-serif;fill:#1f6fb2} .svg-orange{font:600 16px "Segoe UI","Microsoft YaHei",sans-serif;fill:#c96d25}
+.formula-note{font-size:13px;color:var(--muted)} mjx-container{color:#172a3a} mjx-container[display="true"]{margin:1.35em 0!important;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:.18em .25em .24em;text-align:center;scrollbar-width:thin;scrollbar-color:#c7d5e1 transparent} mjx-container[display="true"]>svg{display:inline-block;vertical-align:middle} mjx-container:not([display="true"]){font-size:1.01em}
+.source-panel{margin-top:52px;padding:22px;border:1px solid var(--line);background:#f8fafc;border-radius:14px;color:#526779;font-size:14px} .source-panel a{color:var(--blue)}
+.footer{margin-top:38px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:#7a8997;text-align:center}
+@media(max-width:980px){.layout{grid-template-columns:1fr;max-width:900px}.sidebar{position:relative;top:0;height:auto;max-height:340px}.article{padding:42px 34px}}
+@media(max-width:600px){body{font-size:15px}.layout{padding:12px 8px 50px}.sidebar{display:none}.article{padding:30px 20px;border-radius:12px}h1{font-size:28px}h2{font-size:22px}.diagram{padding:5px}mjx-container[display="true"]{font-size:.96em;margin:1.1em 0!important}}
+@media print{body{background:white;font-size:10.5pt}#progress,.sidebar{display:none!important}.layout{display:block;max-width:none;padding:0}.article{border:0;box-shadow:none;padding:0}.hero{margin-top:0}h2,h3{break-after:avoid-page}.diagram,table,blockquote,mjx-container[display="true"]{break-inside:avoid}mjx-container[display="true"]{overflow:visible}a{color:inherit;text-decoration:none}}
+
+:root{color-scheme:light;--paper:#fff;--ink:#20303d;--muted:#627385;--soft:#f5f8fb;--line:#dce5ed;--accent:#1f6fb2}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#17212b;--ink:#e7edf3;--muted:#a8b7c5;--soft:#202d39;--line:#344554;--accent:#72b8f2}
+body{background:var(--soft);color:var(--ink)}.layout{max-width:1120px}.article{background:var(--paper);color:var(--ink);min-height:80vh}.article p,.article li{line-height:1.85}.article h1,.article h2,.article h3{color:var(--ink)}.article table{display:block;overflow:auto}.article th{background:var(--soft)}
+.locked-card{max-width:680px;margin:70px auto;padding:32px;border:1px solid var(--line);border-radius:20px;background:var(--paper);box-shadow:0 14px 38px #18344b12}.locked-card h1{margin-top:0}.unlock-row{display:flex;gap:10px;margin:20px 0}.unlock-row input{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}.unlock-row button,.module-link,.catalog-back{border:1px solid var(--line);border-radius:10px;padding:11px 15px;background:var(--paper);color:var(--accent);cursor:pointer}.status{min-height:1.6em;color:var(--muted)}
+#course-catalog{display:none}.module-list{display:grid;gap:14px;margin:24px 0}.module-link{display:block;text-align:left}.module-link strong{display:block;font-size:18px;margin-bottom:6px}.module-link span{color:var(--muted)}.app-article{display:none}.app-article.active{display:block}.course-topline{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:10px 0 22px}.app-toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px}.app-toc a{padding:6px 10px;border-radius:999px;background:var(--soft);color:var(--accent);font-size:13px;text-decoration:none}.app-note{max-width:900px;margin:auto}.app-note h1{font-size:clamp(30px,4vw,42px)}.privacy-note{font-size:13px;color:var(--muted)}
+@media(max-width:650px){.locked-card{margin:30px 0;padding:22px}.unlock-row{flex-direction:column}.unlock-row button{min-height:46px}.course-topline{align-items:flex-start;flex-direction:column}}
+:root{--manual-width:clamp(400px,45vw,760px)}
+#manual-toggle{position:fixed;right:18px;bottom:24px;z-index:90;border:1px solid #1f6fb2;border-radius:12px;padding:12px 17px;background:#1f6fb2;color:white;box-shadow:0 5px 24px #17344d30;font:600 14px "Microsoft YaHei",sans-serif;cursor:pointer}
+#manual-panel[hidden]{display:none!important}#manual-panel{position:fixed;inset:0 0 0 auto;width:var(--manual-width);height:100vh;height:100dvh;z-index:100;display:flex;flex-direction:column;background:#f3f6fa;border-left:1px solid #cbd9e6;box-shadow:-10px 0 35px #17344d14;color:#20303d;overscroll-behavior:contain;overflow:hidden;font-size:14px;line-height:1.55}
+.manual-header{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;box-sizing:border-box;padding:7px 12px;background:white;border-bottom:1px solid #dce5ed;flex:none}.manual-header strong{font-size:15px}.manual-header-actions{display:flex;align-items:center;gap:8px}.manual-header-actions a{font-size:12px;color:#1f6fb2}
+#manual-panel button,#manual-panel select,#manual-page{font:inherit;border:1px solid #cbd9e6;border-radius:7px;background:white;color:#244e70;padding:5px 8px}#manual-panel button{cursor:pointer}#manual-panel button:disabled{opacity:.4;cursor:default}#manual-panel button:focus-visible,#manual-toggle:focus-visible,#manual-pages:focus-visible,#manual-resize:focus-visible{outline:3px solid #e99f49;outline-offset:2px}
+.manual-source{flex:none;background:#fff;border-bottom:1px solid #dce5ed;font-size:12px}.manual-source summary{padding:6px 12px;color:#38688e;cursor:pointer;user-select:none}.manual-source summary:hover{background:#f7fafc}.manual-source-content{display:flex;align-items:center;gap:10px;padding:4px 12px 10px}.manual-file-label{position:relative;flex:none;overflow:hidden;border:1px solid #cbd9e6;padding:5px 9px;border-radius:7px;color:#244e70;cursor:pointer}.manual-file-label:focus-within{outline:2px solid #1f6fb2}.manual-file-label input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.manual-unlock{display:flex;align-items:center;gap:7px;min-width:0;flex:1;font-size:12px}.manual-unlock label{white-space:nowrap}.manual-unlock input{min-width:0;flex:1;border:1px solid #cbd9e6;border-radius:7px;padding:6px 8px;font:inherit;color:#20303d}.manual-unlock input:focus-visible{outline:2px solid #1f6fb2;outline-offset:1px}
+.manual-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:5px 10px;background:white;border-bottom:1px solid #dce5ed;flex:none;font-size:12px}#manual-page{width:48px;padding:4px;text-align:center}.manual-zoom-label{margin-left:auto;white-space:nowrap}.manual-zoom-label select{padding:4px 6px!important}.manual-zoom-caption{color:#526779}
+#manual-status{margin:0;padding:5px 12px;font-size:11px;color:#526779;background:#edf4fa;flex:none}#manual-status[hidden]{display:none!important}
+#manual-pages{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scroll-behavior:auto;touch-action:pan-x pan-y;scrollbar-gutter:stable;padding:10px 8px;position:relative}.manual-empty{padding:22px 18px;max-width:430px;margin:30px auto;color:#53697c}.manual-empty strong{font-size:18px}.manual-pdf-page{position:relative;background:white;margin:0 auto 16px;box-shadow:0 2px 10px #17344d12;flex:none}.manual-pdf-page canvas{display:block}.manual-pdf-page::after{content:attr(data-page);position:absolute;bottom:3px;right:8px;font-size:10px;color:#60788d;background:#ffffffe0;padding:1px 4px;border-radius:3px}.manual-footer{flex:none;background:white;padding:5px 10px;font-size:10px;color:#627385;border-top:1px solid #dce5ed}
+#manual-resize{display:none}
+.manual-open #manual-toggle{visibility:hidden}
+body.manual-resizing,body.manual-resizing *{cursor:col-resize!important;user-select:none!important}
+@media(min-width:1000px){.manual-open .layout{grid-template-columns:minmax(0,1fr);max-width:none;margin-left:0;margin-right:var(--manual-width);padding:24px 20px 80px;gap:0}.manual-open .sidebar{display:none}.manual-open .article{padding:38px 32px;max-width:950px;margin:0 auto;width:100%}#manual-resize{position:fixed;z-index:101;top:0;bottom:0;right:calc(var(--manual-width) - 5px);width:10px;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;cursor:col-resize;touch-action:none}#manual-resize::after{content:"";position:absolute;top:0;bottom:0;left:4px;width:2px;background:#cbd9e6;transition:background .15s,width .15s,left .15s}#manual-resize:hover::after,#manual-resize:focus-visible::after,#manual-resize[aria-valuenow]:active::after{left:2px;width:6px;background:#397eae}.manual-open #manual-resize{display:block}}
+@media(max-width:999px){body.manual-open{overflow:hidden}#manual-panel{width:min(94vw,680px)}.manual-header{padding:7px 10px;min-height:44px}.manual-header strong{font-size:14px}.manual-source-content{align-items:flex-start;flex-direction:column}.manual-unlock{width:100%}.manual-toolbar{gap:4px;padding:5px 7px}}
+@media(max-width:600px){#manual-panel{width:100vw}#manual-toggle{right:12px;bottom:16px;font-size:12px;padding:10px 12px}.manual-footer{font-size:9px}#manual-pages{padding:8px 5px}.manual-zoom-caption{display:none}}
+@media print{#manual-toggle,#manual-panel,#manual-resize{display:none!important}.manual-open .layout{display:block;margin:0;padding:0}.manual-open .article{padding:0;max-width:none}}
+</style><script id="note-theme-bootstrap">(()=>{let theme=null;try{theme=localStorage.getItem("study-notes-theme")}catch(_){}if(theme!=="light"&&theme!=="dark")theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=theme;})();</script><style id="note-navigation-styles">:root{
+  --note-ui-paper:#fff;
+  --note-ui-canvas:#f6f7f8;
+  --note-ui-ink:#26323b;
+  --note-ui-muted:#6c7a85;
+  --note-ui-border:#e2e7eb;
+  --note-ui-accent:#397aa8;
+  --note-ui-accent-soft:#edf4f8;
+  --note-ui-shadow:0 12px 36px rgba(24,39,52,.12);
+  --note-ui-focus:rgba(57,122,168,.52);
+}
+/* Keep navigation in document flow: it can never sit on top of reading content. */
+.note-navigation-controls{
+  position:relative;z-index:2;display:flex;align-items:center;gap:2px;width:max-content;max-width:calc(100% - 32px);
+  margin:14px auto -18px;transform:translateX(calc((min(1210px,100vw) - 100%)/-2 + 8px));
+  padding:4px;border:1px solid rgba(220,226,231,.72);border-radius:14px;
+  background:rgba(255,255,255,.66);box-shadow:0 3px 16px rgba(24,39,52,.055);backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+.note-navigation-controls button,.note-navigation-controls a{
+  display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border:0;border-radius:10px;
+  background:transparent;color:var(--note-ui-ink);text-decoration:none;white-space:nowrap;cursor:pointer;transition:background-color .16s ease,color .16s ease;
+}
+.note-navigation-controls button:hover,.note-navigation-controls a:hover{background:var(--note-ui-accent-soft);color:#245f86}
+.note-navigation-controls button:focus-visible,.note-navigation-controls a:focus-visible,
+#manual-toggle:focus-visible,#study-toggle:focus-visible,#manual-panel button:focus-visible,#manual-panel select:focus-visible,#manual-page:focus-visible,
+#modern-dsp-learning-sidebar button:focus-visible,#manual-resize:focus-visible,#study-resize:focus-visible{
+  outline:3px solid var(--note-ui-focus);outline-offset:2px
+}
+.note-navigation-controls a{border-left:1px solid var(--note-ui-border);border-radius:0 10px 10px 0}
+.note-navigation-controls .note-theme-toggle{min-width:72px}
+.note-navigation-catalog-controls{width:max-content;max-width:100%;margin:0 0 22px;transform:none}
+body.note-navigation-ready .sidebar{scroll-margin-top:18px}
+body.note-toc-collapsed .sidebar{display:none!important}
+body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
+
+/* Optional readers stay available but recede visually until needed. */
+#manual-toggle,#study-toggle{
+  position:fixed;z-index:90;bottom:max(20px,env(safe-area-inset-bottom));min-height:42px;padding:0 15px;border:1px solid rgba(210,220,228,.78);border-radius:14px;
+  background:rgba(250,252,253,.70);color:var(--note-ui-ink);box-shadow:0 4px 18px rgba(24,39,52,.075);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease;
+}
+#manual-toggle{right:20px}#study-toggle{left:20px}
+#manual-toggle:hover,#study-toggle:hover{background:rgba(255,255,255,.92);border-color:#cad9e3;transform:translateY(-1px)}
+#manual-panel,#modern-dsp-learning-sidebar{background:var(--note-ui-canvas);color:var(--note-ui-ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+#manual-panel{border-left-color:var(--note-ui-border);box-shadow:-12px 0 36px rgba(24,39,52,.10)}
+#modern-dsp-learning-sidebar{border-right-color:var(--note-ui-border);box-shadow:12px 0 36px rgba(24,39,52,.10)}
+.manual-header,.study-header{background:rgba(255,255,255,.82);border-color:var(--note-ui-border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.manual-header strong,.study-header strong{color:var(--note-ui-ink)}
+#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button{
+  border-color:var(--note-ui-border);border-radius:9px;color:var(--note-ui-ink);background:var(--note-ui-paper)
+}
+#manual-panel button:hover:not(:disabled),.study-header button:hover,.study-tabs button:hover,.study-exercises button:hover{background:var(--note-ui-accent-soft)}
+#manual-source,.manual-source,.manual-toolbar,.study-tabs{border-color:var(--note-ui-border)}
+#manual-pages,.manual-pdf-page,.study-dock-content{overscroll-behavior:contain}
+#manual-resize::after,.study-resize::after{background:#d6dee4}
+#manual-resize:hover::after,#manual-resize:focus-visible::after,#study-resize:hover::after,#study-resize:focus-visible::after{background:var(--note-ui-accent)}
+
+/* Dark theme: calm charcoal surfaces, softened text, and restrained blue accents. */
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --note-ui-paper:#202329;--note-ui-canvas:#191c21;--note-ui-ink:#e5e9ed;--note-ui-muted:#a4adb7;
+  --note-ui-border:#363c44;--note-ui-accent:#83bce5;--note-ui-accent-soft:#283744;
+  --note-ui-shadow:0 14px 40px rgba(0,0,0,.30);--note-ui-focus:rgba(124,190,234,.68);
+}
+html[data-theme="dark"] body{background:#14171b!important;color:#d9dee3!important}
+html[data-theme="dark"] .sidebar{background:rgba(29,32,37,.94);border-color:var(--note-ui-border);color:var(--note-ui-ink)}
+html[data-theme="dark"] .article{background:#1c1f24;border-color:#30363e;color:#d9dee3}
+html[data-theme="dark"] .card{background:#22262c;border-color:#383f48}
+html[data-theme="dark"] .card h2{color:#dce8f2}
+html[data-theme="dark"] .card p,html[data-theme="dark"] .source-ref{color:#aeb9c4}
+html[data-theme="dark"] .hero{background:linear-gradient(135deg,#202a34,#1c1f24);border-color:#383f48}
+html[data-theme="dark"] .title{color:#dce8f2}
+html[data-theme="dark"] .num{color:#8fc9f2}
+html[data-theme="dark"] .sub,html[data-theme="dark"] footer{color:#aeb9c4}
+html[data-theme="dark"] .brand,html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,html[data-theme="dark"] h5,html[data-theme="dark"] strong{color:#dce8f2}
+html[data-theme="dark"] p,html[data-theme="dark"] li,html[data-theme="dark"] dd,html[data-theme="dark"] label{color:inherit}
+html[data-theme="dark"] .lead,html[data-theme="dark"] .footer,html[data-theme="dark"] figcaption,
+html[data-theme="dark"] .formula-note,html[data-theme="dark"] .meta,html[data-theme="dark"] .source-panel{color:#aeb9c4}
+html[data-theme="dark"] a{color:#8fc9f2}
+html[data-theme="dark"] .toc a{color:#b7c1ca}
+html[data-theme="dark"] .toc a:hover,html[data-theme="dark"] .toc a.active{background:#283744;color:#a9d7f5}
+html[data-theme="dark"] .eyebrow{color:#88c6f0}
+html[data-theme="dark"] .chip{background:#263542;border-color:#3a4c59;color:#b7dcf4}
+html[data-theme="dark"] code,html[data-theme="dark"] pre{background:#252a30;border-color:#3b424b;color:#dce5ec}
+html[data-theme="dark"] blockquote.callout,html[data-theme="dark"] .source-panel{background:#222b33;border-color:#394650}
+html[data-theme="dark"] hr,html[data-theme="dark"] .hero,html[data-theme="dark"] .footer{border-color:#353b43}
+html[data-theme="dark"] table{color:#d9dee3}
+html[data-theme="dark"] th,html[data-theme="dark"] td{border-color:#3b424a}
+html[data-theme="dark"] th{background:#27323c;color:#d7e8f5}
+html[data-theme="dark"] tr:nth-child(even) td{background:#22262c}
+html[data-theme="dark"] .diagram,html[data-theme="dark"] figure.diagram{background:#f7faff;border-color:#cfd9e2}
+html[data-theme="dark"] mjx-container{color:#e4eaf0}
+html[data-theme="dark"] .note-navigation-controls{border-color:rgba(81,91,102,.72);background:rgba(38,42,48,.70);box-shadow:0 4px 18px rgba(0,0,0,.18)}
+html[data-theme="dark"] .note-navigation-controls button,html[data-theme="dark"] .note-navigation-controls a{color:#e2e8ed}
+html[data-theme="dark"] .note-navigation-controls button:hover,html[data-theme="dark"] .note-navigation-controls a:hover{background:#303d48;color:#c5e5fa}
+html[data-theme="dark"] #manual-toggle,html[data-theme="dark"] #study-toggle{background:rgba(38,42,48,.72);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.24)}
+html[data-theme="dark"] #manual-toggle:hover,html[data-theme="dark"] #study-toggle:hover{background:rgba(55,61,69,.94)}
+html[data-theme="dark"] #manual-panel,html[data-theme="dark"] #modern-dsp-learning-sidebar{background:#191c21;color:#e0e5ea}
+html[data-theme="dark"] #manual-panel .manual-header,html[data-theme="dark"] #manual-panel .manual-source,
+html[data-theme="dark"] #manual-panel .manual-toolbar,html[data-theme="dark"] #manual-panel .manual-footer,
+html[data-theme="dark"] #modern-dsp-learning-sidebar .study-header,html[data-theme="dark"] #modern-dsp-learning-sidebar .study-tabs,
+html[data-theme="dark"] #modern-dsp-learning-sidebar .study-footer{background:#20242a;color:#cbd3db;border-color:#383e46}
+html[data-theme="dark"] #manual-panel button,html[data-theme="dark"] #manual-panel select,html[data-theme="dark"] #manual-page,
+html[data-theme="dark"] .study-header button,html[data-theme="dark"] .study-tabs button,html[data-theme="dark"] .study-exercises button{background:#292e35;color:#e0e6eb;border-color:#444b54}
+html[data-theme="dark"] #manual-panel input,html[data-theme="dark"] #modern-dsp-learning-sidebar input{background:#242930;color:#e5e9ed;border-color:#444b54}
+html[data-theme="dark"] #manual-status{background:#252d35;color:#b4c0ca}
+html[data-theme="dark"] .study-dock-content{color:#d5dce3}
+html[data-theme="dark"] .study-dock-content h3,html[data-theme="dark"] .study-dock-content h4,
+html[data-theme="dark"] .study-flow li>strong,html[data-theme="dark"] .study-exercises summary,
+html[data-theme="dark"] .study-exercise-body strong{color:#d7e8f5}
+html[data-theme="dark"] .study-intro,html[data-theme="dark"] .study-flow li,html[data-theme="dark"] .study-exercises details,
+html[data-theme="dark"] .study-exercise-body .study-answer{background:#242a31;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-bridge,html[data-theme="dark"] .study-warning{background:#332a22;color:#e5c8a8}
+html[data-theme="dark"] .study-exercise-body .study-check{background:#24312b;color:#d2e6d8}
+html[data-theme="dark"] .study-flow li p,html[data-theme="dark"] .study-exercise-body{color:#c4cdd5}
+html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-resize::after{background:#4b535d}
+
+@media(max-width:980px){.note-navigation-controls{margin:12px 16px -18px;transform:none}}
+@media(max-width:980px){.note-navigation-catalog-controls{margin:0 0 20px;transform:none}}
+@media(max-width:600px){
+  .note-navigation-controls{margin:8px 10px -4px;padding:3px;border-radius:13px}
+  .note-navigation-controls button,.note-navigation-controls a{min-height:40px;padding:0 10px}
+  .note-navigation-controls .note-theme-toggle{min-width:62px}
+  .note-navigation-catalog-controls{margin-bottom:18px}
+  .note-navigation-ready .layout{padding-top:12px}
+  .note-navigation-ready .sidebar{display:none}
+  .note-navigation-ready.note-toc-drawer-open{overflow:hidden}
+  .note-toc-drawer-open::before{content:"";position:fixed;z-index:100;inset:0;background:rgba(25,37,47,.28);backdrop-filter:blur(2px)}
+  .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:var(--note-ui-paper);box-shadow:var(--note-ui-shadow)}
+  #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:42px;padding:0 13px}
+  #manual-toggle{right:12px}#study-toggle{left:12px}
+}
+@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle{transition:none}}
+@media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
+</style></head><body><div id="progress"></div><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:1120px"><main class="article"><div class="note-navigation-controls note-navigation-catalog-controls" id="note-navigation-controls"><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div>
+<section id="locked-view" class="locked-card"><p class="eyebrow">学习笔记 · 本机解锁</p><h1>加密学习空间</h1><p>课程目录与正文均以认证加密形式保存。输入本机密钥后，内容只在当前浏览器内存中解密。</p><div class="unlock-row"><input id="course-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="粘贴桌面上的课程密钥" aria-label="课程解锁密钥"><button id="course-unlock" type="button">解锁笔记</button></div><p id="course-status" class="status" role="status" aria-live="polite"></p><p class="privacy-note">课程密钥不上传、不写入浏览器存储；刷新页面后需重新输入。PDF手册使用独立密钥。</p></section>
+<section id="course-catalog" hidden><header class="hero"><div class="eyebrow">已在本机解锁</div><h1 id="catalog-title">学习笔记</h1><p id="catalog-description" class="lead"></p></header><div id="module-list" class="module-list"></div></section>
+<section id="course-article" class="app-article"><div class="course-topline"><button id="catalog-back" class="catalog-back" type="button">‹ 课程目录</button><span id="current-title"></span></div><nav id="course-toc" class="app-toc" aria-label="当前笔记目录"></nav><article id="current-content" class="app-note"></article></section>
+</main></div><button id="manual-toggle" type="button" aria-controls="manual-panel" aria-expanded="false" aria-label="打开参考 PDF"><span id="manual-toggle-label">参考 PDF</span></button>
+<button id="manual-resize" type="button" role="separator" aria-label="调整笔记与手册宽度" aria-orientation="vertical" aria-controls="manual-panel" aria-valuemin="360" aria-valuemax="75" aria-valuenow="45" tabindex="0"></button>
+<aside id="manual-panel" aria-label="参考 PDF 阅读侧栏" hidden data-pdf-url="" data-encrypted-url="manual/CSP2025T_UM10055_Rev2.0.pdf.enc" data-document-title="CSP2025T 用户手册" data-viewer-base="manual-viewer/">
+  <header class="manual-header"><strong id="manual-heading">参考 PDF</strong><div class="manual-header-actions"><a id="manual-original" hidden target="_blank" rel="noopener">单独打开</a><button id="manual-close" type="button" aria-label="收起阅读侧栏">收起 ×</button></div></header>
+  <details class="manual-source"><summary>打开或解锁手册</summary><div class="manual-source-content">
+    <label class="manual-file-label">选择本机 PDF<input id="manual-file" type="file" accept=".pdf,application/pdf"></label>
+    <div class="manual-unlock"><label for="manual-key">在线手册密钥</label><input id="manual-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="粘贴桌面密钥" aria-label="手册解锁密钥"><button id="manual-unlock" type="button">解锁</button></div>
+  </div></details>
+  <div class="manual-toolbar"><button id="manual-prev" type="button" aria-label="手册上一页" disabled>‹</button><label>第 <input id="manual-page" type="number" min="1" value="1" aria-label="手册页码" disabled> 页</label><span id="manual-total">/ —</span><button id="manual-go" type="button" disabled>前往</button><button id="manual-next" type="button" aria-label="手册下一页" disabled>›</button><label class="manual-zoom-label"><span class="manual-zoom-caption">缩放</span> <select id="manual-zoom" aria-label="手册缩放"><option value="fit">适合宽度</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option></select></label></div>
+  <p id="manual-status" role="status" aria-live="polite" hidden>在线文件以 AES-GCM 加密保存。输入本机密钥后在当前浏览器解密；密钥不会上传或保存。</p>
+  <div id="manual-pages" tabindex="0" aria-label="参考资料内容，滚动不影响笔记"><div class="manual-empty"><strong id="manual-empty-title">笔记与参考资料，并排阅读</strong><p>在这里滚动、翻页或放大 PDF，不会带动笔记。收起侧栏后，笔记保留在刚才的位置。</p><p>输入本机密钥解锁在线密文，或选择本机 PDF；PDF 内容仅在浏览器内存中处理。</p></div></div>
+  <footer class="manual-footer">原文档版权归原作者所有。侧栏阅读状态只在本次页面保留。</footer>
+</aside>
+<script>
+(() => {
+  const enc = new TextEncoder();
+  const keyInput = document.getElementById('course-key');
+  const status = document.getElementById('course-status');
+  const unlock = document.getElementById('course-unlock');
+  const locked = document.getElementById('locked-view');
+  const catalog = document.getElementById('course-catalog');
+  const article = document.getElementById('course-article');
+  const toc = document.getElementById('course-toc');
+  const title = document.getElementById('current-title');
+  const content = document.getElementById('current-content');
+  const back = document.getElementById('catalog-back');
+  const routeIds = ['a','b','c'];
+  let rawKeyBytes = null, cryptoKey = null, manifest = null, currentId = null;
+
+  function decodeKey(text) {
+    const normalized = text.trim().replace(/-/g,'+').replace(/_/g,'/');
+    const bytes = Uint8Array.from(atob(normalized.padEnd(Math.ceil(normalized.length/4)*4,'=')), c => c.charCodeAt(0));
+    if (bytes.length !== 32 || text.trim().length !== 43) throw new Error('KEY_FORMAT');
+    return bytes;
+  }
+  async function decryptResource(id) {
+    const response = await fetch(`sealed/${id}.bin`, {cache:'no-store'});
+    if (!response.ok) throw new Error('RESOURCE');
+    const sealed = new Uint8Array(await response.arrayBuffer());
+    if (new TextDecoder().decode(sealed.subarray(0,8)) !== 'RADNOTE1' || sealed.length < 36) throw new Error('FORMAT');
+    const aad = enc.encode(`radar-course-v1/${id}`);
+    const plain = await crypto.subtle.decrypt({name:'AES-GCM',iv:sealed.subarray(8,20),additionalData:aad,tagLength:128},cryptoKey,sealed.subarray(20));
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+  function showStatus(message) { status.textContent = message; }
+  function makeCatalog() {
+    const list = document.getElementById('module-list');
+    list.replaceChildren();
+    manifest.modules.forEach(item => {
+      const button = document.createElement('button'); button.className='module-link'; button.type='button';
+      const heading = document.createElement('strong'); heading.textContent=item.title;
+      const summary = document.createElement('span'); summary.textContent=item.summary;
+      button.append(heading,summary); button.addEventListener('click',()=>openNote(item.id)); list.append(button);
+    });
+    document.title = manifest.title;
+    document.getElementById('catalog-title').textContent = manifest.title;
+    document.getElementById('catalog-description').textContent = manifest.description;
+  }
+  function makeToc() {
+    toc.replaceChildren();
+    content.querySelectorAll('h2[id],h3[id]').forEach(heading => {
+      const link=document.createElement('a'); link.href=`#${heading.id}`; link.textContent=heading.textContent; toc.append(link);
+    });
+  }
+  async function openNote(id) {
+    if (!routeIds.includes(id)) { showCatalog(); return; }
+    showStatus('');
+    try {
+      const note = await decryptResource(id);
+      currentId=id; title.textContent=note.title; content.innerHTML=note.html;
+      makeToc(); catalog.hidden=true; catalog.style.display='none'; article.classList.add('active');
+      history.replaceState(null,'',`#${id}`); window.scrollTo({top:0,behavior:'instant'});
+      showStatus('');
+    } catch (error) { showStatus(error.name==='OperationError'?'解密校验失败：密钥不正确或密文已损坏。':'无法读取加密笔记，请检查网络后重试。'); }
+  }
+  function showCatalog() {
+    currentId=null; article.classList.remove('active'); catalog.hidden=false; catalog.style.display='block';
+    history.replaceState(null,'',location.pathname); window.scrollTo({top:0,behavior:'instant'});
+  }
+  async function unlockCourse() {
+    unlock.disabled=true; showStatus('正在验证密钥…');
+    try {
+      rawKeyBytes=decodeKey(keyInput.value); keyInput.value='';
+      cryptoKey=await crypto.subtle.importKey('raw',rawKeyBytes,{name:'AES-GCM'},false,['decrypt']);
+      manifest=await decryptResource('i'); makeCatalog(); locked.hidden=true; catalog.hidden=false; catalog.style.display='block';
+      showStatus(''); const requested=location.hash.slice(1); if(routeIds.includes(requested)) await openNote(requested);
+    } catch (error) {
+      rawKeyBytes?.fill(0); rawKeyBytes=null; cryptoKey=null; keyInput.value='';
+      showStatus(error.name==='OperationError'?'密钥不正确，或密文校验失败。':'无法解锁，请确认密钥文件和网络连接。');
+    } finally { unlock.disabled=false; }
+  }
+  unlock.addEventListener('click',unlockCourse);
+  keyInput.addEventListener('keydown',event=>{if(event.key==='Enter')unlockCourse();});
+  back.addEventListener('click',showCatalog);
+  window.addEventListener('pagehide',()=>rawKeyBytes?.fill(0));
+})();
+</script><script data-reference-reader-widget="true">// A separate PDF canvas scroller; never sends local file bytes to a server.
+(() => {
+  const panel = document.getElementById('manual-panel');
+  if (!panel) return;
+  const byId = id => document.getElementById(id);
+  const toggle = byId('manual-toggle'), close = byId('manual-close'), resizeHandle = byId('manual-resize');
+  const pages = byId('manual-pages'), status = byId('manual-status');
+  const pageInput = byId('manual-page'), zoom = byId('manual-zoom');
+  const previous = byId('manual-prev'), next = byId('manual-next');
+  const original = byId('manual-original');
+  const setStatus = (message, visible = true) => { status.textContent = message; status.hidden = !visible; };
+  const documentTitle = panel.dataset.documentTitle || '参考 PDF';
+  const shortTitle = documentTitle.includes('CSP2025T') ? '用户手册' : '教材 PDF';
+  byId('manual-toggle-label').textContent = shortTitle;
+  toggle.setAttribute('aria-label', `打开${documentTitle}`);
+  byId('manual-heading').textContent = documentTitle;
+  byId('manual-empty-title').textContent = `笔记与${documentTitle}，并排阅读`;
+  panel.setAttribute('aria-label', `${documentTitle} 阅读侧栏`);
+  pages.setAttribute('aria-label', `${documentTitle}内容，滚动不影响笔记`);
+  close.setAttribute('aria-label', `收起${documentTitle}阅读侧栏`);
+  let library, pdf, current = 1, generation = 0, observer, blobUrl;
+  let pageViews = [], rendering = new Set(), tasks = new Set(), loadGeneration = 0;
+  let autoAttempted = false, resizeTimer, lastWidth = 0;
+
+  function widthBounds() {
+    const max = Math.max(360, Math.min(Math.round(innerWidth * .75), innerWidth - 600));
+    return {min:Math.min(360,max),max};
+  }
+  function applyPanelWidth(width, persist = false) {
+    const {min,max} = widthBounds(), value = Math.max(min, Math.min(max, Math.round(width)));
+    document.body.style.setProperty('--manual-width', `${value}px`);
+    resizeHandle.setAttribute('aria-valuemin', min);
+    resizeHandle.setAttribute('aria-valuemax', max);
+    resizeHandle.setAttribute('aria-valuenow', value);
+    resizeHandle.setAttribute('aria-valuetext', `手册侧栏宽度 ${value} 像素`);
+    if (persist) { try { localStorage.setItem('radar-manual-panel-width', String(value)); } catch {} }
+    return value;
+  }
+  applyPanelWidth(Math.min(760, Math.max(400, innerWidth * .45)));
+  try {
+    const savedWidth = Number(localStorage.getItem('radar-manual-panel-width'));
+    if (savedWidth > 0) applyPanelWidth(savedWidth);
+  } catch {}
+  resizeHandle.addEventListener('pointerdown', event => {
+    if (innerWidth < 1000 || event.button !== 0) return;
+    event.preventDefault();
+    resizeHandle.setPointerCapture(event.pointerId);
+    document.body.classList.add('manual-resizing');
+    applyPanelWidth(innerWidth - event.clientX);
+  });
+  resizeHandle.addEventListener('pointermove', event => {
+    if (resizeHandle.hasPointerCapture(event.pointerId)) applyPanelWidth(innerWidth - event.clientX);
+  });
+  const stopResize = event => {
+    if (!resizeHandle.hasPointerCapture(event.pointerId)) return;
+    resizeHandle.releasePointerCapture(event.pointerId);
+    document.body.classList.remove('manual-resizing');
+    applyPanelWidth(innerWidth - event.clientX, true);
+  };
+  resizeHandle.addEventListener('pointerup', stopResize);
+  resizeHandle.addEventListener('pointercancel', stopResize);
+  resizeHandle.addEventListener('keydown', event => {
+    if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    const currentWidth = Number(resizeHandle.getAttribute('aria-valuenow')) || 600;
+    const {min,max} = widthBounds();
+    const nextWidth = event.key === 'Home' ? min : event.key === 'End' ? max : currentWidth + (event.key === 'ArrowLeft' ? 24 : -24);
+    applyPanelWidth(nextWidth, true);
+  });
+
+  function readingAnchor() {
+    const article = document.querySelector('.article');
+    const candidates = [...article.querySelectorAll('h1,h2,h3,p,li,figure,table')];
+    const node = candidates.find(e => { const r = e.getBoundingClientRect(); return r.bottom > 95 && r.top < innerHeight; });
+    return {node, top:node?.getBoundingClientRect().top, y:scrollY};
+  }
+  function restoreAnchor(anchor) {
+    requestAnimationFrame(() => {
+      const delta = anchor.node?.isConnected ? anchor.node.getBoundingClientRect().top - anchor.top : 0;
+      window.scrollTo({top:anchor.y + delta, behavior:'instant'});
+    });
+  }
+  function setOpen(open) {
+    if (open === !panel.hidden) return;
+    const anchor = readingAnchor();
+    panel.hidden = !open;
+    document.body.classList.toggle('manual-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', `${open ? '收起' : '打开'}${documentTitle}阅读侧栏`);
+    restoreAnchor(anchor);
+    (open ? close : toggle).focus({preventScroll:true});
+    if (open) {
+      if (pdf && zoom.value === 'fit') requestAnimationFrame(() => {
+        if (Math.abs(pages.clientWidth - lastWidth) > 1) rebuildPages(current);
+      });
+      if (!autoAttempted && panel.dataset.pdfUrl) {
+        autoAttempted = true;
+        loadPdf(panel.dataset.pdfUrl, documentTitle);
+      }
+    }
+  }
+  toggle.addEventListener('click', () => setOpen(true));
+  close.addEventListener('click', () => setOpen(false));
+  panel.addEventListener('keydown', e => { if (e.key === 'Escape') {e.preventDefault();setOpen(false);} });
+  // Contain wheel input even at the first/last PDF page and over the toolbar.
+  panel.addEventListener('wheel', e => {
+    if (e.ctrlKey) return;
+    e.stopPropagation();
+    const inside = pages.contains(e.target);
+    const atTop = pages.scrollTop <= 0, atBottom = pages.scrollTop + pages.clientHeight >= pages.scrollHeight - 1;
+    if (!inside || (e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) e.preventDefault();
+  }, {passive:false});
+
+  async function getLibrary() {
+    if (!library) library = import(viewerAsset('pdf.mjs').href).then(lib => {
+      lib.GlobalWorkerOptions.workerSrc = viewerAsset('pdf.worker.mjs').href;
+      return lib;
+    }).catch(error => {library = undefined;throw error;});
+    return library;
+  }
+  function viewerAsset(path) {
+    const base = panel.dataset.viewerBase || 'manual-viewer/';
+    return new URL(`${base}${path}`, location.href);
+  }
+  function setPage(value, navigate = false) {
+    if (!pdf) return;
+    current = Math.max(1, Math.min(pdf.numPages, Math.round(Number(value) || 1)));
+    pageInput.value = current;
+    previous.disabled = current === 1; next.disabled = current === pdf.numPages;
+    if (navigate) {
+      const target = pages.querySelector(`[data-page="${current}"]`);
+      if (target) pages.scrollTo({top:target.offsetTop - 10, behavior:'instant'});
+    }
+  }
+  async function renderPage(index, token) {
+    const key = `${token}:${index}`;
+    if (rendering.has(key) || token !== generation || !pdf) return;
+    const holder = pages.querySelector(`[data-page="${index + 1}"]`);
+    if (!holder || holder.querySelector('canvas')) return;
+    rendering.add(key);
+    try {
+      const page = await pdf.getPage(index + 1);
+      if (token !== generation) return;
+      const raw = pageViews[index], scale = Number(holder.dataset.width) / raw.width;
+      const viewport = page.getViewport({scale});
+      const ratio = Math.min(devicePixelRatio || 1, 1.75);
+      const canvas = document.createElement('canvas');
+      canvas.setAttribute('aria-label', `手册第 ${index + 1} 页`);
+      canvas.width = Math.ceil(viewport.width * ratio); canvas.height = Math.ceil(viewport.height * ratio);
+      canvas.style.width = `${viewport.width}px`; canvas.style.height = `${viewport.height}px`;
+      holder.append(canvas);
+      const task = page.render({canvasContext:canvas.getContext('2d'), viewport, transform:ratio === 1 ? null : [ratio,0,0,ratio,0,0]});
+      tasks.add(task);
+      try { await task.promise; canvas.dataset.rendered = 'true'; } finally {tasks.delete(task);}
+    } catch (error) {
+      if (token === generation && error.name !== 'RenderingCancelledException') {
+        holder?.querySelector('canvas')?.remove();
+        setStatus(`第${index + 1}页预览失败，可用“单独打开 PDF”查看原件。`);
+      }
+    } finally {rendering.delete(key);}
+  }
+  function rebuildPages(keepPage = current) {
+    if (!pdf || panel.hidden) return;
+    const token = ++generation;
+    observer?.disconnect(); tasks.forEach(task => task.cancel()); tasks.clear();
+    pages.replaceChildren();
+    const available = Math.max(200, pages.clientWidth - 24);
+    lastWidth = pages.clientWidth;
+    pageViews.forEach((view, index) => {
+      const width = zoom.value === 'fit' ? available : view.width * Number(zoom.value);
+      const section = document.createElement('section');
+      section.className = 'manual-pdf-page'; section.dataset.page = index + 1;
+      section.dataset.width = width; section.style.width = `${width}px`;
+      section.style.height = `${width * view.height / view.width}px`;
+      pages.append(section);
+    });
+    observer = new IntersectionObserver(entries => {
+      entries.filter(entry => entry.isIntersecting).forEach(entry => renderPage(Number(entry.target.dataset.page) - 1, token));
+    }, {root:pages, rootMargin:'600px 0px'});
+    pages.querySelectorAll('.manual-pdf-page').forEach(element => observer.observe(element));
+    setPage(keepPage, true);
+  }
+  async function loadPdf(source, label) {
+    const request = ++loadGeneration;
+    setStatus('正在打开手册…');
+    try {
+      const lib = await getLibrary();
+      const options = typeof source === 'string' ? {url:source} : {data:source};
+      const loading = lib.getDocument({...options, isEvalSupported:false,
+        cMapUrl:viewerAsset('cmaps/').href, cMapPacked:true,
+        standardFontDataUrl:viewerAsset('standard_fonts/').href,
+        wasmUrl:viewerAsset('wasm/').href});
+      const doc = await loading.promise;
+      if (request !== loadGeneration) { await doc.loadingTask.destroy(); return; }
+      const views = await Promise.all(Array.from({length:doc.numPages}, async (_, i) => (await doc.getPage(i + 1)).getViewport({scale:1})));
+      if (request !== loadGeneration) { await doc.loadingTask.destroy(); return; }
+      const old = pdf;
+      observer?.disconnect(); tasks.forEach(task => task.cancel()); tasks.clear();
+      pdf = doc; pageViews = views; current = 1;
+      await old?.loadingTask.destroy();
+      byId('manual-total').textContent = `/ ${pdf.numPages}`;
+      pageInput.disabled = false; pageInput.max = pdf.numPages; byId('manual-go').disabled = false;
+      setStatus(`${label} · ${pdf.numPages}页 · 在此滚动，不带动笔记`, false);
+      rebuildPages(1);
+    } catch (error) {
+      if (request === loadGeneration) setStatus('无法打开这份 PDF。请确认文件有效，或使用“单独打开 PDF”；笔记阅读不受影响。');
+    }
+  }
+  byId('manual-unlock').addEventListener('click', async () => {
+    const keyText = byId('manual-key').value.trim();
+    byId('manual-key').value = '';
+    if (!panel.dataset.encryptedUrl) { setStatus('此页面没有配置加密手册地址。'); return; }
+    try {
+      const keyBytes = Uint8Array.from(atob(keyText.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(keyText.length / 4) * 4,'=')), ch => ch.charCodeAt(0));
+      if (keyBytes.length !== 32) throw new Error('Invalid key length');
+      setStatus('正在读取并在本机解密手册…');
+      const response = await fetch(new URL(panel.dataset.encryptedUrl, location.href), {cache:'no-store'});
+      if (!response.ok) throw new Error('Encrypted file unavailable');
+      const sealed = new Uint8Array(await response.arrayBuffer());
+      const magic = new TextDecoder().decode(sealed.subarray(0,8));
+      if (magic !== 'CSPMENC1' || sealed.length < 36) throw new Error('Invalid encrypted file');
+      const key = await crypto.subtle.importKey('raw', keyBytes, {name:'AES-GCM'}, false, ['decrypt']);
+      const plain = await crypto.subtle.decrypt({name:'AES-GCM',iv:sealed.subarray(8,20),tagLength:128},key,sealed.subarray(20));
+      await loadPdf(new Uint8Array(plain), `${documentTitle}（本机解密）`);
+    } catch (error) {
+      setStatus(error.name === 'OperationError' ? '密钥不正确，或加密文件已损坏。密钥仅在本机浏览器处理。' : '无法解锁手册；请检查密钥与网络连接。密钥没有发送或保存。');
+    }
+  });
+  byId('manual-file').addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!/\.pdf$/i.test(file.name) || file.size > 50 * 1024 * 1024) {
+      setStatus('请选择不超过50MB的PDF文件。'); return;
+    }
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    blobUrl = URL.createObjectURL(file);
+    original.href = blobUrl; original.hidden = false;
+    await loadPdf(new Uint8Array(await file.arrayBuffer()), file.name);
+  });
+  if (panel.dataset.pdfUrl) {original.href = panel.dataset.pdfUrl;original.hidden = false;}
+  previous.addEventListener('click', () => setPage(current - 1, true));
+  next.addEventListener('click', () => setPage(current + 1, true));
+  pageInput.addEventListener('change', () => setPage(pageInput.value, true));
+  byId('manual-go').addEventListener('click', () => setPage(pageInput.value, true));
+  pageInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {event.preventDefault();setPage(pageInput.value,true);}
+  });
+  zoom.addEventListener('change', () => rebuildPages(current));
+  let scrollScheduled = false;
+  pages.addEventListener('scroll', () => {
+    if (scrollScheduled || !pdf) return;
+    scrollScheduled = true;
+    requestAnimationFrame(() => {
+      scrollScheduled = false;
+      const top = pages.getBoundingClientRect().top;
+      const candidate = [...pages.querySelectorAll('.manual-pdf-page')].find(e => e.getBoundingClientRect().bottom > top + 30);
+      if (candidate) setPage(candidate.dataset.page);
+    });
+  }, {passive:true});
+  new ResizeObserver(() => {
+    if (!pdf || panel.hidden || zoom.value !== 'fit' || Math.abs(pages.clientWidth - lastWidth) < 2) return;
+    clearTimeout(resizeTimer); resizeTimer = setTimeout(() => rebuildPages(current), 180);
+  }).observe(pages);
+})();
+</script><script id="note-navigation-script">(() => {
+  const body = document.body;
+  const toggle = document.getElementById('note-toc-toggle');
+  const themeToggle = document.getElementById('note-theme-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (themeToggle) {
+    const updateThemeButton = () => {
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      themeToggle.textContent = isDark ? '日间' : '夜间';
+      themeToggle.setAttribute('aria-label', isDark ? '切换到日间模式' : '切换到夜间模式');
+      themeToggle.setAttribute('aria-pressed', String(isDark));
+      themeToggle.title = isDark ? '切换到日间模式' : '切换到夜间模式';
+    };
+    updateThemeButton();
+    themeToggle.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('study-notes-theme', next); } catch (_) {}
+      updateThemeButton();
+    });
+  }
+  if (!toggle || !sidebar) return;
+
+  const smallScreen = () => window.matchMedia('(max-width: 600px)').matches;
+  const mobileOpen = () => body.classList.contains('note-toc-drawer-open');
+  const desktopOpen = () => !body.classList.contains('note-toc-collapsed');
+  const announce = open => {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? '关闭目录' : '打开目录');
+    toggle.textContent = smallScreen() ? '☰ 目录' : '目录';
+  };
+  const closeDrawer = restoreFocus => {
+    if (!mobileOpen()) return;
+    body.classList.remove('note-toc-drawer-open');
+    announce(false);
+    if (restoreFocus) toggle.focus({ preventScroll:true });
+  };
+
+  body.classList.add('note-navigation-ready');
+  let saved = null;
+  try { saved = localStorage.getItem('study-notes-toc-collapsed'); } catch (_) {}
+  if (saved === 'true' && !smallScreen()) body.classList.add('note-toc-collapsed');
+  announce(smallScreen() ? mobileOpen() : desktopOpen());
+
+  toggle.addEventListener('click', () => {
+    if (smallScreen()) {
+      if (mobileOpen()) closeDrawer(false);
+      else body.classList.add('note-toc-drawer-open');
+      announce(mobileOpen());
+      return;
+    }
+    body.classList.toggle('note-toc-collapsed');
+    const open = desktopOpen();
+    try { localStorage.setItem('study-notes-toc-collapsed', String(!open)); } catch (_) {}
+    announce(open);
+  });
+
+  sidebar.querySelectorAll('.toc a').forEach(link => link.addEventListener('click', () => {
+    if (!smallScreen() || !mobileOpen()) return;
+    closeDrawer(false);
+  }));
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && smallScreen() && mobileOpen()) {
+      event.preventDefault();
+      closeDrawer(true);
+    }
+  });
+  document.addEventListener('click', event => {
+    // The dimmed backdrop is the body pseudo-element; close only when it is hit.
+    if (smallScreen() && mobileOpen() && event.target === body) closeDrawer(true);
+  });
+
+  window.addEventListener('resize', () => {
+    closeDrawer(false);
+    announce(smallScreen() ? false : desktopOpen());
+  }, {passive:true});
+})();
+</script></body></html>
