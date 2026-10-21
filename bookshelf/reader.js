@@ -205,8 +205,10 @@
 
   async function openBook(buffer) {
     if (typeof window.ePub !== 'function') throw new Error('ReaderUnavailable');
-    openedBook = window.ePub(buffer, { openAs:'binary' });
-    await openedBook.ready;
+    // epub.js 0.3.88 can fail to initialize when an ArrayBuffer is passed
+    // to the constructor. Open the decrypted bytes through Book.open instead.
+    openedBook = window.ePub();
+    await openedBook.open(buffer);
     const navigation = await openedBook.loaded.navigation;
     tableOfContents = navigation?.toc || [];
     tocList.replaceChildren(renderToc(tableOfContents));
@@ -247,8 +249,10 @@
     unlockButton.disabled = true;
     setStatus('正在读取加密书籍并在本机验证…', 'info');
     let keyBytes;
+    let phase = 'key';
     try {
       keyBytes = decodeKey(encodedKey);
+      phase = 'download';
       const response = await fetch('books/justice-heart.epub.enc', {cache:'no-store', credentials:'same-origin'});
       if (!response.ok) throw new Error('CiphertextUnavailable');
       const sealed = new Uint8Array(await response.arrayBuffer());
@@ -259,12 +263,14 @@
       const importedKey = await crypto.subtle.importKey('raw', keyBytes, {name:'AES-GCM'}, false, ['decrypt']);
       keyBytes.fill(0);
       keyBytes = null;
+      phase = 'decrypt';
       decryptedBytes = await crypto.subtle.decrypt({
         name:'AES-GCM', iv:sealed.subarray(8,20), additionalData:new TextEncoder().encode(AAD), tagLength:128
       }, importedKey, sealed.subarray(20));
       sealed.fill(0);
       setStatus('', 'info');
       readSavedPreferences();
+      phase = 'epub';
       await openBook(decryptedBytes);
     } catch (error) {
       if (keyBytes) keyBytes.fill(0);
@@ -276,9 +282,15 @@
       unlockCard.hidden = false;
       const message = error?.name === 'OperationError'
         ? '密钥不正确，或加密文件校验失败。'
-        : error?.message === 'ReaderUnavailable'
-          ? '阅读组件尚未加载完成，请刷新页面重试。'
-          : '暂时无法打开这本书，请检查网络后重试。';
+        : error?.message === 'InvalidKey'
+          ? '密钥格式不正确，请使用配套的 43 位 Base64URL 密钥。'
+          : error?.message === 'ReaderUnavailable'
+            ? '阅读组件尚未加载完成，请刷新页面重试。'
+            : phase === 'download'
+              ? '加密书籍下载失败，请检查网络后重试。'
+              : phase === 'epub'
+                ? '密钥验证已通过，但 EPUB 解析失败。请刷新重试；若仍失败，请反馈此提示。'
+                : '解锁过程中发生错误，请检查密钥格式后重试。';
       setStatus(message);
     } finally {
       keyInput.value = '';
