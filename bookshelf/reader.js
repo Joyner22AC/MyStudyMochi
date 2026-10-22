@@ -205,6 +205,7 @@
 
   async function openBook(buffer) {
     if (typeof window.ePub !== 'function') throw new Error('ReaderUnavailable');
+    if (typeof window.JSZip !== 'function') throw new Error('ZipLibraryUnavailable');
     // epub.js 0.3.88 can fail to initialize when an ArrayBuffer is passed
     // to the constructor. Open the decrypted bytes through Book.open instead.
     openedBook = window.ePub();
@@ -286,6 +287,8 @@
           ? '密钥格式不正确，请使用配套的 43 位 Base64URL 密钥。'
           : error?.message === 'ReaderUnavailable'
             ? '阅读组件尚未加载完成，请刷新页面重试。'
+            : error?.message === 'ZipLibraryUnavailable'
+              ? 'EPUB 压缩包组件尚未加载，请刷新页面重试。'
             : phase === 'download'
               ? '加密书籍下载失败，请检查网络后重试。'
               : phase === 'epub'

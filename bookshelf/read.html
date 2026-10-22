@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#f4f6f8">
   <title>正义之心｜我的书架</title>
   <link rel="stylesheet" href="reader.css">
+  <script src="runtime/jszip.min.js" defer></script>
   <script src="runtime/epub.min.js" defer></script>
   <script src="reader.js" defer></script>
 <script id="note-theme-bootstrap">(()=>{let theme=null;try{theme=localStorage.getItem("study-notes-theme")}catch(_){}if(theme!=="light"&&theme!=="dark")theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=theme;})();</script><style id="note-navigation-styles">:root{
@@ -169,7 +170,7 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
 </style></head>
 <body class="book-reader-page">
-  <main class="article reader-main"><div class="note-navigation-controls note-navigation-catalog-controls" id="note-navigation-controls"><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div>
+  <main class="article reader-main"><div class="note-navigation-controls note-navigation-catalog-controls" id="note-navigation-controls"><a aria-label="返回全部课程" href="../%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0_%E8%AF%BE%E7%A8%8B%E6%80%BB%E5%85%A5%E5%8F%A3.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div>
     <a class="shelf-back" href="index.html"><span aria-hidden="true">←</span> 我的书架</a>
 
     <section class="unlock-card" id="unlock-card" aria-labelledby="book-title">
@@ -221,7 +222,7 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
       </div>
     </section>
   </main>
-<script id="note-navigation-script">(() => {
+<button aria-hidden="true" id="note-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" tabindex="-1" hidden>↑</button><script id="note-navigation-script">(() => {
   const body = document.body;
   const toggle = document.getElementById('note-toc-toggle');
   const themeToggle = document.getElementById('note-theme-toggle');
