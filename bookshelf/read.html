@@ -195,17 +195,15 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
         <button id="toc-toggle" class="quiet-button toc-toggle" type="button" aria-expanded="false" aria-controls="toc-panel" aria-label="打开目录和标记">☰</button>
         <div class="reader-book-label"><strong>正义之心</strong><span id="chapter-label">准备阅读</span></div>
         <div class="reader-progress">
-          <span id="reading-progress-text" class="progress-text">0%</span>
+          <span id="reading-progress-text" class="progress-text">定位中</span>
           <label class="visually-hidden" for="reading-scrubber">阅读进度</label>
-          <input id="reading-scrubber" type="range" min="0" max="1000" value="0" aria-label="拖动跳转阅读进度">
+          <input id="reading-scrubber" type="range" min="0" max="1000" value="0" aria-label="拖动预览阅读进度，松开后跳转" disabled>
+          <output id="scrub-preview" class="scrub-preview" hidden></output>
         </div>
         <div class="reader-controls" aria-label="阅读控制">
-          <button id="font-smaller" class="quiet-button font-button" type="button" aria-label="缩小字号" title="缩小字号">A−</button>
-          <button id="font-larger" class="quiet-button font-button" type="button" aria-label="放大字号" title="放大字号">A+</button>
-          <label class="visually-hidden" for="reading-flow">阅读方式</label>
-          <select id="reading-flow" class="flow-select" aria-label="阅读方式"><option value="paginated">分页</option><option value="scrolled-doc">连续</option></select>
+          <button id="return-position" class="quiet-button return-position" type="button" title="返回跳转前的阅读位置" hidden>返回原处</button>
+          <button id="appearance-toggle" class="quiet-button appearance-toggle" type="button" aria-label="阅读排版与本机备份" aria-expanded="false" aria-controls="appearance-panel" title="阅读设置">Aa</button>
           <button id="bookmark-button" class="quiet-button icon-quiet-button" type="button" aria-pressed="false" aria-label="在此添加书签" title="添加书签">☆</button>
-          <button id="highlights-toggle" class="quiet-button" type="button" aria-label="查看划线" title="查看划线">划线</button>
           <button id="fullscreen-button" class="quiet-button icon-quiet-button" type="button" aria-label="进入浏览器全屏" title="全屏阅读">⛶</button>
           <button id="lock-button" class="quiet-button lock-button" type="button" aria-label="锁定并退出阅读" title="锁定并退出">锁定</button>
         </div>
@@ -217,11 +215,40 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
           <button id="previous-page" class="page-turn page-turn-previous" type="button" aria-label="上一页" title="上一页（←）"><span aria-hidden="true">‹</span></button>
           <button id="next-page" class="page-turn page-turn-next" type="button" aria-label="下一页" title="下一页（→）"><span aria-hidden="true">›</span></button>
           <div id="selection-toolbar" class="selection-toolbar" hidden>
-            <span>选中文字</span><button id="add-highlight" type="button">标记</button><button id="dismiss-selection" type="button" aria-label="关闭">×</button>
+            <span>选中文字</span><button id="add-highlight" type="button">划线</button><button id="add-note-from-selection" type="button">写笔记</button><button id="dismiss-selection" type="button" aria-label="关闭">×</button>
           </div>
+          <div id="reading-footer" class="reading-footer" aria-hidden="true">正在定位阅读位置</div>
+          <div id="page-feedback" class="page-feedback" hidden aria-live="polite"></div>
           <p id="reader-status" class="reader-status" role="status" aria-live="polite"></p>
         </section>
       </div>
+      <aside id="appearance-panel" class="appearance-panel" role="dialog" aria-label="阅读设置" aria-hidden="true" hidden>
+        <div class="appearance-head"><strong>阅读设置</strong><button id="appearance-close" class="quiet-button" type="button" aria-label="关闭阅读设置">×</button></div>
+        <div class="appearance-body">
+          <fieldset class="reading-settings-group"><legend>快速排版</legend><div class="preset-row">
+            <button type="button" data-reading-preset="clear">清爽</button><button type="button" data-reading-preset="relaxed">宽松</button><button type="button" data-reading-preset="large">大字</button>
+          </div></fieldset>
+          <div class="reading-settings-grid">
+            <label>字号 <output id="setting-font-value"></output><input id="setting-font" type="range" min="80" max="160" step="5"></label>
+            <label>行距 <output id="setting-line-value"></output><input id="setting-line" type="range" min="1.5" max="2.2" step="0.05"></label>
+            <label>段距 <output id="setting-paragraph-value"></output><input id="setting-paragraph" type="range" min="0" max="1.5" step="0.1"></label>
+            <label>行宽 <output id="setting-width-value"></output><input id="setting-width" type="range" min="30" max="52" step="2"></label>
+            <label>页边距 <output id="setting-margin-value"></output><input id="setting-margin" type="range" min="1" max="3" step="0.25"></label>
+            <label>字体<select id="setting-family"><option value="serif">宋体阅读</option><option value="sans">清晰黑体</option></select></label>
+            <label>纸张<select id="setting-paper"><option value="follow">跟随日夜</option><option value="white">柔白</option><option value="sepia">暖纸</option><option value="dark">深色</option></select></label>
+            <label>对齐<select id="setting-align"><option value="left">左对齐</option><option value="justify">两端对齐</option></select></label>
+            <label>阅读方式<select id="reading-flow"><option value="paginated">分页 · 滚轮翻页</option><option value="scrolled-doc">连续 · 滚轮滚动</option></select></label>
+          </div>
+          <p class="settings-hint">排版选择仅存于本机；放大字号后会尽量保持当前阅读位置。</p>
+          <details class="backup-details"><summary>本机标记备份</summary>
+            <p>位置、书签与划线保存在此浏览器；个人笔记使用本书密钥在本机加密。备份文件另用你输入的密码加密，不上传服务器；导入会覆盖本机标记。</p>
+            <label for="backup-passphrase">备份密码（至少 12 位，勿使用书籍密钥）</label>
+            <input id="backup-passphrase" type="password" autocomplete="new-password" spellcheck="false" minlength="12">
+            <div class="backup-actions"><button id="backup-export" type="button">导出加密备份</button><label for="backup-file" class="backup-file-label">选择备份文件</label><input id="backup-file" type="file" accept=".json,application/json" aria-label="选择加密备份文件"><button id="backup-import" type="button">导入并覆盖</button></div>
+            <p id="backup-status" class="backup-status" role="status" aria-live="polite"></p>
+          </details>
+        </div>
+      </aside>
       <aside id="toc-panel" class="toc-panel" role="dialog" aria-modal="true" aria-label="目录、书签和划线" aria-hidden="true" inert>
         <div class="toc-heading"><span>阅读位置</span><button id="toc-close" class="icon-button toc-close" type="button" aria-label="关闭侧栏">×</button></div>
         <nav class="reader-drawer-tabs" aria-label="阅读导航">
@@ -237,6 +264,16 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
         <div class="toc-security"><span>密钥仅在本页内存中；阅读位置与标记仅保存在本机浏览器。</span><button id="lock-from-toc" class="quiet-button" type="button">锁定并退出</button></div>
       </aside>
       <button id="toc-backdrop" class="toc-backdrop" type="button" aria-label="关闭阅读导航" hidden></button>
+      <dialog id="note-dialog" class="note-dialog" aria-labelledby="note-dialog-title">
+        <form method="dialog" id="note-form">
+          <h2 id="note-dialog-title">这条划线的笔记</h2>
+          <p id="note-location" class="note-location"></p>
+          <label for="note-text">我的想法</label>
+          <textarea id="note-text" maxlength="500" rows="6" placeholder="写下自己的理解，不会自动保存书中原文"></textarea>
+          <p class="note-privacy">笔记使用本书密钥在本机加密；刷新后需重新解锁才能查看。</p>
+          <div class="note-actions"><button id="note-delete-highlight" type="button">删除划线</button><button id="note-cancel" type="button">取消</button><button id="note-save" type="submit">保存笔记</button></div>
+        </form>
+      </dialog>
     </section>
   </main>
 <button aria-hidden="true" id="note-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" tabindex="-1" hidden>↑</button><script id="note-navigation-script">(() => {
