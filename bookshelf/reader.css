@@ -45,6 +45,7 @@ body.is-reading .shelf-back,body.is-reading .note-navigation-controls,body.is-re
 .reading-app[data-paper=dark]{--book-bg:#20242a;--book-paper:#252a30;--book-ink:#e5e8eb;--book-muted:#a6b2bb;--book-line:#3b4650;--book-soft:#303b45;--book-accent:#9bc9e8}
 .reading-app[data-paper=sepia]{--book-bg:#eee2cf;--book-paper:#f5eddd;--book-ink:#353027;--book-muted:#776d5f;--book-line:#dacbb3;--book-soft:#ecdfc9;--book-accent:#81613f}
 .epub-viewer{background:var(--reader-paper)}
+.reading-app[data-flow=paginated] .epub-viewer{width:min(100%,var(--reader-page-width,44rem));margin-inline:auto}
 .reader-toolbar{grid-template-columns:auto minmax(110px,1fr) minmax(150px,28vw) auto}
 .reader-controls .appearance-toggle{font-family:Georgia,serif;font-size:16px;font-weight:700;letter-spacing:-.07em}
 .reader-controls .return-position{width:auto;padding:0 10px;color:var(--book-accent);font-size:11px}

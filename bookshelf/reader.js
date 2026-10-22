@@ -645,7 +645,13 @@
       : 'Georgia,"Noto Serif CJK SC","Songti SC",serif';
     reader.dataset.paper = paper;
     reader.style.setProperty('--reader-paper', colors.bg);
-    return `html{background:${colors.bg}!important}body{color:${colors.ink}!important;background:${colors.bg}!important;font-family:${family}!important;line-height:${readingPrefs.line}!important;max-width:${readingPrefs.width}rem!important;margin-left:auto!important;margin-right:auto!important;padding:4.2rem ${readingPrefs.margin}rem 5rem!important;box-sizing:border-box!important;text-align:${readingPrefs.align}!important;overflow-wrap:break-word}body p,body li{line-height:${readingPrefs.line}!important;margin-bottom:${readingPrefs.paragraph}em!important;text-align:${readingPrefs.align}!important}body a{color:${colors.link}!important}img,svg{max-width:100%!important}`;
+    reader.style.setProperty('--reader-page-width', `${readingPrefs.width + readingPrefs.margin * 2}rem`);
+    // epub.js owns the paginated body's width, columns, gap and padding. Constraining
+    // that body to a prose width makes multiple EPUB columns visible at once.
+    const layout = activeFlow === 'paginated'
+      ? 'max-width:none!important;margin:0!important'
+      : `max-width:${readingPrefs.width}rem!important;margin-left:auto!important;margin-right:auto!important;padding:4.2rem ${readingPrefs.margin}rem 5rem!important;box-sizing:border-box!important`;
+    return `html{background:${colors.bg}!important}body{color:${colors.ink}!important;background:${colors.bg}!important;font-family:${family}!important;line-height:${readingPrefs.line}!important;${layout};text-align:${readingPrefs.align}!important;overflow-wrap:break-word}body p,body li{line-height:${readingPrefs.line}!important;margin-bottom:${readingPrefs.paragraph}em!important;text-align:${readingPrefs.align}!important}body a{color:${colors.link}!important}img,svg{max-width:100%!important}`;
   }
 
   function applyStyleToDocument(doc) {
@@ -696,6 +702,11 @@
       if (!rendition || !anchor) return;
       try {
         const viewer = byId('epub-viewer');
+        if (activeFlow === 'paginated' && rendition.manager?.settings) {
+          // Keep epub.js's internal column gap in step with the margin control.
+          rendition.manager.settings.gap = Math.round(readingPrefs.margin * 32);
+          rendition.manager.updateLayout();
+        }
         rendition.resize(viewer.clientWidth, viewer.clientHeight);
         await withTimeout(rendition.display(anchor), 12000, 'ReflowTimeout');
       } catch (_) { announce('排版已更新；若位置偏移，可用书签返回。'); }
@@ -712,12 +723,12 @@
 
   function installBookThemes() {
     rendition.themes.register('light', {
-      body: { color:'#30343a', background:'#fff', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'font-size':'1em', 'line-height':'1.9', 'max-width':'48rem', 'margin-left':'auto', 'margin-right':'auto', 'padding':'4.4rem 2.25rem 5rem', 'box-sizing':'border-box' },
+      body: { color:'#30343a', background:'#fff', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'font-size':'1em', 'line-height':'1.9' },
       'p, li': { 'line-height':'1.9' },
       'img, svg': { 'max-width':'100%' }
     });
     rendition.themes.register('dark', {
-      body: { color:'#d8dde2', background:'#20242a', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'font-size':'1em', 'line-height':'1.9', 'max-width':'48rem', 'margin-left':'auto', 'margin-right':'auto', 'padding':'4.4rem 2.25rem 5rem', 'box-sizing':'border-box' },
+      body: { color:'#d8dde2', background:'#20242a', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'font-size':'1em', 'line-height':'1.9' },
       'p, li': { 'line-height':'1.9' },
       'a': { color:'#91c5e7' },
       'img, svg': { 'max-width':'100%' }
@@ -734,6 +745,7 @@
     const saved = readSaved('readingPrefs');
     readingPrefs = sanitizePrefs(saved || {...PRESETS.clear, font:readSaved('font') || 100});
     activeFlow = readSaved('flow') === 'scrolled-doc' ? 'scrolled-doc' : 'paginated';
+    readingStyleText();
     renderSettingsControls();
   }
 
@@ -745,11 +757,15 @@
     const resumeCfi = currentCfi || readSaved('position')?.cfi;
     activeFlow = nextFlow;
     reader.dataset.flow = nextFlow;
+    applyReadingStyles();
     wheelAccumulator = 0;
     wheelGestureTurned = false;
     clearTimeout(wheelTurnTimer);
     try {
+      if (rendition.manager?.settings) rendition.manager.settings.gap = Math.round(readingPrefs.margin * 32);
       rendition.flow(nextFlow);
+      const viewer = byId('epub-viewer');
+      rendition.resize(viewer.clientWidth, viewer.clientHeight);
       await withTimeout(rendition.display(resumeCfi || undefined), 12000, 'FlowChangeTimeout');
       writeSaved('flow', nextFlow);
       renderSettingsControls();
@@ -758,8 +774,11 @@
     } catch (_) {
       activeFlow = previousFlow;
       reader.dataset.flow = previousFlow;
+      applyReadingStyles();
       try {
         rendition.flow(previousFlow);
+        const viewer = byId('epub-viewer');
+        rendition.resize(viewer.clientWidth, viewer.clientHeight);
         await withTimeout(rendition.display(resumeCfi || undefined), 12000, 'FlowRestoreTimeout');
       } catch (_) {}
       renderSettingsControls();
@@ -771,6 +790,7 @@
   function createRendition(bookToken) {
     rendition = openedBook.renderTo('epub-viewer', {
       width:'100%', height:'100%', flow:activeFlow, spread:'none',
+      gap:Math.round(readingPrefs.margin * 32),
       allowScriptedContent:false, allowPopups:false, resizeOnOrientationChange:true
     });
     installBookThemes();
