@@ -32,7 +32,9 @@
   const progressText = byId('reading-progress-text');
   const tocPanel = byId('toc-panel');
   const tocList = byId('toc-list');
-  const bookmarkSlot = byId('bookmark-slot');
+  const bookmarkList = byId('bookmark-list');
+  const highlightList = byId('highlight-list');
+  const selectionToolbar = byId('selection-toolbar');
   let openedBook = null;
   let rendition = null;
   let decryptedBytes = null;
@@ -41,6 +43,11 @@
   let fontPercent = 100;
   let activeFlow = 'paginated';
   let saveTimer = 0;
+  let chromeTimer = 0;
+  let selectedCfi = '';
+  let activeDrawerTab = 'toc';
+  let touchStart = null;
+  let lastTurnAt = 0;
   let tableOfContents = [];
 
   function setStatus(message, kind = 'error') {
@@ -72,6 +79,7 @@
     const percent = Math.round(fraction * 100);
     progressBar.style.width = `${percent}%`;
     progressText.textContent = `${percent}%`;
+    byId('reading-scrubber').value = String(Math.round(fraction * 1000));
     const label = chapterFor(location?.start?.href || '');
     byId('chapter-label').textContent = label || '正在阅读';
     currentCfi = location?.start?.cfi || currentCfi;
@@ -135,35 +143,171 @@
     });
   }
 
-  function showBookmark() {
-    const mark = readSaved('bookmark');
-    bookmarkSlot.replaceChildren();
-    bookmarkSlot.hidden = !mark?.cfi;
-    byId('bookmark-button').setAttribute('aria-pressed', String(Boolean(mark?.cfi)));
-    if (!mark?.cfi) return;
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'bookmark-open';
-    button.textContent = `书签 · ${mark.label || '已保存位置'} · ${mark.percent ?? 0}%`;
-    button.addEventListener('click', async () => {
-      if (rendition) await rendition.display(mark.cfi);
-      closeToc();
-    });
-    bookmarkSlot.append(button);
+  function savedBookmarks() {
+    const list = readSaved('bookmarks');
+    if (Array.isArray(list)) return list;
+    const old = readSaved('bookmark');
+    return old?.cfi ? [old] : [];
+  }
+
+  function showBookmarks() {
+    const bookmarks = savedBookmarks();
+    bookmarkList.replaceChildren();
+    byId('bookmark-button').setAttribute('aria-pressed', String(bookmarks.some(mark => mark.cfi === currentCfi)));
+    if (!bookmarks.length) {
+      const empty = document.createElement('p');
+      empty.className = 'drawer-empty';
+      empty.textContent = '还没有书签。阅读时点一下 ☆ 即可保存位置。';
+      bookmarkList.append(empty);
+      return;
+    }
+    for (const [index, mark] of bookmarks.entries()) {
+      const row = document.createElement('div');
+      row.className = 'saved-mark-row';
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'saved-mark-open';
+      open.textContent = `${mark.label || '阅读位置'} · ${mark.percent ?? 0}%`;
+      open.addEventListener('click', async () => {
+        await rendition?.display(mark.cfi);
+        closeToc();
+      });
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'saved-mark-remove';
+      remove.textContent = '×';
+      remove.setAttribute('aria-label', `删除书签 ${index + 1}`);
+      remove.addEventListener('click', () => {
+        const next = savedBookmarks().filter((_, itemIndex) => itemIndex !== index);
+        writeSaved('bookmarks', next);
+        try { localStorage.removeItem(`${STORAGE}:bookmark`); } catch (_) {}
+        showBookmarks();
+      });
+      row.append(open, remove);
+      bookmarkList.append(row);
+    }
+  }
+
+  function savedHighlights() {
+    const list = readSaved('highlights');
+    return Array.isArray(list) ? list : [];
+  }
+
+  function showHighlights() {
+    const highlights = savedHighlights();
+    highlightList.replaceChildren();
+    if (!highlights.length) {
+      const empty = document.createElement('p');
+      empty.className = 'drawer-empty';
+      empty.textContent = '还没有划线。选中正文后点“标记”即可保存。';
+      highlightList.append(empty);
+      return;
+    }
+    for (const [index, mark] of highlights.entries()) {
+      const row = document.createElement('div');
+      row.className = 'saved-mark-row';
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'saved-mark-open';
+      open.textContent = `${mark.label || '阅读位置'} · ${mark.percent ?? 0}%`;
+      open.addEventListener('click', async () => {
+        await rendition?.display(mark.cfi);
+        closeToc();
+      });
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'saved-mark-remove';
+      remove.textContent = '×';
+      remove.setAttribute('aria-label', `删除第 ${index + 1} 条划线`);
+      remove.addEventListener('click', () => removeHighlight(mark.cfi));
+      row.append(open, remove);
+      highlightList.append(row);
+    }
+  }
+
+  function applyHighlights() {
+    if (!rendition?.annotations) return;
+    for (const mark of savedHighlights()) {
+      try {
+        rendition.annotations.highlight(mark.cfi, {fill:'rgba(246, 205, 91, .48)', 'fill-opacity':'0.48'}, undefined, 'reader-highlight');
+      } catch (_) {}
+    }
+  }
+
+  function removeHighlight(cfi) {
+    try { rendition?.annotations.remove(cfi, 'highlight'); } catch (_) {}
+    writeSaved('highlights', savedHighlights().filter(mark => mark.cfi !== cfi));
+    showHighlights();
+  }
+
+  function addHighlight() {
+    if (!selectedCfi || !rendition?.annotations) return;
+    const marks = savedHighlights();
+    if (!marks.some(mark => mark.cfi === selectedCfi)) {
+      const href = lastLocation?.href || '';
+      marks.push({cfi:selectedCfi, label:chapterFor(href) || '正文', percent:lastLocation?.percent || 0, color:'yellow'});
+      writeSaved('highlights', marks);
+      try {
+        rendition.annotations.highlight(selectedCfi, {fill:'rgba(246, 205, 91, .48)', 'fill-opacity':'0.48'}, undefined, 'reader-highlight');
+      } catch (_) {}
+      showHighlights();
+      readerStatus.textContent = '划线已保存到本机浏览器';
+      setTimeout(() => { readerStatus.textContent = ''; }, 1600);
+    }
+    selectionToolbar.hidden = true;
+    selectedCfi = '';
   }
 
   function closeToc() {
-    if (!matchMedia('(max-width:650px)').matches) return;
     reader.classList.remove('toc-open');
     byId('toc-backdrop').hidden = true;
     byId('toc-toggle').setAttribute('aria-expanded', 'false');
+    tocPanel.setAttribute('aria-hidden', 'true');
+    tocPanel.inert = true;
+    byId('toc-toggle').focus({preventScroll:true});
   }
 
   function toggleToc(open = !reader.classList.contains('toc-open')) {
     reader.classList.toggle('toc-open', open);
-    const small = matchMedia('(max-width:650px)').matches;
-    byId('toc-backdrop').hidden = !open || !small;
+    byId('toc-backdrop').hidden = !open;
     byId('toc-toggle').setAttribute('aria-expanded', String(open));
+    tocPanel.setAttribute('aria-hidden', String(!open));
+    tocPanel.inert = !open;
+    if (open) {
+      selectionToolbar.hidden = true;
+      switchDrawerTab(activeDrawerTab);
+      showChrome();
+      byId('toc-close').focus({preventScroll:true});
+    }
+  }
+
+  function switchDrawerTab(tab) {
+    activeDrawerTab = tab;
+    document.querySelectorAll('[data-reader-tab]').forEach(button => {
+      button.setAttribute('aria-selected', String(button.dataset.readerTab === tab));
+    });
+    document.querySelectorAll('[data-reader-panel]').forEach(panel => {
+      panel.hidden = panel.dataset.readerPanel !== tab;
+    });
+    if (tab === 'bookmarks') showBookmarks();
+    if (tab === 'highlights') showHighlights();
+  }
+
+  function showChrome() {
+    reader.classList.add('chrome-visible');
+    clearTimeout(chromeTimer);
+    chromeTimer = setTimeout(() => {
+      if (!reader.classList.contains('toc-open') && selectionToolbar.hidden && !reader.querySelector('.reader-toolbar :focus')) {
+        reader.classList.remove('chrome-visible');
+      }
+    }, 2600);
+  }
+
+  function turnPage(direction) {
+    if (!rendition) return;
+    showChrome();
+    if (direction < 0) rendition.prev();
+    else rendition.next();
   }
 
   function selectedTheme() {
@@ -182,15 +326,19 @@
 
   function installBookThemes() {
     rendition.themes.register('light', {
-      body: { color:'#30343a', background:'#fff', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'line-height':'1.9' },
+      body: { color:'#30343a', background:'#fff', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'font-size':'1em', 'line-height':'1.9', 'max-width':'48rem', 'margin-left':'auto', 'margin-right':'auto', 'padding':'4.4rem 2.25rem 5rem', 'box-sizing':'border-box' },
       'p, li': { 'line-height':'1.9' },
       'img, svg': { 'max-width':'100%' }
     });
     rendition.themes.register('dark', {
-      body: { color:'#d8dde2', background:'#20242a', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'line-height':'1.9' },
+      body: { color:'#d8dde2', background:'#20242a', 'font-family':'Georgia,"Noto Serif CJK SC","Songti SC",serif', 'font-size':'1em', 'line-height':'1.9', 'max-width':'48rem', 'margin-left':'auto', 'margin-right':'auto', 'padding':'4.4rem 2.25rem 5rem', 'box-sizing':'border-box' },
       'p, li': { 'line-height':'1.9' },
       'a': { color:'#91c5e7' },
       'img, svg': { 'max-width':'100%' }
+    });
+    rendition.themes.default({
+      '::selection': {background:'rgba(246,205,91,.34)'},
+      '.reader-highlight': {fill:'rgba(246,205,91,.48)', 'fill-opacity':'0.48', 'mix-blend-mode':'multiply'}
     });
     applyBookTheme();
   }
@@ -198,9 +346,6 @@
   function readSavedPreferences() {
     const savedFont = Number(readSaved('font'));
     if (savedFont >= 80 && savedFont <= 160) fontPercent = savedFont;
-    const savedFlow = readSaved('flow');
-    if (savedFlow === 'paginated' || savedFlow === 'scrolled-doc') activeFlow = savedFlow;
-    byId('reading-flow').value = activeFlow;
   }
 
   async function openBook(buffer) {
@@ -219,7 +364,7 @@
       empty.textContent = '这本书没有可解析的目录。';
       tocList.append(empty);
     }
-    toggleToc(!matchMedia('(max-width:650px)').matches);
+    toggleToc(false);
 
     const metadata = await openedBook.loaded.metadata;
     byId('chapter-label').textContent = metadata?.title || '正文';
@@ -238,9 +383,37 @@
       showProgress(location);
       setTocCurrent(location?.start?.href || '');
     });
+    rendition.on('selected', (cfiRange, contents) => {
+      selectedCfi = cfiRange || '';
+      selectionToolbar.hidden = !selectedCfi;
+      try { contents?.window?.getSelection()?.removeAllRanges(); } catch (_) {}
+      if (selectedCfi) showChrome();
+    });
+    rendition.on('rendered', (_section, view) => {
+      const doc = view?.contents?.document;
+      if (!doc || doc.documentElement.dataset.pageTurnReady) return;
+      doc.documentElement.dataset.pageTurnReady = 'true';
+      doc.addEventListener('touchstart', event => {
+        const point = event.changedTouches?.[0];
+        if (point) touchStart = {x:point.clientX, y:point.clientY, at:Date.now()};
+      }, {passive:true});
+      doc.addEventListener('touchend', event => {
+        const point = event.changedTouches?.[0];
+        if (!point || !touchStart || Date.now() - touchStart.at > 900) return;
+        const dx = point.clientX - touchStart.x;
+        const dy = point.clientY - touchStart.y;
+        touchStart = null;
+        if (Math.abs(dx) > 54 && Math.abs(dx) > Math.abs(dy) * 1.25) turnPage(dx > 0 ? -1 : 1);
+      }, {passive:true});
+    });
+    applyHighlights();
     const saved = readSaved('position');
     await rendition.display(saved?.cfi || undefined);
-    showBookmark();
+    document.body.classList.add('is-reading');
+    showBookmarks();
+    showHighlights();
+    reader.classList.add('chrome-visible');
+    showChrome();
     readerStatus.textContent = '';
     setTimeout(() => { readerStatus.textContent = ''; }, 1300);
   }
@@ -313,8 +486,10 @@
     tableOfContents = [];
     tocList.replaceChildren();
     reader.hidden = true;
+    document.body.classList.remove('is-reading');
     unlockCard.hidden = false;
     reader.classList.remove('toc-open');
+    selectionToolbar.hidden = true;
     keyInput.focus({preventScroll:true});
   }
 
@@ -333,13 +508,46 @@
     } finally { keyFile.value = ''; }
   });
 
-  byId('previous-page').addEventListener('click', () => rendition?.prev());
-  byId('next-page').addEventListener('click', () => rendition?.next());
+  byId('previous-page').addEventListener('click', () => turnPage(-1));
+  byId('next-page').addEventListener('click', () => turnPage(1));
   byId('toc-toggle').addEventListener('click', () => toggleToc());
   byId('toc-close').addEventListener('click', () => closeToc());
   byId('toc-backdrop').addEventListener('click', () => closeToc());
+  document.querySelectorAll('[data-reader-tab]').forEach(button => {
+    button.addEventListener('click', () => switchDrawerTab(button.dataset.readerTab));
+  });
   byId('lock-button').addEventListener('click', lockBook);
   byId('lock-from-toc').addEventListener('click', lockBook);
+  byId('add-highlight').addEventListener('click', addHighlight);
+  byId('dismiss-selection').addEventListener('click', () => {
+    selectionToolbar.hidden = true;
+    selectedCfi = '';
+  });
+  byId('highlights-toggle').addEventListener('click', () => {
+    switchDrawerTab('highlights');
+    toggleToc(true);
+  });
+  byId('fullscreen-button').addEventListener('click', async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await reader.requestFullscreen();
+    } catch (_) {
+      readerStatus.textContent = '浏览器未允许全屏；阅读器仍会铺满页面。';
+      setTimeout(() => { readerStatus.textContent = ''; }, 1800);
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    const active = Boolean(document.fullscreenElement);
+    byId('fullscreen-button').setAttribute('aria-label', active ? '退出浏览器全屏' : '进入浏览器全屏');
+    byId('fullscreen-button').title = active ? '退出全屏' : '全屏阅读';
+    showChrome();
+  });
+  byId('reading-scrubber').addEventListener('change', async event => {
+    const fraction = Number(event.target.value) / 1000;
+    const cfi = openedBook?.locations?.cfiFromPercentage(fraction);
+    if (cfi) await rendition?.display(cfi);
+    showChrome();
+  });
   byId('font-smaller').addEventListener('click', () => {
     fontPercent = Math.max(80, fontPercent - 10);
     rendition?.themes.fontSize(`${fontPercent}%`);
@@ -350,30 +558,47 @@
     rendition?.themes.fontSize(`${fontPercent}%`);
     writeSaved('font', fontPercent);
   });
-  byId('reading-flow').addEventListener('change', async event => {
-    if (!rendition) return;
-    activeFlow = event.target.value === 'scrolled-doc' ? 'scrolled-doc' : 'paginated';
-    writeSaved('flow', activeFlow);
-    const resume = currentCfi || readSaved('position')?.cfi;
-    rendition.flow(activeFlow);
-    if (resume) await rendition.display(resume);
-  });
   byId('bookmark-button').addEventListener('click', () => {
     if (!currentCfi) return;
-    const active = readSaved('bookmark');
-    if (active?.cfi === currentCfi) {
-      try { localStorage.removeItem(`${STORAGE}:bookmark`); } catch (_) {}
-    }
-    else writeSaved('bookmark', {cfi:currentCfi,percent:lastLocation?.percent || 0,label:chapterFor(lastLocation?.href || '')});
-    showBookmark();
+    const bookmarks = savedBookmarks();
+    const existing = bookmarks.findIndex(mark => mark.cfi === currentCfi);
+    if (existing >= 0) bookmarks.splice(existing, 1);
+    else bookmarks.push({cfi:currentCfi,percent:lastLocation?.percent || 0,label:chapterFor(lastLocation?.href || '') || '正文'});
+    writeSaved('bookmarks', bookmarks);
+    try { localStorage.removeItem(`${STORAGE}:bookmark`); } catch (_) {}
+    showBookmarks();
+    readerStatus.textContent = existing >= 0 ? '已移除此处书签' : '书签已保存到本机浏览器';
+    setTimeout(() => { readerStatus.textContent = ''; }, 1500);
   });
+
+  reader.addEventListener('pointermove', event => {
+    if (event.clientY < 82) showChrome();
+  });
+  reader.addEventListener('pointerdown', event => {
+    if (event.clientY < 82) showChrome();
+  });
+  reader.addEventListener('focusin', showChrome);
 
   document.addEventListener('keydown', event => {
     if (!rendition || event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
-    if (event.key === 'ArrowLeft') { event.preventDefault(); rendition.prev(); }
-    if (event.key === 'ArrowRight') { event.preventDefault(); rendition.next(); }
-    if (event.key === 'Escape' && reader.classList.contains('toc-open')) closeToc();
+    if (event.key === 'Tab' && reader.classList.contains('toc-open')) {
+      const focusable = [...tocPanel.querySelectorAll('button:not(:disabled), .toc-item')]
+        .filter(element => !element.closest('[hidden]'));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      return;
+    }
+    if (reader.classList.contains('toc-open') && tocPanel.contains(event.target) && event.key !== 'Escape') return;
+    if (event.key === ' ' && event.target instanceof HTMLButtonElement) return;
+    showChrome();
+    if (event.key === 'ArrowLeft' || event.key === 'PageUp') { event.preventDefault(); turnPage(-1); }
+    if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') { event.preventDefault(); turnPage(1); }
+    if (event.key === 'Escape' && !selectionToolbar.hidden) { selectionToolbar.hidden = true; selectedCfi = ''; }
+    else if (event.key === 'Escape' && reader.classList.contains('toc-open')) closeToc();
+    else if (event.key === 'Escape' && document.fullscreenElement) document.exitFullscreen().catch(() => {});
   });
 
   window.addEventListener('storage', event => {

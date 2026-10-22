@@ -191,35 +191,50 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
     </section>
 
     <section id="reading-app" class="reading-app" hidden aria-label="电子书阅读器">
-      <header class="reader-toolbar">
-        <button id="toc-toggle" class="quiet-button toc-toggle" type="button" aria-expanded="true" aria-controls="toc-panel">目录</button>
+      <header class="reader-toolbar" id="reader-toolbar">
+        <button id="toc-toggle" class="quiet-button toc-toggle" type="button" aria-expanded="false" aria-controls="toc-panel" aria-label="打开目录和标记">☰</button>
         <div class="reader-book-label"><strong>正义之心</strong><span id="chapter-label">准备阅读</span></div>
-        <div class="reader-controls" aria-label="阅读控制">
-          <button id="previous-page" class="icon-button" type="button" aria-label="上一页" title="上一页">‹</button>
+        <div class="reader-progress">
           <span id="reading-progress-text" class="progress-text">0%</span>
-          <button id="next-page" class="icon-button" type="button" aria-label="下一页" title="下一页">›</button>
-          <span class="toolbar-divider" aria-hidden="true"></span>
+          <label class="visually-hidden" for="reading-scrubber">阅读进度</label>
+          <input id="reading-scrubber" type="range" min="0" max="1000" value="0" aria-label="拖动跳转阅读进度">
+        </div>
+        <div class="reader-controls" aria-label="阅读控制">
           <button id="font-smaller" class="quiet-button font-button" type="button" aria-label="缩小字号" title="缩小字号">A−</button>
           <button id="font-larger" class="quiet-button font-button" type="button" aria-label="放大字号" title="放大字号">A+</button>
-          <select id="reading-flow" class="flow-select" aria-label="阅读排版"><option value="paginated">翻页</option><option value="scrolled-doc">连续</option></select>
-          <button id="bookmark-button" class="quiet-button bookmark-button" type="button" aria-pressed="false">书签</button>
-          <button id="lock-button" class="quiet-button lock-button" type="button">锁定</button>
+          <button id="bookmark-button" class="quiet-button icon-quiet-button" type="button" aria-pressed="false" aria-label="在此添加书签" title="添加书签">☆</button>
+          <button id="highlights-toggle" class="quiet-button" type="button" aria-label="查看划线" title="查看划线">划线</button>
+          <button id="fullscreen-button" class="quiet-button icon-quiet-button" type="button" aria-label="进入浏览器全屏" title="全屏阅读">⛶</button>
+          <button id="lock-button" class="quiet-button lock-button" type="button" aria-label="锁定并退出阅读" title="锁定并退出">锁定</button>
         </div>
       </header>
       <div class="progress-track" aria-hidden="true"><span id="reading-progress-bar"></span></div>
       <div class="reader-layout">
-        <aside id="toc-panel" class="toc-panel" aria-label="书籍目录">
-          <div class="toc-heading"><span>目录</span><button id="toc-close" class="icon-button toc-close" type="button" aria-label="关闭目录">×</button></div>
-          <nav id="toc-list" class="toc-list"></nav>
-          <div class="bookmark-slot" id="bookmark-slot" hidden></div>
-          <div class="toc-security"><span>解锁仅在本页内存中有效</span><button id="lock-from-toc" class="quiet-button" type="button">锁定并退出</button></div>
-        </aside>
-        <div id="toc-backdrop" class="toc-backdrop" hidden></div>
         <section class="reading-surface" aria-label="书籍正文">
           <div id="epub-viewer" class="epub-viewer"></div>
+          <button id="previous-page" class="page-turn page-turn-previous" type="button" aria-label="上一页" title="上一页（←）"><span aria-hidden="true">‹</span></button>
+          <button id="next-page" class="page-turn page-turn-next" type="button" aria-label="下一页" title="下一页（→）"><span aria-hidden="true">›</span></button>
+          <div id="selection-toolbar" class="selection-toolbar" hidden>
+            <span>选中文字</span><button id="add-highlight" type="button">标记</button><button id="dismiss-selection" type="button" aria-label="关闭">×</button>
+          </div>
           <p id="reader-status" class="reader-status" role="status" aria-live="polite"></p>
         </section>
       </div>
+      <aside id="toc-panel" class="toc-panel" role="dialog" aria-modal="true" aria-label="目录、书签和划线" aria-hidden="true" inert>
+        <div class="toc-heading"><span>阅读位置</span><button id="toc-close" class="icon-button toc-close" type="button" aria-label="关闭侧栏">×</button></div>
+        <nav class="reader-drawer-tabs" aria-label="阅读导航">
+          <button type="button" data-reader-tab="toc" aria-selected="true">目录</button>
+          <button type="button" data-reader-tab="bookmarks" aria-selected="false">书签</button>
+          <button type="button" data-reader-tab="highlights" aria-selected="false">划线</button>
+        </nav>
+        <div class="reader-drawer-content">
+          <nav id="toc-list" class="toc-list reader-drawer-panel" data-reader-panel="toc"></nav>
+          <div id="bookmark-list" class="toc-list reader-drawer-panel" data-reader-panel="bookmarks" hidden></div>
+          <div id="highlight-list" class="toc-list reader-drawer-panel" data-reader-panel="highlights" hidden></div>
+        </div>
+        <div class="toc-security"><span>密钥仅在本页内存中；阅读位置与标记仅保存在本机浏览器。</span><button id="lock-from-toc" class="quiet-button" type="button">锁定并退出</button></div>
+      </aside>
+      <button id="toc-backdrop" class="toc-backdrop" type="button" aria-label="关闭阅读导航" hidden></button>
     </section>
   </main>
 <button aria-hidden="true" id="note-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" tabindex="-1" hidden>↑</button><script id="note-navigation-script">(() => {
