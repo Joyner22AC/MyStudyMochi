@@ -45,10 +45,24 @@
   let saveTimer = 0;
   let chromeTimer = 0;
   let selectedCfi = '';
+  let selectedContents = null;
   let activeDrawerTab = 'toc';
   let touchStart = null;
   let lastTurnAt = 0;
+  let wheelTurnTimer = 0;
+  let wheelAccumulator = 0;
+  let activeBookToken = 0;
   let tableOfContents = [];
+
+  function withTimeout(promise, timeoutMs, label) {
+    let timer;
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(label)), timeoutMs);
+      })
+    ]).finally(() => clearTimeout(timer));
+  }
 
   function setStatus(message, kind = 'error') {
     status.textContent = message;
@@ -228,9 +242,7 @@
   function applyHighlights() {
     if (!rendition?.annotations) return;
     for (const mark of savedHighlights()) {
-      try {
-        rendition.annotations.highlight(mark.cfi, {fill:'rgba(246, 205, 91, .48)', 'fill-opacity':'0.48'}, undefined, 'reader-highlight');
-      } catch (_) {}
+      try { rendition.annotations.highlight(mark.cfi, {}); } catch (_) {}
     }
   }
 
@@ -247,15 +259,15 @@
       const href = lastLocation?.href || '';
       marks.push({cfi:selectedCfi, label:chapterFor(href) || '正文', percent:lastLocation?.percent || 0, color:'yellow'});
       writeSaved('highlights', marks);
-      try {
-        rendition.annotations.highlight(selectedCfi, {fill:'rgba(246, 205, 91, .48)', 'fill-opacity':'0.48'}, undefined, 'reader-highlight');
-      } catch (_) {}
+      try { rendition.annotations.highlight(selectedCfi, {}); } catch (_) {}
       showHighlights();
       readerStatus.textContent = '划线已保存到本机浏览器';
       setTimeout(() => { readerStatus.textContent = ''; }, 1600);
     }
+    try { selectedContents?.window?.getSelection()?.removeAllRanges(); } catch (_) {}
     selectionToolbar.hidden = true;
     selectedCfi = '';
+    selectedContents = null;
   }
 
   function closeToc() {
@@ -306,8 +318,11 @@
   function turnPage(direction) {
     if (!rendition) return;
     showChrome();
-    if (direction < 0) rendition.prev();
-    else rendition.next();
+    const action = direction < 0 ? rendition.prev() : rendition.next();
+    Promise.resolve(action).catch(() => {
+      readerStatus.textContent = '翻页没有完成，请稍后再试。';
+      setTimeout(() => { readerStatus.textContent = ''; }, 1800);
+    });
   }
 
   function selectedTheme() {
@@ -337,8 +352,8 @@
       'img, svg': { 'max-width':'100%' }
     });
     rendition.themes.default({
-      '::selection': {background:'rgba(246,205,91,.34)'},
-      '.reader-highlight': {fill:'rgba(246,205,91,.48)', 'fill-opacity':'0.48', 'mix-blend-mode':'multiply'}
+      '::selection': {background:'rgba(246,205,91,.38)'},
+      '.epubjs-hl': {fill:'rgba(246,205,91,.62)', 'fill-opacity':'0.62', 'mix-blend-mode':'multiply'}
     });
     applyBookTheme();
   }
@@ -346,53 +361,42 @@
   function readSavedPreferences() {
     const savedFont = Number(readSaved('font'));
     if (savedFont >= 80 && savedFont <= 160) fontPercent = savedFont;
+    activeFlow = readSaved('flow') === 'scrolled-doc' ? 'scrolled-doc' : 'paginated';
   }
 
-  async function openBook(buffer) {
-    if (typeof window.ePub !== 'function') throw new Error('ReaderUnavailable');
-    if (typeof window.JSZip !== 'function') throw new Error('ZipLibraryUnavailable');
-    // epub.js 0.3.88 can fail to initialize when an ArrayBuffer is passed
-    // to the constructor. Open the decrypted bytes through Book.open instead.
-    openedBook = window.ePub();
-    await openedBook.open(buffer);
-    const navigation = await openedBook.loaded.navigation;
-    tableOfContents = navigation?.toc || [];
-    tocList.replaceChildren(renderToc(tableOfContents));
-    if (!tableOfContents.length) {
-      const empty = document.createElement('p');
-      empty.className = 'shelf-note';
-      empty.textContent = '这本书没有可解析的目录。';
-      tocList.append(empty);
-    }
-    toggleToc(false);
-
-    const metadata = await openedBook.loaded.metadata;
-    byId('chapter-label').textContent = metadata?.title || '正文';
-    readerStatus.textContent = '正在准备阅读位置…';
-    try { await openedBook.locations.generate(1500); } catch (_) { /* CFI resume still works without percentage locations. */ }
-    byId('reading-app').hidden = false;
-    unlockCard.hidden = true;
-    readerStatus.textContent = '正在排版书籍…';
+  function createRendition(bookToken) {
     rendition = openedBook.renderTo('epub-viewer', {
       width:'100%', height:'100%', flow:activeFlow, spread:'none',
       allowScriptedContent:false, allowPopups:false, resizeOnOrientationChange:true
     });
     installBookThemes();
+    byId('reading-flow').value = activeFlow;
     rendition.themes.fontSize(`${fontPercent}%`);
     rendition.on('relocated', location => {
+      if (bookToken !== activeBookToken) return;
       showProgress(location);
       setTocCurrent(location?.start?.href || '');
     });
     rendition.on('selected', (cfiRange, contents) => {
       selectedCfi = cfiRange || '';
+      selectedContents = contents || null;
       selectionToolbar.hidden = !selectedCfi;
-      try { contents?.window?.getSelection()?.removeAllRanges(); } catch (_) {}
       if (selectedCfi) showChrome();
     });
     rendition.on('rendered', (_section, view) => {
       const doc = view?.contents?.document;
       if (!doc || doc.documentElement.dataset.pageTurnReady) return;
       doc.documentElement.dataset.pageTurnReady = 'true';
+      doc.addEventListener('wheel', event => {
+        if (activeFlow !== 'paginated' || event.ctrlKey) return;
+        event.preventDefault();
+        wheelAccumulator += event.deltaY;
+        if (wheelTurnTimer || Math.abs(wheelAccumulator) < 24) return;
+        const direction = wheelAccumulator > 0 ? 1 : -1;
+        wheelAccumulator = 0;
+        turnPage(direction);
+        wheelTurnTimer = setTimeout(() => { wheelTurnTimer = 0; }, 380);
+      }, {passive:false});
       doc.addEventListener('touchstart', event => {
         const point = event.changedTouches?.[0];
         if (point) touchStart = {x:point.clientX, y:point.clientY, at:Date.now()};
@@ -406,16 +410,63 @@
         if (Math.abs(dx) > 54 && Math.abs(dx) > Math.abs(dy) * 1.25) turnPage(dx > 0 ? -1 : 1);
       }, {passive:true});
     });
-    applyHighlights();
-    const saved = readSaved('position');
-    await rendition.display(saved?.cfi || undefined);
+    return rendition;
+  }
+
+  async function openBook(buffer) {
+    if (typeof window.ePub !== 'function') throw new Error('ReaderUnavailable');
+    if (typeof window.JSZip !== 'function') throw new Error('ZipLibraryUnavailable');
+    // epub.js 0.3.88 can fail to initialize when an ArrayBuffer is passed
+    // to the constructor. Open the decrypted bytes through Book.open instead.
+    const bookToken = ++activeBookToken;
+    openedBook = window.ePub();
+    await withTimeout(openedBook.open(buffer), 20000, 'BookOpenTimeout');
+    const [navigation, metadata] = await withTimeout(Promise.all([
+      openedBook.loaded.navigation,
+      openedBook.loaded.metadata
+    ]), 12000, 'BookMetadataTimeout');
+    tableOfContents = navigation?.toc || [];
+    tocList.replaceChildren(renderToc(tableOfContents));
+    if (!tableOfContents.length) {
+      const empty = document.createElement('p');
+      empty.className = 'shelf-note';
+      empty.textContent = '这本书没有可解析的目录。';
+      tocList.append(empty);
+    }
+    toggleToc(false);
+
+    byId('chapter-label').textContent = metadata?.title || '正文';
+    byId('reading-app').hidden = false;
+    unlockCard.hidden = true;
     document.body.classList.add('is-reading');
+    readerStatus.textContent = '正在打开书籍…';
+    createRendition(bookToken);
+    const saved = readSaved('position');
+    try {
+      await withTimeout(rendition.display(saved?.cfi || undefined), 15000, 'BookDisplayTimeout');
+    } catch (error) {
+      if (!saved?.cfi) throw error;
+      // A stale or malformed saved CFI should not trap the reader at the loading screen.
+      writeSaved('position', null);
+      readerStatus.textContent = '上次阅读位置无法恢复，正在从书首页打开…';
+      try { rendition.destroy(); } catch (_) {}
+      createRendition(bookToken);
+      await withTimeout(rendition.display(), 15000, 'BookDisplayTimeout');
+    }
+    if (bookToken !== activeBookToken) return;
+    applyHighlights();
     showBookmarks();
     showHighlights();
     reader.classList.add('chrome-visible');
     showChrome();
-    readerStatus.textContent = '';
-    setTimeout(() => { readerStatus.textContent = ''; }, 1300);
+    readerStatus.textContent = '已打开。分页模式滚轮翻页；连续模式滚轮滚动。';
+    setTimeout(() => { if (readerStatus.textContent.startsWith('已打开。')) readerStatus.textContent = ''; }, 2600);
+    // Location generation can be expensive; do not block the first page on the progress index.
+    openedBook.locations.generate(1500).then(async () => {
+      if (bookToken !== activeBookToken || !rendition) return;
+      const location = await rendition.currentLocation();
+      if (location) showProgress(location);
+    }).catch(() => {});
   }
 
   async function unlock(encodedKey) {
@@ -427,9 +478,11 @@
     try {
       keyBytes = decodeKey(encodedKey);
       phase = 'download';
-      const response = await fetch('books/justice-heart.epub.enc', {cache:'no-store', credentials:'same-origin'});
+      const response = await withTimeout(fetch('books/justice-heart.epub.enc', {
+        cache:'no-store', credentials:'same-origin'
+      }), 20000, 'DownloadTimeout');
       if (!response.ok) throw new Error('CiphertextUnavailable');
-      const sealed = new Uint8Array(await response.arrayBuffer());
+      const sealed = new Uint8Array(await withTimeout(response.arrayBuffer(), 15000, 'DownloadTimeout'));
       if (sealed.length < 36 || new TextDecoder().decode(sealed.subarray(0,8)) !== 'MYBOOK01') {
         sealed.fill(0);
         throw new Error('InvalidCiphertext');
@@ -450,8 +503,12 @@
       if (keyBytes) keyBytes.fill(0);
       if (decryptedBytes) new Uint8Array(decryptedBytes).fill(0);
       decryptedBytes = null;
+      activeBookToken += 1;
+      if (rendition) { try { rendition.destroy(); } catch (_) {} }
       if (openedBook) { try { openedBook.destroy(); } catch (_) {} }
       openedBook = null; rendition = null;
+      document.body.classList.remove('is-reading');
+      reader.classList.remove('toc-open', 'chrome-visible');
       byId('reading-app').hidden = true;
       unlockCard.hidden = false;
       const message = error?.name === 'OperationError'
@@ -465,7 +522,11 @@
             : phase === 'download'
               ? '加密书籍下载失败，请检查网络后重试。'
               : phase === 'epub'
-                ? '密钥验证已通过，但 EPUB 解析失败。请刷新重试；若仍失败，请反馈此提示。'
+                ? error?.message === 'BookDisplayTimeout'
+                  ? '打开书页超时，阅读器已退出。请重新解锁；若再次发生，请反馈此提示。'
+                  : error?.message === 'BookOpenTimeout' || error?.message === 'BookMetadataTimeout'
+                    ? '书籍解析超时，阅读器已退出。请重新解锁；若再次发生，请反馈此提示。'
+                    : '密钥验证已通过，但 EPUB 解析失败。阅读器已退出，请重试；若仍失败，请反馈此提示。'
                 : '解锁过程中发生错误，请检查密钥格式后重试。';
       setStatus(message);
     } finally {
@@ -522,6 +583,7 @@
   byId('dismiss-selection').addEventListener('click', () => {
     selectionToolbar.hidden = true;
     selectedCfi = '';
+    selectedContents = null;
   });
   byId('highlights-toggle').addEventListener('click', () => {
     switchDrawerTab('highlights');
@@ -557,6 +619,32 @@
     fontPercent = Math.min(160, fontPercent + 10);
     rendition?.themes.fontSize(`${fontPercent}%`);
     writeSaved('font', fontPercent);
+  });
+  byId('reading-flow').addEventListener('change', async event => {
+    if (!rendition) return;
+    const nextFlow = event.target.value === 'scrolled-doc' ? 'scrolled-doc' : 'paginated';
+    const previousFlow = activeFlow;
+    const resumeCfi = currentCfi || readSaved('position')?.cfi;
+    activeFlow = nextFlow;
+    wheelAccumulator = 0;
+    try {
+      rendition.flow(nextFlow);
+      await withTimeout(rendition.display(resumeCfi || undefined), 12000, 'FlowChangeTimeout');
+      writeSaved('flow', nextFlow);
+      readerStatus.textContent = nextFlow === 'paginated'
+        ? '分页模式：滚轮每次翻一页。'
+        : '连续模式：滚轮按页面自然滚动。';
+      showChrome();
+    } catch (_) {
+      activeFlow = previousFlow;
+      event.target.value = previousFlow;
+      try {
+        rendition.flow(previousFlow);
+        await withTimeout(rendition.display(resumeCfi || undefined), 12000, 'FlowRestoreTimeout');
+      } catch (_) {}
+      readerStatus.textContent = '切换阅读方式失败，已保留原模式。';
+    }
+    setTimeout(() => { readerStatus.textContent = ''; }, 2200);
   });
   byId('bookmark-button').addEventListener('click', () => {
     if (!currentCfi) return;

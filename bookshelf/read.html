@@ -202,6 +202,8 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
         <div class="reader-controls" aria-label="阅读控制">
           <button id="font-smaller" class="quiet-button font-button" type="button" aria-label="缩小字号" title="缩小字号">A−</button>
           <button id="font-larger" class="quiet-button font-button" type="button" aria-label="放大字号" title="放大字号">A+</button>
+          <label class="visually-hidden" for="reading-flow">阅读方式</label>
+          <select id="reading-flow" class="flow-select" aria-label="阅读方式"><option value="paginated">分页</option><option value="scrolled-doc">连续</option></select>
           <button id="bookmark-button" class="quiet-button icon-quiet-button" type="button" aria-pressed="false" aria-label="在此添加书签" title="添加书签">☆</button>
           <button id="highlights-toggle" class="quiet-button" type="button" aria-label="查看划线" title="查看划线">划线</button>
           <button id="fullscreen-button" class="quiet-button icon-quiet-button" type="button" aria-label="进入浏览器全屏" title="全屏阅读">⛶</button>
