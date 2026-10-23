@@ -250,6 +250,11 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
 .home-scene .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .shelf-file-label:hover,.shelf-file-label:has(+ input:focus-visible){color:#fff5de;text-decoration-thickness:2px}
 @media(max-width:650px){.home-scene .desk-paper::after{right:10px;top:10px}.desk-lamp{transform:scale(.62)}}
+
+/* Visible feedback while the embedded reader starts, including slow connections. */
+.home-reader-loading[hidden]{display:none!important}
+.home-reader-loading{position:absolute;z-index:1;inset:0;display:grid;place-items:center;padding:32px;background:#191b1c;color:#d8c8ae;font:13px/1.6 Georgia,"Songti SC",serif;letter-spacing:.05em;text-align:center;pointer-events:none}
+.shelf-unlock-form button:disabled{opacity:.7;cursor:progress;transform:none}
 </style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="home-scene" data-cipher-href="bookshelf/books/justice-heart.epub.enc" data-reader-href="bookshelf/read.html" id="home-stage">
 <header class="home-masthead">
 <a aria-label="MyStudyMochi，回到主页顶部" class="home-brand" href="#home-stage"><span aria-hidden="true" class="brand-mark">M.</span><span>MyStudy<span class="brand-contrast">Mochi</span></span></a>
@@ -272,11 +277,11 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
 </div>
 </div>
 <div class="shelf-actions"><button hidden="" id="shelf-relock" type="button">重新上锁</button><a href="bookshelf/">独立书架页面 <span aria-hidden="true">↗</span></a></div>
-<p class="scene-footnote">书目公开展示；书籍正文只以加密副本存放。</p>
+<p aria-live="polite" class="scene-footnote" id="shelf-footnote" role="status">书目公开展示；书籍正文只以加密副本存放。</p>
 </section>
 </div>
 <footer class="home-footer">MyStudyMochi <span aria-hidden="true">·</span> 给认真而不着急的学习。</footer>
-<div class="home-reader-overlay" hidden="" id="home-reader-overlay"><button id="home-reader-close" type="button">← 返回书桌</button><div class="home-reader-host" id="home-reader-host"></div></div>
+<div class="home-reader-overlay" hidden="" id="home-reader-overlay"><button id="home-reader-close" type="button">← 返回书桌</button><div aria-live="polite" class="home-reader-loading" hidden="" id="home-reader-loading" role="status">正在展开书页…</div><div class="home-reader-host" id="home-reader-host"></div></div>
 </main></div><script id="note-navigation-script">(() => {
   const body = document.body;
   const toggle = document.getElementById('note-toc-toggle');
@@ -382,10 +387,12 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   const keyFile = document.getElementById('shelf-key-file');
   const unlockButton = document.getElementById('shelf-unlock-button');
   const status = document.getElementById('shelf-status');
+  const shelfFootnote = document.getElementById('shelf-footnote');
   const relockButton = document.getElementById('shelf-relock');
   const bookButton = document.getElementById('open-home-book');
   const overlay = document.getElementById('home-reader-overlay');
   const readerHost = document.getElementById('home-reader-host');
+  const readerLoading = document.getElementById('home-reader-loading');
   const closeReaderButton = document.getElementById('home-reader-close');
   const AAD = 'bookshelf/justice-heart/edition-1';
   let bookKey = null;
@@ -395,6 +402,7 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   let activeReaderFrame = null;
   let readerReadyTimer = 0;
   let readerKeySent = false;
+  let shelfEpoch = 0;
 
   function decodeKey(encoded) {
     if (!/^[A-Za-z0-9_-]{43}$/.test(encoded)) throw new Error('InvalidKey');
@@ -439,6 +447,7 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   async function unlockShelf(encoded) {
     if (busy) return false;
     busy = true;
+    const epoch = shelfEpoch;
     unlockButton.disabled = true;
     status.textContent = '正在本机验证密钥…';
     let raw;
@@ -447,6 +456,7 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
       const key = await crypto.subtle.importKey('raw', raw, {name:'AES-GCM'}, false, ['decrypt', 'encrypt']);
       raw.fill(0); raw = null;
       await validateBookKey(key);
+      if (epoch !== shelfEpoch) return false;
       bookKey = key;
       books.hidden = false;
       books.inert = false;
@@ -454,9 +464,11 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
       shelf.dataset.unlocked = 'true';
       relockButton.hidden = false;
       status.textContent = '书架已打开。';
+      shelfFootnote.textContent = '已解锁。点书脊即可阅读；离开本页会自动上锁。';
       bookButton.focus({preventScroll:true});
       return true;
     } catch (error) {
+      if (epoch !== shelfEpoch) return false;
       status.textContent = error?.message === 'BookUnavailable'
         ? '暂时无法取得加密书籍，请检查网络后重试。'
         : error?.message === 'InvalidKey'
@@ -465,14 +477,16 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
       return false;
     } finally {
       raw?.fill(0);
-      keyInput.value = '';
-      keyFile.value = '';
-      unlockButton.disabled = false;
-      busy = false;
+      if (epoch === shelfEpoch) {
+        keyInput.value = '';
+        keyFile.value = '';
+        unlockButton.disabled = false;
+        busy = false;
+      }
     }
   }
 
-  function closeReader() {
+  function closeReader(restoreFocus = true) {
     clearTimeout(pendingOpen);
     clearTimeout(readerReadyTimer);
     pendingOpen = 0;
@@ -481,22 +495,29 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
     activeReaderFrame = null;
     readerKeySent = false;
     overlay.hidden = true;
+    readerLoading.hidden = true;
     readerHost.replaceChildren();
     bookButton.classList.remove('is-pulling');
     document.body.style.overflow = '';
-    if (bookKey) bookButton.focus({preventScroll:true});
+    if (restoreFocus && bookKey) bookButton.focus({preventScroll:true});
   }
 
-  function relockShelf() {
-    closeReader();
+  function relockShelf(restoreFocus = true) {
+    shelfEpoch += 1;
+    closeReader(false);
     bookKey = null;
+    busy = false;
+    unlockButton.disabled = false;
+    keyInput.value = '';
+    keyFile.value = '';
     books.inert = true;
     books.hidden = true;
     door.inert = false;
     shelf.dataset.unlocked = 'false';
     relockButton.hidden = true;
     status.textContent = '密钥只在当前页面的内存中使用，不上传或保存。';
-    keyInput.focus({preventScroll:true});
+    shelfFootnote.textContent = '书目公开展示；书籍正文只以加密副本存放。';
+    if (restoreFocus) keyInput.focus({preventScroll:true});
   }
 
   function openReader() {
@@ -508,6 +529,7 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
       pendingOpen = 0;
       if (!bookKey) { openingReader = false; return; }
       overlay.hidden = false;
+      readerLoading.hidden = false;
       document.body.style.overflow = 'hidden';
       const frame = document.createElement('iframe');
       frame.title = '《正义之心》阅读模式';
@@ -521,7 +543,7 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
       readerReadyTimer = setTimeout(() => {
         if (activeReaderFrame !== frame) return;
         closeReader();
-        status.textContent = '阅读器加载超时，请重新点书脊。';
+        shelfFootnote.textContent = '书页加载超时。书架仍已解锁，请重试点书脊。';
       }, 20000);
       closeReaderButton.focus({preventScroll:true});
       openingReader = false;
@@ -535,6 +557,7 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
       clearTimeout(readerReadyTimer);
       readerReadyTimer = 0;
       readerKeySent = true;
+      readerLoading.hidden = true;
       activeReaderFrame.contentWindow.postMessage(
         {type:'mystudy:unlock-book', key:bookKey}, location.origin
       );
@@ -553,18 +576,22 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
     const file = keyFile.files?.[0];
     if (!file) return;
     if (file.size > 1024) { status.textContent = '密钥文件大小不正确。'; keyFile.value = ''; return; }
-    try { await unlockShelf((await file.text()).trim()); }
+    const epoch = shelfEpoch;
+    try {
+      const encoded = (await file.text()).trim();
+      if (epoch === shelfEpoch) await unlockShelf(encoded);
+    }
     catch (_) { status.textContent = '读取密钥文件失败。'; keyFile.value = ''; }
   });
   bookButton.addEventListener('click', openReader);
-  relockButton.addEventListener('click', relockShelf);
-  closeReaderButton.addEventListener('click', closeReader);
+  relockButton.addEventListener('click', () => relockShelf());
+  closeReaderButton.addEventListener('click', () => closeReader());
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !overlay.hidden) closeReader();
   });
-  window.addEventListener('pagehide', () => {
-    bookKey = null;
-    readerHost.replaceChildren();
+  window.addEventListener('pagehide', () => relockShelf(false));
+  window.addEventListener('pageshow', () => {
+    if (!bookKey && shelf.dataset.unlocked === 'true') relockShelf(false);
   });
 })();
 </script></body></html>
