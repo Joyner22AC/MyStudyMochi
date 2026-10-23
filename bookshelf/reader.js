@@ -29,6 +29,10 @@
   const reader = byId('reading-app');
   const unlockCard = byId('unlock-card');
   if (!reader || !unlockCard) return;
+  const embedded = Boolean(window.parent && window.parent !== window &&
+    new URLSearchParams(location.search).get('embedded') === '1');
+  const embeddedStatus = byId('embedded-status');
+  const embeddedStatusText = byId('embedded-status-text');
 
   const status = byId('unlock-status');
   const readerStatus = byId('reader-status');
@@ -888,6 +892,7 @@
     byId('chapter-label').textContent = metadata?.title || '正文';
     byId('reading-app').hidden = false;
     unlockCard.hidden = true;
+    if (embedded) embeddedStatus.hidden = true;
     document.body.classList.add('is-reading');
     readerStatus.textContent = '正在打开书籍…';
     createRendition(bookToken);
@@ -974,7 +979,7 @@
       document.body.classList.remove('is-reading');
       reader.classList.remove('toc-open', 'chrome-visible');
       byId('reading-app').hidden = true;
-      unlockCard.hidden = false;
+      unlockCard.hidden = embedded;
       const message = error?.name === 'OperationError'
         ? '密钥不正确，或加密文件校验失败。'
         : error?.message === 'InvalidKey'
@@ -993,6 +998,10 @@
                     : '密钥验证已通过，但 EPUB 解析失败。阅读器已退出，请重试；若仍失败，请反馈此提示。'
                 : '解锁过程中发生错误，请检查密钥格式后重试。';
       setStatus(message);
+      if (embedded) {
+        embeddedStatus.hidden = false;
+        embeddedStatusText.textContent = message;
+      }
     } finally {
       sealed?.fill(0);
       keyInput.value = '';
@@ -1003,8 +1012,9 @@
   // Same-origin home scene keeps a non-extractable CryptoKey in this tab's
   // memory. The embedded reader may receive it without URL or storage secrets.
   window.addEventListener('message', event => {
-    if (window.parent === window || event.source !== window.parent || event.origin !== location.origin ||
+    if (!embedded || event.source !== window.parent || event.origin !== location.origin ||
         event.data?.type !== 'mystudy:unlock-book' || !reader.hidden || unlockButton.disabled) return;
+    embeddedStatusText.textContent = '正在验证并打开书籍…';
     unlock(event.data.key);
   });
 
@@ -1035,10 +1045,12 @@
     tocList.replaceChildren();
     reader.hidden = true;
     document.body.classList.remove('is-reading');
-    unlockCard.hidden = false;
+    unlockCard.hidden = embedded;
+    if (embedded) embeddedStatus.hidden = false;
     reader.classList.remove('toc-open');
     selectionToolbar.hidden = true;
-    keyInput.focus({preventScroll:true});
+    if (embedded) window.parent.postMessage({type:'mystudy:reader-close'}, location.origin);
+    else keyInput.focus({preventScroll:true});
   }
 
   byId('unlock-form').addEventListener('submit', event => {
@@ -1225,4 +1237,9 @@
     decryptedBytes = null;
     bookCryptoKey = null;
   });
+  if (embedded) {
+    unlockCard.hidden = true;
+    embeddedStatus.hidden = false;
+    window.parent.postMessage({type:'mystudy:reader-ready'}, location.origin);
+  }
 })();

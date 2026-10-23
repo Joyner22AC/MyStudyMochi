@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#f4f6f8">
   <title>正义之心｜我的书架</title>
+  <script>if (window.parent !== window && new URLSearchParams(location.search).get('embedded') === '1') document.documentElement.classList.add('book-embedded');</script>
   <link rel="stylesheet" href="reader.css">
   <script src="runtime/jszip.min.js" defer></script>
   <script src="runtime/epub.min.js" defer></script>
@@ -172,6 +173,11 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
 <body class="book-reader-page">
   <main class="article reader-main"><div class="note-navigation-controls note-navigation-catalog-controls" id="note-navigation-controls"><a aria-label="返回全部课程" href="../%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0_%E8%AF%BE%E7%A8%8B%E6%80%BB%E5%85%A5%E5%8F%A3.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div>
     <a class="shelf-back" href="index.html"><span aria-hidden="true">←</span> 我的书架</a>
+
+    <section class="embedded-status" id="embedded-status" role="status" aria-live="polite" hidden>
+      <span class="embedded-status-mark" aria-hidden="true">◇</span>
+      <p id="embedded-status-text">正在从书架打开书籍…</p>
+    </section>
 
     <section class="unlock-card" id="unlock-card" aria-labelledby="book-title">
       <div class="unlock-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M15 21v-6a9 9 0 0 1 18 0v6M12 21h24v19H12z"/><path d="M24 28v5"/></svg></div>

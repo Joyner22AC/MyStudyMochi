@@ -213,6 +213,43 @@ html[data-theme=dark] .home-scene{--home-ink:#e7dcc8;--home-muted:#b7a78f;backgr
 @media(max-width:650px){.home-scene{padding:0 12px 16px}.home-masthead{padding:12px 4px}.home-brand{gap:7px;font-size:17px}.brand-mark{width:30px;height:30px;font-size:13px}.masthead-caption{display:none}.home-intro{padding:31px 6px}.home-intro h1{font-size:36px}.scene-grid{gap:22px}.desk-environment{padding:31px 12px 28px;border-width:5px}.desk-blotter{margin:16px 2px 0;padding:26px 14px 24px;border-width:6px}.desk-papers{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.home-scene .desk-paper{min-height:171px;padding:19px 11px 13px;transform:none}.paper-index{font-size:9px}.paper-title{margin-top:13px;font-size:15px}.paper-summary{font-size:10px}.desk-lamp{left:3%;transform:scale(.72);transform-origin:top left}.desk-cup{right:9%;transform:scale(.7);transform-origin:top right}.desk-pen{right:8%;bottom:4px;transform:scale(.72) rotate(-19deg)}.cabinet{min-height:490px}.cabinet-books{padding-bottom:86px}.cabinet-door{padding:42px 12px 24px}.shelf-unlock-form{grid-template-columns:1fr}.shelf-unlock-form button{width:100%}}
 @media(max-width:390px){.desk-papers{grid-template-columns:1fr}.home-scene .desk-paper{min-height:132px}.paper-title{margin-top:7px}.paper-summary{margin:3px 0 6px}.desk-environment{padding:27px 9px}.desk-blotter{padding:19px 11px}.cabinet{min-height:470px}.shelf-ornament{display:none}}
 @media(prefers-reduced-motion:reduce){.home-scene *,.home-scene *::before,.home-scene *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* Small tactile details: a stitched blotter, indexed paper and brass hardware. */
+.home-masthead{position:relative}
+.home-masthead::after{position:absolute;bottom:-1px;left:0;width:84px;height:2px;background:var(--home-brass);content:""}
+.home-brand,.home-theme,.shelf-unlock-form button,.shelf-actions a,.shelf-actions button{transition:color .2s ease,background-color .2s ease,border-color .2s ease,transform .2s ease}
+.home-brand:hover .brand-mark,.home-brand:focus-visible .brand-mark{background:rgba(182,140,83,.14);transform:rotate(-8deg)}
+.brand-mark{transition:background-color .25s ease,transform .25s ease}
+.home-theme:hover,.home-theme:focus-visible{border-color:var(--home-brass);background:rgba(255,250,239,.85);transform:translateY(-1px)}
+.desk-environment{background:radial-gradient(ellipse at 23% 9%,rgba(254,218,151,.15),transparent 57%),repeating-linear-gradient(174deg,rgba(25,11,5,.045) 0 2px,transparent 2px 11px),linear-gradient(145deg,#825536,#5a3829 72%,#492c22)}
+.desk-blotter{background:radial-gradient(ellipse at 35% 12%,rgba(150,183,132,.11),transparent 65%),repeating-linear-gradient(30deg,rgba(255,255,255,.014) 0 1px,transparent 1px 5px),linear-gradient(145deg,#315246,#203a34 65%,#193129)}
+.desk-lamp{transform:scale(.76);transform-origin:top left}
+.blotter-ruling{border-style:dashed;border-color:rgba(241,218,171,.24)}
+.home-scene .desk-paper{background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(74,108,127,.045) 27px 28px),linear-gradient(165deg,#fffaf0,#f4ead5)}
+.home-scene .desk-paper:nth-child(2n){background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(74,108,127,.04) 27px 28px),linear-gradient(160deg,#fffdf4,#eee7d7)}
+.home-scene .desk-paper::after{position:absolute;right:13px;top:15px;width:5px;height:5px;border:1px solid rgba(145,105,65,.5);border-radius:50%;content:""}
+.home-scene .desk-paper:hover,.home-scene .desk-paper:focus-visible{background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(74,108,127,.045) 27px 28px),#fffdf6}
+.paper-index{font-variant-numeric:tabular-nums}.paper-open{transition:border-color .2s ease,color .2s ease}
+.desk-paper:is(:hover,:focus-visible) .paper-open{border-color:rgba(75,105,92,.5);color:#244d3f}
+.desk-paper:is(:hover,:focus-visible) .paper-open span{transform:translate(2px,-2px)}
+.desk-cup::before{position:absolute;inset:-16px;border:1px solid rgba(234,207,162,.17);border-radius:50%;content:""}
+.desk-pen::before{position:absolute;top:-2px;left:14px;width:22px;height:2px;background:#e2c894;border-radius:2px;content:""}
+.cabinet-door::after{position:absolute;inset:32px;border:1px solid rgba(255,217,152,.1);border-radius:50px 50px 2px 2px;content:"";pointer-events:none}
+.lock-glyph::after{position:absolute;top:19px;left:27px;width:6px;height:12px;border-radius:50% 50% 2px 2px;background:#ddc39b;content:""}
+.shelf-unlock-form input{transition:border-color .2s ease,background-color .2s ease,box-shadow .2s ease}
+.shelf-unlock-form input:hover,.shelf-unlock-form input:focus{border-color:#e7c99b;background:rgba(33,24,20,.63);box-shadow:0 0 0 3px rgba(231,201,155,.1)}
+.shelf-unlock-form button:hover,.shelf-unlock-form button:focus-visible{background:#fff0cf;transform:translateY(-1px)}
+.shelf-book{border-top:2px solid rgba(255,222,166,.55);border-bottom:3px double rgba(255,222,166,.55)}
+.shelf-book::before,.shelf-book::after{position:absolute;left:8px;right:8px;height:1px;background:rgba(255,227,179,.44);content:""}
+.shelf-book::before{top:14px}.shelf-book::after{bottom:14px}
+.shelf-book:is(:hover,:focus-visible){filter:brightness(1.13)}
+html[data-theme=dark] .home-theme:is(:hover,:focus-visible){background:rgba(88,72,55,.8);color:#fff4df}
+html[data-theme=dark] .home-scene .desk-paper{background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(74,108,127,.045) 27px 28px),linear-gradient(165deg,#fffaf0,#f4ead5);border-color:#d8cab0;color:#332b24}
+html[data-theme=dark] .home-scene .desk-paper:nth-child(2n){background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(74,108,127,.04) 27px 28px),linear-gradient(160deg,#fffdf4,#eee7d7)}
+html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){background:repeating-linear-gradient(0deg,transparent 0 27px,rgba(74,108,127,.045) 27px 28px),#fffdf6}
+.home-scene .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.shelf-file-label:hover,.shelf-file-label:has(+ input:focus-visible){color:#fff5de;text-decoration-thickness:2px}
+@media(max-width:650px){.home-scene .desk-paper::after{right:10px;top:10px}.desk-lamp{transform:scale(.62)}}
 </style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="home-scene" data-cipher-href="bookshelf/books/justice-heart.epub.enc" data-reader-href="bookshelf/read.html" id="home-stage">
 <header class="home-masthead">
 <a aria-label="MyStudyMochi，回到主页顶部" class="home-brand" href="#home-stage"><span aria-hidden="true" class="brand-mark">M.</span><span>MyStudy<span class="brand-contrast">Mochi</span></span></a>
@@ -355,6 +392,9 @@ html[data-theme=dark] .home-scene{--home-ink:#e7dcc8;--home-muted:#b7a78f;backgr
   let busy = false;
   let openingReader = false;
   let pendingOpen = 0;
+  let activeReaderFrame = null;
+  let readerReadyTimer = 0;
+  let readerKeySent = false;
 
   function decodeKey(encoded) {
     if (!/^[A-Za-z0-9_-]{43}$/.test(encoded)) throw new Error('InvalidKey');
@@ -434,8 +474,12 @@ html[data-theme=dark] .home-scene{--home-ink:#e7dcc8;--home-muted:#b7a78f;backgr
 
   function closeReader() {
     clearTimeout(pendingOpen);
+    clearTimeout(readerReadyTimer);
     pendingOpen = 0;
+    readerReadyTimer = 0;
     openingReader = false;
+    activeReaderFrame = null;
+    readerKeySent = false;
     overlay.hidden = true;
     readerHost.replaceChildren();
     bookButton.classList.remove('is-pulling');
@@ -468,18 +512,36 @@ html[data-theme=dark] .home-scene{--home-ink:#e7dcc8;--home-muted:#b7a78f;backgr
       const frame = document.createElement('iframe');
       frame.title = '《正义之心》阅读模式';
       frame.allowFullscreen = true;
-      frame.addEventListener('load', () => {
-        if (bookKey && frame.contentWindow) {
-          // A non-extractable CryptoKey is cloned only to our same-origin reader.
-          frame.contentWindow.postMessage({type:'mystudy:unlock-book', key:bookKey}, location.origin);
-        }
-      });
+      activeReaderFrame = frame;
+      readerKeySent = false;
       readerHost.replaceChildren(frame);
-      frame.src = stage.dataset.readerHref;
+      // The embedded marker contains no secret. The reader requests its key
+      // only after its own message listener is installed.
+      frame.src = `${stage.dataset.readerHref}?embedded=1`;
+      readerReadyTimer = setTimeout(() => {
+        if (activeReaderFrame !== frame) return;
+        closeReader();
+        status.textContent = '阅读器加载超时，请重新点书脊。';
+      }, 20000);
       closeReaderButton.focus({preventScroll:true});
       openingReader = false;
     }, reduced ? 0 : 360);
   }
+
+  window.addEventListener('message', event => {
+    if (!activeReaderFrame || event.source !== activeReaderFrame.contentWindow ||
+        event.origin !== location.origin || overlay.hidden) return;
+    if (event.data?.type === 'mystudy:reader-ready' && bookKey && !readerKeySent) {
+      clearTimeout(readerReadyTimer);
+      readerReadyTimer = 0;
+      readerKeySent = true;
+      activeReaderFrame.contentWindow.postMessage(
+        {type:'mystudy:unlock-book', key:bookKey}, location.origin
+      );
+    } else if (event.data?.type === 'mystudy:reader-close') {
+      closeReader();
+    }
+  });
 
   form.addEventListener('submit', event => {
     event.preventDefault();
