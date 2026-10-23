@@ -920,33 +920,42 @@
     }).catch(() => { byId('reading-scrubber').disabled = true; });
   }
 
-  async function unlock(encodedKey) {
+  async function unlock(credential) {
     if (unlockButton.disabled) return;
     unlockButton.disabled = true;
     setStatus('正在读取加密书籍并在本机验证…', 'info');
     let keyBytes;
+    let sealed;
     let phase = 'key';
     try {
-      keyBytes = decodeKey(encodedKey);
+      let importedKey;
+      if (typeof credential === 'string') {
+        keyBytes = decodeKey(credential);
+        importedKey = await crypto.subtle.importKey('raw', keyBytes, {name:'AES-GCM'}, false, ['decrypt', 'encrypt']);
+        keyBytes.fill(0);
+        keyBytes = null;
+      } else if (credential?.algorithm?.name === 'AES-GCM' &&
+                 credential.extractable === false &&
+                 credential.usages?.includes('decrypt') && credential.usages?.includes('encrypt')) {
+        importedKey = credential;
+      } else {
+        throw new Error('InvalidKey');
+      }
       phase = 'download';
       const response = await withTimeout(fetch('books/justice-heart.epub.enc', {
         cache:'no-store', credentials:'same-origin'
       }), 20000, 'DownloadTimeout');
       if (!response.ok) throw new Error('CiphertextUnavailable');
-      const sealed = new Uint8Array(await withTimeout(response.arrayBuffer(), 15000, 'DownloadTimeout'));
+      sealed = new Uint8Array(await withTimeout(response.arrayBuffer(), 15000, 'DownloadTimeout'));
       if (sealed.length < 36 || new TextDecoder().decode(sealed.subarray(0,8)) !== 'MYBOOK01') {
         sealed.fill(0);
         throw new Error('InvalidCiphertext');
       }
-      const importedKey = await crypto.subtle.importKey('raw', keyBytes, {name:'AES-GCM'}, false, ['decrypt', 'encrypt']);
-      keyBytes.fill(0);
-      keyBytes = null;
       phase = 'decrypt';
       decryptedBytes = await crypto.subtle.decrypt({
         name:'AES-GCM', iv:sealed.subarray(8,20), additionalData:new TextEncoder().encode(AAD), tagLength:128
       }, importedKey, sealed.subarray(20));
       bookCryptoKey = importedKey;
-      sealed.fill(0);
       setStatus('', 'info');
       readSavedPreferences();
       phase = 'epub';
@@ -985,10 +994,19 @@
                 : '解锁过程中发生错误，请检查密钥格式后重试。';
       setStatus(message);
     } finally {
+      sealed?.fill(0);
       keyInput.value = '';
       unlockButton.disabled = false;
     }
   }
+
+  // Same-origin home scene keeps a non-extractable CryptoKey in this tab's
+  // memory. The embedded reader may receive it without URL or storage secrets.
+  window.addEventListener('message', event => {
+    if (window.parent === window || event.source !== window.parent || event.origin !== location.origin ||
+        event.data?.type !== 'mystudy:unlock-book' || !reader.hidden || unlockButton.disabled) return;
+    unlock(event.data.key);
+  });
 
   async function lockBook() {
     activeBookToken += 1;

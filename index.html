@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>学习笔记 · 课程总入口｜课程目录</title><style>:root{--ink:#20303d;--muted:#627385;--line:#dce5ed;--paper:#fff;--soft:#f6f9fc;--blue:#1f6fb2;--blue2:#315f91;--orange:#c96d25;--shadow:0 12px 34px rgba(41,63,82,.08);}
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>MyStudyMochi · 书桌与书架</title><style>:root{--ink:#20303d;--muted:#627385;--line:#dce5ed;--paper:#fff;--soft:#f6f9fc;--blue:#1f6fb2;--blue2:#315f91;--orange:#c96d25;--shadow:0 12px 34px rgba(41,63,82,.08);}
 *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:#f3f6f9;color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;line-height:1.82;font-size:16px}
 #progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;z-index:50}
 .layout{display:grid;grid-template-columns:280px minmax(0,860px);gap:32px;max-width:1210px;margin:0 auto;padding:34px 24px 80px}
@@ -53,6 +54,18 @@ pre{overflow:auto;padding:16px;background:#f3f7fa;border-radius:10px}pre code{bo
 body.note-navigation-ready .sidebar{scroll-margin-top:18px}
 body.note-toc-collapsed .sidebar{display:none!important}
 body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
+
+/* A quiet return-to-top affordance appears only after the reader has scrolled. */
+#note-back-to-top{
+  position:fixed;z-index:80;right:20px;bottom:76px;min-width:44px;min-height:44px;padding:0 14px;
+  border:1px solid rgba(210,220,228,.78);border-radius:14px;background:rgba(250,252,253,.78);
+  color:var(--note-ui-ink);box-shadow:0 4px 18px rgba(24,39,52,.09);backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);
+  font:500 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;
+  transition:background-color .16s ease,border-color .16s ease,transform .16s ease
+}
+#note-back-to-top:hover{background:rgba(255,255,255,.96);border-color:#cad9e3;transform:translateY(-2px)}
+#note-back-to-top:focus-visible{outline:3px solid var(--note-ui-focus);outline-offset:3px}
+#note-back-to-top[hidden]{display:none!important}
 
 /* Optional readers stay available but recede visually until needed. */
 #manual-toggle,#study-toggle{
@@ -116,6 +129,8 @@ html[data-theme="dark"] mjx-container{color:#e4eaf0}
 html[data-theme="dark"] .note-navigation-controls{border-color:rgba(81,91,102,.72);background:rgba(38,42,48,.70);box-shadow:0 4px 18px rgba(0,0,0,.18)}
 html[data-theme="dark"] .note-navigation-controls button,html[data-theme="dark"] .note-navigation-controls a{color:#e2e8ed}
 html[data-theme="dark"] .note-navigation-controls button:hover,html[data-theme="dark"] .note-navigation-controls a:hover{background:#303d48;color:#c5e5fa}
+html[data-theme="dark"] #note-back-to-top{background:rgba(38,42,48,.82);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.26)}
+html[data-theme="dark"] #note-back-to-top:hover{background:rgba(55,61,69,.96)}
 html[data-theme="dark"] #manual-toggle,html[data-theme="dark"] #study-toggle{background:rgba(38,42,48,.72);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.24)}
 html[data-theme="dark"] #manual-toggle:hover,html[data-theme="dark"] #study-toggle:hover{background:rgba(55,61,69,.94)}
 html[data-theme="dark"] #manual-panel,html[data-theme="dark"] #modern-dsp-learning-sidebar{background:#191c21;color:#e0e5ea}
@@ -133,6 +148,13 @@ html[data-theme="dark"] .study-flow li>strong,html[data-theme="dark"] .study-exe
 html[data-theme="dark"] .study-exercise-body strong{color:#d7e8f5}
 html[data-theme="dark"] .study-intro,html[data-theme="dark"] .study-flow li,html[data-theme="dark"] .study-exercises details,
 html[data-theme="dark"] .study-exercise-body .study-answer{background:#242a31;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-prompt{background:#222a31;border-color:#3b434c}
+html[data-theme="dark"] .study-solution-step{background:#20252b;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-solution-step--formula{background:#222a31;border-color:#3b434c;border-left-color:#6f9fbe}
+html[data-theme="dark"] .study-solution-step--formula:before,html[data-theme="dark"] .study-solution-title{color:#9fc9e4}
+html[data-theme="dark"] .study-solution-step--conclusion{background:#202c34;border-color:#496478}
+html[data-theme="dark"] .study-solution-step--conclusion p{color:#d8eaf5}
+html[data-theme="dark"] .study-exercise-body .study-source{background:#292f36;color:#b9c7d1}
 html[data-theme="dark"] .study-bridge,html[data-theme="dark"] .study-warning{background:#332a22;color:#e5c8a8}
 html[data-theme="dark"] .study-exercise-body .study-check{background:#24312b;color:#d2e6d8}
 html[data-theme="dark"] .study-flow li p,html[data-theme="dark"] .study-exercise-body{color:#c4cdd5}
@@ -152,14 +174,92 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
   .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:var(--note-ui-paper);box-shadow:var(--note-ui-shadow)}
   #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:42px;padding:0 13px}
   #manual-toggle{right:12px}#study-toggle{left:12px}
+  #note-back-to-top{right:12px;bottom:max(68px,calc(env(safe-area-inset-bottom) + 62px));min-height:42px}
 }
-@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle{transition:none}}
+@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle,#note-back-to-top{transition:none}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
-</style><style id="personal-library-style">.personal-library{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:34px;padding:23px 0 2px;border-top:1px solid var(--line)}.personal-library-copy{display:grid;gap:5px}.personal-library-label{color:var(--blue2);font-size:11px;font-weight:650;letter-spacing:.06em}.personal-library h2{margin:0;font-size:18px}.personal-library p{margin:0;color:var(--muted);font-size:13px}.personal-library-open{flex:none;padding:10px 13px;border:1px solid var(--line);border-radius:10px;color:var(--blue2);font-size:12px;text-decoration:none}.personal-library-open:hover{background:var(--soft)}@media(max-width:600px){.personal-library{align-items:flex-start;gap:12px}.personal-library-open{align-self:center}}</style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="article"><div class="note-navigation-controls note-navigation-catalog-controls" id="note-navigation-controls"><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div><header class="hero"><div class="eyebrow">学习笔记 · 2026-10-19更新</div><h1>学习笔记 · 课程总入口</h1><p class="lead">六套课程、21份学习笔记，另设独立的个人书架。按知识依赖组织，公式与图示服务于理解。</p></header><div class="cards"><a class="card" href="mmwave-radar/"><h2>毫米波雷达基础</h2><p>6节：距离、相位、速度、系统设计、角度、检测与跟踪</p></a><a class="card" href="modern-dsp/"><h2>现代数字信号处理</h2><p>随机信号 → Wiener/预测 → Kalman → LMS</p></a><a class="card" href="array-signal-processing/"><h2>阵列信号处理</h2><p>阵列几何 → 空间统计 → 子空间/似然方法</p></a><a class="card" href="advanced-engineering-math/"><h2>高等工程数学</h2><p>对象 → 线性作用 → 内积几何 → 相似结构</p></a><a class="card" href="modern-signal-processing/"><h2>现代信号处理</h2><p>信号描述 → 统计与变换 → 采样硬件与恢复</p></a><a class="card" href="radar-board/"><h2>毫米波雷达系统解析</h2><p>硬件接口、固件数据流与信号处理</p></a></div><section aria-labelledby="personal-library-title" class="personal-library" id="personal-library"><div class="personal-library-copy"><span class="personal-library-label">独立阅读</span><h2 id="personal-library-title">我的书架</h2><p>个人藏书 · 加密阅读 · 与课程目录分开</p></div><a class="personal-library-open" href="bookshelf/">打开书架 ↗</a></section><p class="source-ref">依据已收到材料持续更新。新笔记公式已预渲染为SVG；旧笔记保留原有路径和内容。原始课件未上传到本次发布。</p></main></div><script id="note-navigation-script">(() => {
+</style><style id="personal-library-style">.personal-library{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:34px;padding:23px 0 2px;border-top:1px solid var(--line)}.personal-library-copy{display:grid;gap:5px}.personal-library-label{color:var(--blue2);font-size:11px;font-weight:650;letter-spacing:.06em}.personal-library h2{margin:0;font-size:18px}.personal-library p{margin:0;color:var(--muted);font-size:13px}.personal-library-open{flex:none;padding:10px 13px;border:1px solid var(--line);border-radius:10px;color:var(--blue2);font-size:12px;text-decoration:none}.personal-library-open:hover{background:var(--soft)}@media(max-width:600px){.personal-library{align-items:flex-start;gap:12px}.personal-library-open{align-self:center}}</style><style id="home-scene-style">/* A quiet mid-century study, drawn entirely in CSS; no remote assets. */
+.layout:has(#home-stage){display:block!important;width:100%;max-width:none!important;margin:0!important;padding:0!important}
+body:has(#home-stage){background:#e9e1d2;color:#302b28}
+.home-scene{--home-ink:#2f2b28;--home-muted:#665d53;--home-cream:#f6f0e4;--home-paper:#fffaf0;--home-brass:#b68c53;--home-wood:#6a4634;--home-walnut:#3d2923;position:relative;isolation:isolate;min-height:100dvh;padding:0 clamp(18px,3vw,56px) 26px;background:radial-gradient(circle at 18% 7%,#faf4e8 0,#eee6d7 44%,#e8dfcf 100%);color:var(--home-ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+.home-scene *{box-sizing:border-box}
+.home-masthead{display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1600px;margin:0 auto;padding:19px 0 15px;border-bottom:1px solid rgba(82,62,47,.19)}
+.home-brand{display:inline-flex;align-items:center;gap:11px;color:var(--home-ink);font-family:Georgia,"Songti SC",serif;font-size:21px;font-weight:700;letter-spacing:-.04em;text-decoration:none}
+.home-brand:hover{color:#614435}.brand-mark{display:grid;place-items:center;width:36px;height:36px;border:1px solid #876a50;border-radius:50%;font-size:16px;font-style:italic;letter-spacing:-.09em}.brand-contrast{color:#9b6b46}.masthead-right{display:flex;align-items:center;gap:18px}.masthead-caption{color:var(--home-muted);font-size:12px;letter-spacing:.08em}.home-theme{min-width:58px;height:34px;padding:0 12px;border:1px solid rgba(92,70,52,.3);border-radius:999px;background:rgba(255,250,239,.55);color:var(--home-ink);font:500 12px/1 inherit;cursor:pointer}
+.home-intro{max-width:1600px;margin:0 auto;padding:34px 0 36px}.home-intro .overline,.scene-number{color:#927054;font-size:11px;font-weight:700;letter-spacing:.2em}.home-intro h1{margin:8px 0 8px;color:var(--home-ink);font:500 clamp(34px,3.1vw,54px)/1.25 Georgia,"Songti SC",serif;letter-spacing:-.055em}.home-intro p{max-width:650px;margin:0;color:var(--home-muted);font-size:14px;line-height:1.85}
+.scene-grid{display:grid;grid-template-columns:minmax(0,1.37fr) minmax(355px,.78fr);gap:clamp(20px,2vw,38px);max-width:1600px;margin:0 auto;align-items:start}.scene-heading{display:grid;align-content:start;min-height:103px}.scene-heading h2{margin:4px 0 0;padding:0;color:var(--home-ink);font:500 clamp(24px,2vw,32px)/1.25 Georgia,"Songti SC",serif;letter-spacing:-.035em}.scene-heading p{margin:7px 0 0;color:var(--home-muted);font-size:12px}.scene-footnote{margin:14px 2px;color:var(--home-muted);font-size:11px;letter-spacing:.03em}
+.desk-environment{position:relative;min-height:590px;padding:40px 40px 37px;overflow:hidden;border:7px solid #86573a;border-radius:16px;background:repeating-linear-gradient(174deg,rgba(25,11,5,.045) 0 2px,transparent 2px 11px),linear-gradient(145deg,#825536,#5a3829 72%,#492c22);box-shadow:inset 0 0 0 2px rgba(236,191,120,.45),inset 0 22px 38px rgba(255,221,166,.1),0 28px 48px rgba(63,40,27,.23)}
+.desk-environment::before{position:absolute;inset:11px;pointer-events:none;border:1px solid rgba(237,199,136,.25);border-radius:9px;content:""}
+.desk-blotter{position:relative;z-index:1;min-height:500px;margin:14px 8px 0;padding:32px 26px 28px;border:9px solid #533c2c;border-radius:11px;background:linear-gradient(145deg,#315246,#203a34 65%,#193129);box-shadow:0 18px 25px rgba(28,17,13,.35),inset 0 0 0 2px rgba(202,168,106,.5),inset 0 0 40px rgba(0,0,0,.15)}
+.blotter-ruling{position:absolute;inset:16px;border:1px solid rgba(241,218,171,.14);border-radius:4px;pointer-events:none}.desk-papers{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;gap:18px;margin:0;padding:0;z-index:2}
+.home-scene .desk-paper{position:relative;display:flex;flex-direction:column;min-height:181px;margin:0;padding:23px 20px 17px;border:1px solid #d8cab0;border-radius:3px;background:linear-gradient(165deg,#fffaf0,#f4ead5);box-shadow:1px 3px 0 rgba(62,46,31,.12),5px 12px 17px rgba(9,23,17,.23);color:#332b24;text-decoration:none;transform:rotate(calc((var(--paper-number) - 3) * 1deg));transition:transform .22s ease,box-shadow .22s ease,background .22s ease}
+.home-scene .desk-paper:nth-child(2n){background:linear-gradient(160deg,#fffdf4,#eee7d7)}.home-scene .desk-paper:nth-child(3n){transform:rotate(-1.4deg)}.home-scene .desk-paper::before{position:absolute;top:-7px;left:50%;width:40px;height:11px;border:1px solid rgba(79,72,62,.28);border-radius:7px;background:linear-gradient(#c8beb0,#ded7ca 45%,#a99f90);content:"";transform:translateX(-50%);box-shadow:0 2px 3px rgba(0,0,0,.15)}
+.home-scene .desk-paper:hover,.home-scene .desk-paper:focus-visible{z-index:4;background:#fffdf6;transform:translateY(-12px) rotate(0deg) scale(1.025);box-shadow:2px 3px 0 rgba(62,46,31,.1),10px 25px 27px rgba(8,22,16,.34)}
+.paper-index{color:#9a7653;font:700 10px/1.2 Georgia,serif;letter-spacing:.16em}.paper-title{margin:16px 0 0;color:#302d29;font:600 clamp(16px,1.18vw,20px)/1.35 Georgia,"Songti SC",serif}.paper-summary{margin:8px 0 13px;color:#70665b;font-size:11px;line-height:1.6}.paper-open{margin-top:auto;padding-top:8px;border-top:1px solid rgba(86,72,54,.2);color:#4b695c;font-size:11px;font-weight:700;letter-spacing:.04em}.paper-open span{display:inline-block;transition:transform .2s ease}.desk-paper:hover .paper-open span{transform:translate(2px,-2px)}
+.desk-lamp{position:absolute;z-index:3;top:-16px;left:11%;width:136px;height:110px;pointer-events:none}.desk-lamp i{position:absolute;left:20px;top:0;width:102px;height:62px;background:#b7975f;clip-path:polygon(29% 0,75% 0,100% 100%,0 100%);filter:drop-shadow(0 8px 5px rgba(22,12,6,.28))}.desk-lamp b{position:absolute;top:59px;left:68px;width:5px;height:48px;background:#a1885d;box-shadow:0 43px 0 9px #846844}.desk-cup{position:absolute;z-index:3;top:19px;right:7%;width:74px;height:74px;border:11px solid #e4d6b4;border-radius:50%;background:radial-gradient(circle at 44% 38%,#9a5d34,#472d20 70%);box-shadow:4px 10px 13px rgba(20,10,5,.28)}.desk-cup::after{position:absolute;top:10px;right:-29px;width:27px;height:29px;border:8px solid #e4d6b4;border-left:0;border-radius:0 50% 50% 0;content:""}.desk-pen{position:absolute;z-index:4;right:12%;bottom:10px;width:146px;height:7px;border-radius:5px;background:linear-gradient(90deg,#d8bb84 0 8%,#222b2c 8% 78%,#c7a46e 78% 100%);transform:rotate(-19deg);box-shadow:3px 6px 8px rgba(0,0,0,.3)}
+.cabinet{position:relative;min-height:590px;overflow:hidden;border:14px solid #664431;border-top-width:22px;border-bottom-width:23px;border-radius:90px 90px 13px 13px;background:repeating-linear-gradient(91deg,rgba(255,219,153,.045) 0 2px,transparent 2px 15px),linear-gradient(150deg,#553a2d,#2c211e 75%);box-shadow:inset 0 0 0 2px #9e734a,inset 0 25px 45px rgba(0,0,0,.24),0 26px 42px rgba(56,36,26,.22);perspective:1300px}
+.cabinet::after{position:absolute;z-index:1;right:0;bottom:0;left:0;height:7px;background:#a3774d;content:""}.cabinet-books{position:absolute;inset:40px 25px 33px;display:flex;align-items:flex-end;gap:13px;padding:0 10px 90px}.cabinet-books[hidden]{display:none!important}.cabinet-shelf-line{position:absolute;right:0;bottom:72px;left:0;height:19px;background:linear-gradient(#b68b5a,#69452f);box-shadow:0 13px 12px rgba(0,0,0,.4)}
+.shelf-book{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:23px;width:88px;height:235px;padding:15px 8px;border:0;border-radius:4px 9px 5px 3px;background:linear-gradient(90deg,#6a2525,#a54d3c 13%,#8f3d32 75%,#682c2a);box-shadow:inset 4px 0 rgba(255,255,255,.12),4px 8px 15px rgba(0,0,0,.4);color:#f4e5c8;cursor:pointer;transition:transform .24s ease,box-shadow .24s ease}.shelf-book:hover,.shelf-book:focus-visible{transform:translateY(-17px) translateX(6px);box-shadow:inset 4px 0 rgba(255,255,255,.16),10px 20px 24px rgba(0,0,0,.45)}.shelf-book.is-pulling{transform:translateY(-140px) rotate(-12deg) scale(1.22);opacity:.35;transition:transform .4s ease,opacity .4s ease}.book-spine-title{writing-mode:vertical-rl;letter-spacing:.17em;font:600 21px/1.1 "Songti SC",serif}.book-spine-author{writing-mode:vertical-rl;font-size:10px;letter-spacing:.1em}.shelf-book-placeholder{position:relative;z-index:1;width:43px;height:190px;border-radius:2px 6px 3px 2px;background:linear-gradient(90deg,#3f594b,#738879 12%,#456052 82%,#273f37);box-shadow:4px 8px 11px rgba(0,0,0,.3)}.shelf-book-placeholder.second{width:34px;height:211px;background:linear-gradient(90deg,#9b7e51,#d2b785 12%,#aa8959 82%,#6d5637)}.shelf-ornament{position:absolute;right:4px;bottom:91px;width:70px;height:92px;border-radius:50% 50% 8px 8px;background:linear-gradient(90deg,#897356,#c8ae83,#8b7656);opacity:.65}
+.cabinet-door{position:absolute;z-index:5;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:45px 22px 34px;border:2px solid rgba(210,159,93,.55);border-radius:72px 72px 2px 2px;background:repeating-linear-gradient(93deg,rgba(222,177,111,.055) 0 3px,transparent 3px 20px),linear-gradient(130deg,#88583a,#5e3b2b 75%,#4c3127);box-shadow:inset 0 0 0 9px #60412d,inset 0 0 0 11px rgba(211,164,98,.45),0 8px 20px rgba(0,0,0,.35);transform-origin:left center;backface-visibility:hidden;transition:transform .76s cubic-bezier(.17,.7,.17,1),opacity .5s ease}
+.shelf-scene[data-unlocked=true] .cabinet-door{transform:rotateY(-104deg);opacity:0;pointer-events:none}.door-rail{position:absolute;inset:22px;border:1px solid rgba(220,175,108,.48);border-radius:58px 58px 5px 5px;pointer-events:none}.lock-glyph{position:relative;display:block;width:66px;height:62px;margin:0 0 22px;border:3px solid #ddc39b;border-radius:16px;background:rgba(51,31,23,.5);box-shadow:0 7px 13px rgba(0,0,0,.22)}.lock-glyph i{position:absolute;top:-25px;left:15px;width:30px;height:28px;border:5px solid #ddc39b;border-bottom:0;border-radius:17px 17px 0 0}.door-title{color:#f3dfb9;font:500 25px/1.2 Georgia,"Songti SC",serif;letter-spacing:.12em}.door-subtitle{margin:8px 0 24px;color:#e2c49a;font:10px/1.3 Georgia,serif;letter-spacing:.17em}.shelf-unlock-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:min(330px,100%)}.shelf-unlock-form input{width:100%;min-width:0;height:41px;padding:0 12px;border:1px solid rgba(249,226,187,.38);border-radius:5px;background:rgba(33,24,20,.42);color:#fff6e7;font-size:12px;outline:none}.shelf-unlock-form input::placeholder{color:#e3cba8}.shelf-unlock-form button{height:41px;padding:0 13px;border:1px solid #e7c99b;border-radius:5px;background:#ead2a7;color:#533a2a;font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer}.shelf-file-label{margin-top:13px;padding:4px;color:#f5deb8;font-size:11px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}.cabinet-door #shelf-status{max-width:330px;min-height:35px;margin:12px 0 0;color:#f2d9b5;font-size:11px;line-height:1.55;text-align:center}
+.shelf-actions{display:flex;align-items:center;justify-content:space-between;min-height:42px;gap:12px}.shelf-actions button,.shelf-actions a{padding:4px 0;border:0;background:transparent;color:#654d39;font-size:12px;text-decoration:none;cursor:pointer}.shelf-actions button[hidden]{display:none!important}.shelf-actions a:hover,.shelf-actions button:hover{text-decoration:underline;text-underline-offset:3px}
+.home-footer{max-width:1600px;margin:24px auto 0;padding-top:16px;border-top:1px solid rgba(82,62,47,.15);color:var(--home-muted);font:12px/1.6 Georgia,"Songti SC",serif;letter-spacing:.06em}
+.home-reader-overlay[hidden]{display:none!important}.home-reader-overlay{position:fixed;z-index:2000;inset:0;background:#191b1c;animation:reader-enter .38s ease both}.home-reader-overlay #home-reader-close{position:absolute;z-index:2;top:10px;left:12px;min-height:36px;padding:0 14px;border:1px solid rgba(255,255,255,.23);border-radius:999px;background:rgba(26,29,31,.82);color:#fff4e1;font-size:12px;cursor:pointer}.home-reader-host,.home-reader-host iframe{display:block;width:100%;height:100%;border:0}.home-reader-host{padding-top:0}
+.home-scene :is(a,button,input,label[for]):focus-visible{outline:3px solid #dbb574;outline-offset:4px}
+html[data-theme=dark] .home-scene{--home-ink:#e7dcc8;--home-muted:#b7a78f;background:radial-gradient(circle at 18% 7%,#35332f,#211f1e 72%)}html[data-theme=dark] .home-theme{border-color:#695641;background:rgba(51,47,43,.8);color:#e7dcc8}html[data-theme=dark] .home-brand:hover{color:#fff1ce}html[data-theme=dark] .home-masthead,html[data-theme=dark] .home-footer{border-color:rgba(221,191,145,.19)}html[data-theme=dark] .scene-number,html[data-theme=dark] .home-intro .overline{color:#caa978}html[data-theme=dark] .shelf-actions a,html[data-theme=dark] .shelf-actions button{color:#d6bc96}
+@keyframes reader-enter{from{opacity:0;transform:scale(.975)}to{opacity:1;transform:scale(1)}}
+@media(max-width:1180px){.scene-grid{grid-template-columns:minmax(0,1fr) minmax(320px,.68fr)}.desk-environment{padding:38px 18px}.desk-blotter{padding:29px 17px}.desk-papers{gap:13px}.home-scene .desk-paper{padding:20px 14px;min-height:185px}.paper-title{font-size:16px}}
+@media(max-width:940px){.scene-grid{grid-template-columns:1fr}.desk-environment{min-height:0}.desk-blotter{min-height:0}.cabinet{max-width:620px;min-height:510px;margin:0 auto}.shelf-scene{margin-top:14px}.desk-scene,.shelf-scene{min-width:0}.scene-heading{min-height:91px}}
+@media(max-width:650px){.home-scene{padding:0 12px 16px}.home-masthead{padding:12px 4px}.home-brand{gap:7px;font-size:17px}.brand-mark{width:30px;height:30px;font-size:13px}.masthead-caption{display:none}.home-intro{padding:31px 6px}.home-intro h1{font-size:36px}.scene-grid{gap:22px}.desk-environment{padding:31px 12px 28px;border-width:5px}.desk-blotter{margin:16px 2px 0;padding:26px 14px 24px;border-width:6px}.desk-papers{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.home-scene .desk-paper{min-height:171px;padding:19px 11px 13px;transform:none}.paper-index{font-size:9px}.paper-title{margin-top:13px;font-size:15px}.paper-summary{font-size:10px}.desk-lamp{left:3%;transform:scale(.72);transform-origin:top left}.desk-cup{right:9%;transform:scale(.7);transform-origin:top right}.desk-pen{right:8%;bottom:4px;transform:scale(.72) rotate(-19deg)}.cabinet{min-height:490px}.cabinet-books{padding-bottom:86px}.cabinet-door{padding:42px 12px 24px}.shelf-unlock-form{grid-template-columns:1fr}.shelf-unlock-form button{width:100%}}
+@media(max-width:390px){.desk-papers{grid-template-columns:1fr}.home-scene .desk-paper{min-height:132px}.paper-title{margin-top:7px}.paper-summary{margin:3px 0 6px}.desk-environment{padding:27px 9px}.desk-blotter{padding:19px 11px}.cabinet{min-height:470px}.shelf-ornament{display:none}}
+@media(prefers-reduced-motion:reduce){.home-scene *,.home-scene *::before,.home-scene *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="home-scene" data-cipher-href="bookshelf/books/justice-heart.epub.enc" data-reader-href="bookshelf/read.html" id="home-stage">
+<header class="home-masthead">
+<a aria-label="MyStudyMochi，回到主页顶部" class="home-brand" href="#home-stage"><span aria-hidden="true" class="brand-mark">M.</span><span>MyStudy<span class="brand-contrast">Mochi</span></span></a>
+<div class="masthead-right"><span class="masthead-caption">一张书桌，一座书架</span><button aria-label="切换到夜间模式" class="note-theme-toggle home-theme" id="note-theme-toggle" type="button">夜间</button></div>
+</header>
+<div class="home-intro"><span class="overline">THE STUDY · 个人学习空间</span><h1>把好奇心，放在手边。</h1><p>在书桌上展开一份笔记，或到书架上读一本书。六门课程与个人藏书，各归其位。</p></div>
+<div class="scene-grid">
+<section aria-labelledby="desk-title" class="desk-scene">
+<div class="scene-heading"><span class="scene-number">01 / THE DESK</span><h2 id="desk-title">学习笔记</h2><p>翻开桌上的一页手稿，继续追问。</p></div>
+<div class="desk-environment"><div aria-hidden="true" class="desk-lamp"><i></i><b></b></div><div aria-hidden="true" class="desk-cup"></div><div aria-hidden="true" class="desk-pen"></div><div class="desk-blotter"><div aria-hidden="true" class="blotter-ruling"></div><div class="cards desk-papers"><a class="card desk-paper" href="mmwave-radar/" style="--paper-number:1"><span class="paper-index">CASE FILE / 01</span><span class="paper-title">毫米波雷达基础</span><span class="paper-summary">6节：距离、相位、速度、系统设计、角度、检测与跟踪</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-dsp/" style="--paper-number:2"><span class="paper-index">CASE FILE / 02</span><span class="paper-title">现代数字信号处理</span><span class="paper-summary">随机信号 → Wiener/预测 → Kalman → LMS</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="array-signal-processing/" style="--paper-number:3"><span class="paper-index">CASE FILE / 03</span><span class="paper-title">阵列信号处理</span><span class="paper-summary">阵列几何 → 空间统计 → 子空间/似然方法</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="advanced-engineering-math/" style="--paper-number:4"><span class="paper-index">CASE FILE / 04</span><span class="paper-title">高等工程数学</span><span class="paper-summary">对象 → 线性作用 → 内积几何 → 相似结构</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-signal-processing/" style="--paper-number:5"><span class="paper-index">CASE FILE / 05</span><span class="paper-title">现代信号处理</span><span class="paper-summary">信号描述 → 统计与变换 → 采样硬件与恢复</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="radar-board/" style="--paper-number:6"><span class="paper-index">CASE FILE / 06</span><span class="paper-title">毫米波雷达系统解析</span><span class="paper-summary">硬件接口、固件数据流与信号处理</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a></div></div></div>
+<p class="scene-footnote">六套课程 · 21 份笔记 · 原始课件不在公开站点</p>
+</section>
+<section aria-labelledby="personal-library-title" class="shelf-scene" data-unlocked="false" id="personal-library">
+<div class="scene-heading"><span class="scene-number">02 / THE LIBRARY</span><h2 id="personal-library-title">我的书架</h2><p>书藏在柜中，打开后再慢慢读。</p></div>
+<div aria-label="上锁的个人书架" class="cabinet">
+<div class="cabinet-books" hidden="" id="shelf-books" inert=""><div aria-hidden="true" class="cabinet-shelf-line"></div><button aria-label="抽出《正义之心》并进入阅读模式" class="shelf-book" id="open-home-book" type="button"><span class="book-spine-title">正义之心</span><span class="book-spine-author">乔纳森·海特</span></button><span aria-hidden="true" class="shelf-book-placeholder"></span><span aria-hidden="true" class="shelf-book-placeholder second"></span><span aria-hidden="true" class="shelf-ornament"></span></div>
+<div class="cabinet-door" id="cabinet-door"><div aria-hidden="true" class="door-rail"></div><span aria-hidden="true" class="lock-glyph"><i></i></span><span class="door-title">私人藏书</span><span class="door-subtitle">ONLY OPEN WITH YOUR KEY</span>
+<form class="shelf-unlock-form" id="shelf-unlock-form"><label class="visually-hidden" for="shelf-key">书架解锁密钥</label><input autocomplete="off" id="shelf-key" placeholder="粘贴本机书架密钥" required="" spellcheck="false" type="password"/><button id="shelf-unlock-button" type="submit">打开书架 <span aria-hidden="true">↗</span></button></form>
+<label class="shelf-file-label" for="shelf-key-file">或选择本机密钥文件</label><input accept=".txt,text/plain" aria-label="选择本机书架密钥文件" class="visually-hidden" id="shelf-key-file" type="file"/><p aria-live="polite" id="shelf-status" role="status">密钥只在当前页面的内存中使用，不上传或保存。</p>
+</div>
+</div>
+<div class="shelf-actions"><button hidden="" id="shelf-relock" type="button">重新上锁</button><a href="bookshelf/">独立书架页面 <span aria-hidden="true">↗</span></a></div>
+<p class="scene-footnote">书目公开展示；书籍正文只以加密副本存放。</p>
+</section>
+</div>
+<footer class="home-footer">MyStudyMochi <span aria-hidden="true">·</span> 给认真而不着急的学习。</footer>
+<div class="home-reader-overlay" hidden="" id="home-reader-overlay"><button id="home-reader-close" type="button">← 返回书桌</button><div class="home-reader-host" id="home-reader-host"></div></div>
+</main></div><script id="note-navigation-script">(() => {
   const body = document.body;
   const toggle = document.getElementById('note-toc-toggle');
   const themeToggle = document.getElementById('note-theme-toggle');
+  const backToTop = document.getElementById('note-back-to-top');
   const sidebar = document.querySelector('.sidebar');
+  if (backToTop) {
+    const updateBackToTop = () => {
+      const visible = window.scrollY > 360;
+      backToTop.hidden = !visible;
+      backToTop.setAttribute('aria-hidden', String(!visible));
+      backToTop.tabIndex = visible ? 0 : -1;
+    };
+    updateBackToTop();
+    window.addEventListener('scroll', updateBackToTop, {passive:true});
+    backToTop.addEventListener('click', () => {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({top:0, behavior:reducedMotion ? 'auto' : 'smooth'});
+    });
+  }
   if (themeToggle) {
     const updateThemeButton = () => {
       const isDark = document.documentElement.dataset.theme === 'dark';
@@ -232,5 +332,177 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
     closeDrawer(false);
     announce(smallScreen() ? false : desktopOpen());
   }, {passive:true});
+})();
+</script><script id="home-scene-script">(() => {
+  'use strict';
+  const stage = document.getElementById('home-stage');
+  if (!stage) return;
+  const shelf = document.getElementById('personal-library');
+  const books = document.getElementById('shelf-books');
+  const door = document.getElementById('cabinet-door');
+  const form = document.getElementById('shelf-unlock-form');
+  const keyInput = document.getElementById('shelf-key');
+  const keyFile = document.getElementById('shelf-key-file');
+  const unlockButton = document.getElementById('shelf-unlock-button');
+  const status = document.getElementById('shelf-status');
+  const relockButton = document.getElementById('shelf-relock');
+  const bookButton = document.getElementById('open-home-book');
+  const overlay = document.getElementById('home-reader-overlay');
+  const readerHost = document.getElementById('home-reader-host');
+  const closeReaderButton = document.getElementById('home-reader-close');
+  const AAD = 'bookshelf/justice-heart/edition-1';
+  let bookKey = null;
+  let busy = false;
+  let openingReader = false;
+  let pendingOpen = 0;
+
+  function decodeKey(encoded) {
+    if (!/^[A-Za-z0-9_-]{43}$/.test(encoded)) throw new Error('InvalidKey');
+    const binary = atob(encoded.replace(/-/g, '+').replace(/_/g, '/') + '=');
+    if (binary.length !== 32) throw new Error('InvalidKey');
+    return Uint8Array.from(binary, char => char.charCodeAt(0));
+  }
+
+  async function validateBookKey(key) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    let sealed;
+    try {
+      const response = await fetch(stage.dataset.cipherHref, {
+        cache:'no-store', credentials:'same-origin', signal:controller.signal
+      });
+      if (!response.ok) throw new Error('BookUnavailable');
+      sealed = new Uint8Array(await response.arrayBuffer());
+    } catch (_) {
+      throw new Error('BookUnavailable');
+    } finally {
+      clearTimeout(timeout);
+    }
+    if (sealed.length < 36 || new TextDecoder().decode(sealed.subarray(0, 8)) !== 'MYBOOK01') {
+      sealed.fill(0);
+      throw new Error('BookUnavailable');
+    }
+    try {
+      // Full AES-GCM authentication: no visual unlock on merely well-formed keys.
+      const plaintext = new Uint8Array(await crypto.subtle.decrypt({
+        name:'AES-GCM', iv:sealed.subarray(8, 20),
+        additionalData:new TextEncoder().encode(AAD), tagLength:128
+      }, key, sealed.subarray(20)));
+      const valid = plaintext.length > 4 && plaintext[0] === 0x50 && plaintext[1] === 0x4b;
+      plaintext.fill(0);
+      if (!valid) throw new Error('InvalidBook');
+    } finally {
+      sealed.fill(0);
+    }
+  }
+
+  async function unlockShelf(encoded) {
+    if (busy) return false;
+    busy = true;
+    unlockButton.disabled = true;
+    status.textContent = '正在本机验证密钥…';
+    let raw;
+    try {
+      raw = decodeKey(encoded.trim());
+      const key = await crypto.subtle.importKey('raw', raw, {name:'AES-GCM'}, false, ['decrypt', 'encrypt']);
+      raw.fill(0); raw = null;
+      await validateBookKey(key);
+      bookKey = key;
+      books.hidden = false;
+      books.inert = false;
+      door.inert = true;
+      shelf.dataset.unlocked = 'true';
+      relockButton.hidden = false;
+      status.textContent = '书架已打开。';
+      bookButton.focus({preventScroll:true});
+      return true;
+    } catch (error) {
+      status.textContent = error?.message === 'BookUnavailable'
+        ? '暂时无法取得加密书籍，请检查网络后重试。'
+        : error?.message === 'InvalidKey'
+          ? '密钥格式不正确，请使用书架专用密钥。'
+          : '密钥无法解锁这本书，请检查是否选对书架密钥。';
+      return false;
+    } finally {
+      raw?.fill(0);
+      keyInput.value = '';
+      keyFile.value = '';
+      unlockButton.disabled = false;
+      busy = false;
+    }
+  }
+
+  function closeReader() {
+    clearTimeout(pendingOpen);
+    pendingOpen = 0;
+    openingReader = false;
+    overlay.hidden = true;
+    readerHost.replaceChildren();
+    bookButton.classList.remove('is-pulling');
+    document.body.style.overflow = '';
+    if (bookKey) bookButton.focus({preventScroll:true});
+  }
+
+  function relockShelf() {
+    closeReader();
+    bookKey = null;
+    books.inert = true;
+    books.hidden = true;
+    door.inert = false;
+    shelf.dataset.unlocked = 'false';
+    relockButton.hidden = true;
+    status.textContent = '密钥只在当前页面的内存中使用，不上传或保存。';
+    keyInput.focus({preventScroll:true});
+  }
+
+  function openReader() {
+    if (!bookKey || !overlay.hidden || openingReader) return;
+    openingReader = true;
+    bookButton.classList.add('is-pulling');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    pendingOpen = setTimeout(() => {
+      pendingOpen = 0;
+      if (!bookKey) { openingReader = false; return; }
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      const frame = document.createElement('iframe');
+      frame.title = '《正义之心》阅读模式';
+      frame.allowFullscreen = true;
+      frame.addEventListener('load', () => {
+        if (bookKey && frame.contentWindow) {
+          // A non-extractable CryptoKey is cloned only to our same-origin reader.
+          frame.contentWindow.postMessage({type:'mystudy:unlock-book', key:bookKey}, location.origin);
+        }
+      });
+      readerHost.replaceChildren(frame);
+      frame.src = stage.dataset.readerHref;
+      closeReaderButton.focus({preventScroll:true});
+      openingReader = false;
+    }, reduced ? 0 : 360);
+  }
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const encoded = keyInput.value.trim();
+    keyInput.value = '';
+    unlockShelf(encoded);
+  });
+  keyFile.addEventListener('change', async () => {
+    const file = keyFile.files?.[0];
+    if (!file) return;
+    if (file.size > 1024) { status.textContent = '密钥文件大小不正确。'; keyFile.value = ''; return; }
+    try { await unlockShelf((await file.text()).trim()); }
+    catch (_) { status.textContent = '读取密钥文件失败。'; keyFile.value = ''; }
+  });
+  bookButton.addEventListener('click', openReader);
+  relockButton.addEventListener('click', relockShelf);
+  closeReaderButton.addEventListener('click', closeReader);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !overlay.hidden) closeReader();
+  });
+  window.addEventListener('pagehide', () => {
+    bookKey = null;
+    readerHost.replaceChildren();
+  });
 })();
 </script></body></html>
