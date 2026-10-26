@@ -190,7 +190,7 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
 <a class="toc-sub" href="#4-2-导向矢量">4.2 导向矢量</a>
 <a class="toc-sub" href="#4-3-导向矢量的物理意义">4.3 导向矢量的物理意义</a>
 <a class="toc-main" href="#5-多源模型-为什么会出现-vandermonde-导向矩阵">5. 多源模型：为什么会出现 Vandermonde 导向矩阵</a>
-<a class="toc-main" href="#6-二阶统计-从瞬时数据到协方差结构">6. 二阶统计：从瞬时数据到协方差结构</a>
+<a class="toc-main" href="#6-二阶统计-从瞬时数据到空间相关结构">6. 二阶统计：从瞬时数据到空间相关结构</a>
 <a class="toc-sub" href="#6-1-为什么-mathbf-r-x-是-hermitian">6.1 为什么 $\mathbf R_x$ 是 Hermitian</a>
 <a class="toc-main" href="#7-阵列方向图-权值如何-选择空间方向">7. 阵列方向图：权值如何“选择空间方向”</a>
 <a class="toc-sub" href="#7-1-把主瓣指向-theta-0">7.1 把主瓣指向 $\theta_0$</a>
@@ -202,7 +202,7 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
 <a class="toc-main" href="#12-第二讲总复盘-第三讲需要带走什么">12. 第二讲总复盘：第三讲需要带走什么</a>
 <a class="toc-sub" href="#12-1-课件-matlab-作业应该验证什么">12.1 课件 MATLAB 作业应该验证什么</a>
 <a class="toc-main" href="#来源说明">来源说明</a></nav></aside><main class="article"><header class="hero"><div class="eyebrow">ARRAY SIGNAL PROCESSING · LECTURE 02</div><h1>第二讲：阵列建模、方向图与空间采样</h1><p class="lead">从窄带/远场假设出发，建立 ULA 导向矢量、协方差模型、阵列方向图、栅瓣、波束宽度与空间 Nyquist 之间的一条完整主线。</p><div class="meta"><span class="chip">73 页课程 PDF</span><span class="chip">ULA · Steering Vector</span><span class="chip">6 张教学示意图</span><span class="chip">Pattern · Spatial Sampling</span></div></header><blockquote class="callout">
-<p>阵列处理最关键的一步，是把“多个天线收到的多路波形”变成一个结构清晰的数学模型。第二讲真正要建立的是一条主线：<strong>波长决定相位尺度 → 窄带假设把时延变成相位 → 远场假设把球面波变成平面波 → 导向矢量描述角度 → 协方差描述统计结构 → 权值形成方向图 → 空间采样决定是否混叠。</strong></p>
+<p>阵列处理最关键的一步，是把“多个天线收到的多路波形”变成一个结构清晰的数学模型。第二讲真正要建立的是一条主线：<strong>波长决定相位尺度 → 窄带假设把时延变成相位 → 远场假设把球面波变成平面波 → 导向矢量描述角度 → 空间相关矩阵描述二阶结构 → 权值形成方向图 → 空间采样决定是否混叠。</strong></p>
 </blockquote>
 
 <h2 id="0-为什么阵列处理首先关心波长">0. 为什么阵列处理首先关心波长</h2>
@@ -436,18 +436,24 @@ $$</p>
 <li>若信源相干导致 $\mathbf R_s$ 秩下降，则经典子空间分离会受破坏。</li>
 </ul>
 <hr/>
-<h2 id="6-二阶统计-从瞬时数据到协方差结构">6. 二阶统计：从瞬时数据到协方差结构</h2>
+<h2 id="6-二阶统计-从瞬时数据到空间相关结构">6. 二阶统计：从瞬时数据到空间相关结构</h2>
 
 <p>对模型</p>
 <p>$$
 \mathbf x=\mathbf A\mathbf s+\mathbf n,
 $$</p>
-<p>定义阵列协方差</p>
+<p>课件第 34 页把下面这个量称为<strong>自相关矩阵</strong>；它对同一快拍内各阵元的复信号做外积，再取统计平均：</p>
 <p>$$
 \mathbf R_x
 =\mathrm E\{\mathbf x\mathbf x^{\mathrm H}\}.
 $$</p>
-<p>若信号和噪声不相关，且噪声为空间白噪声：</p>
+<p><strong>与《现代数字信号处理》的定义对齐（补充说明，非课件原话）：</strong> 严格的协方差矩阵必须减去均值。令 $\boldsymbol\mu_x=\mathrm E\{\mathbf x\}$，则</p>
+<p>$$
+\mathbf C_x=\mathrm E\{(\mathbf x-\boldsymbol\mu_x)(\mathbf x-\boldsymbol\mu_x)^{\mathrm H}\},
+\qquad \mathbf R_x=\mathbf C_x+\boldsymbol\mu_x\boldsymbol\mu_x^{\mathrm H}.
+$$</p>
+<p>因而只有 $\boldsymbol\mu_x=\mathbf0$ 时，两者才相等。这里<strong>不要求实际接收信号普遍零均值</strong>；本笔记把 $\mathbf R_x$ 明确称作“空间相关矩阵（未中心化二阶矩）”。阵列文献和软件有时沿用“协方差矩阵”称呼同一个 $\mathbf R_x$，应先看它实际是否减均值，而不是只看名称。<a href="https://www.mathworks.com/help/phased/ug/music-super-resolution-doa-estimation.html">MathWorks 的 MUSIC 说明</a>和<a href="https://www.mathworks.com/help/phased/ref/phased.covarianceestimator-system-object.html">样本矩阵定义</a>都采用未中心化的外积形式。</p>
+<p>若<strong>噪声</strong>零均值、空间白，且信号与噪声的交叉二阶矩 $\mathrm E\{\mathbf s\mathbf n^{\mathrm H}\}=\mathbf0$，则（不要求 $\mathrm E\{\mathbf s\}=\mathbf0$）：</p>
 <p>$$
 \begin{aligned}
 \mathbf R_x
@@ -458,7 +464,7 @@ $$</p>
 +\sigma_n^2\mathbf I}.
 \end{aligned}
 $$</p>
-<p>这条式子是第二、第三讲之间最重要的桥。</p>
+<p>这里 $\mathbf R_s=\mathrm E\{\mathbf s\mathbf s^{\mathrm H}\}$ 也是未中心化的信源相关矩阵；若信源均值非零，$\mathbf R_s=\mathbf C_s+\boldsymbol\mu_s\boldsymbol\mu_s^{\mathrm H}$。把这条式子用于波束形成或 MUSIC，并不等于断言天线接收序列必然零均值。这是第二、第三讲之间最重要的桥。</p>
 <h3 id="6-1-为什么-mathbf-r-x-是-hermitian">6.1 为什么 $\mathbf R_x$ 是 Hermitian</h3>
 <p>由定义</p>
 <p>$$

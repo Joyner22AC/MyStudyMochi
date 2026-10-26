@@ -177,7 +177,7 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
 @media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle,#note-back-to-top{transition:none}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
 </style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" aria-label="关闭目录" id="note-toc-toggle" type="button">目录</button><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">阵列信号处理</div><nav class="toc"><a class="toc-main" href="#0-doa-估计到底在估什么">0. DOA 估计到底在估什么</a>
-<a class="toc-main" href="#1-有限快拍下-先估计协方差矩阵">1. 有限快拍下，先估计协方差矩阵</a>
+<a class="toc-main" href="#1-有限快拍下-先估计空间相关矩阵">1. 有限快拍下，先估计空间相关矩阵</a>
 <a class="toc-sub" href="#1-1-快拍数为什么重要">1.1 快拍数为什么重要</a>
 <a class="toc-main" href="#2-cbf-最直接的空间匹配扫描">2. CBF：最直接的空间匹配扫描</a>
 <a class="toc-sub" href="#2-1-从波束输出到空间谱">2.1 从波束输出到空间谱</a>
@@ -251,14 +251,14 @@ $$</p>
 </ul>
 <figure class="diagram"><svg viewbox="0 0 960 330"><defs><marker id="l3a" markerheight="8" markerwidth="8" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8z" fill="#60788f"></path></marker></defs><rect fill="#fbfdff" height="328" rx="18" stroke="#dce6f0" width="958" x="1" y="1"></rect><text class="svg-title" text-anchor="middle" x="480" y="42">空间谱估计的三层升级</text><g fill="#eef5fb" stroke="#9dbbd6"><rect height="120" rx="14" width="220" x="65" y="100"></rect><rect height="120" rx="14" width="220" x="370" y="100"></rect><rect height="120" rx="14" width="220" x="675" y="100"></rect></g><text class="svg-title" text-anchor="middle" x="175" y="137">CBF</text><text class="svg-label" text-anchor="middle" x="175" y="170">匹配导向矢量</text><text class="svg-label" text-anchor="middle" x="175" y="198">空域 Fourier</text><text class="svg-title" text-anchor="middle" x="480" y="137">Capon / MVDR</text><text class="svg-label" text-anchor="middle" x="480" y="170">无失真约束</text><text class="svg-label" text-anchor="middle" x="480" y="198">最小输出方差</text><text class="svg-title" text-anchor="middle" x="785" y="137">MUSIC</text><text class="svg-label" text-anchor="middle" x="785" y="170">协方差 EVD</text><text class="svg-label" text-anchor="middle" x="785" y="198">子空间正交</text><g marker-end="url(#l3a)" stroke="#60788f" stroke-width="2.5"><line x1="285" x2="360" y1="160" y2="160"></line><line x1="590" x2="665" y1="160" y2="160"></line></g><text class="svg-accent" text-anchor="middle" x="480" y="285">同一 a(θ) 与 R̂x，不同算法只是“怎样使用统计信息”不同</text></svg><figcaption>图 1　CBF、Capon 和 MUSIC 的思想升级路线。</figcaption></figure>
 <hr/>
-<h2 id="1-有限快拍下-先估计协方差矩阵">1. 有限快拍下，先估计协方差矩阵</h2>
+<h2 id="1-有限快拍下-先估计空间相关矩阵">1. 有限快拍下，先估计空间相关矩阵</h2>
 
-<p>理论协方差是</p>
+<p>这里沿用第二讲和课件的记号：算法实际使用的 $\mathbf R_x$ 是<strong>空间相关矩阵</strong>（未减均值的二阶矩），不是无条件等同于严格的中心化协方差：</p>
 <p>$$
 \mathbf R_x
 =\mathrm E\{\mathbf x[n]\mathbf x^{\mathrm H}[n]\}.
 $$</p>
-<p>但真实数据只有有限 $N$ 个快拍，因此通常用样本协方差</p>
+<p>真实数据只有有限 $N$ 个快拍，因此对这个相关矩阵做快拍平均：</p>
 <p>$$
 \boxed{
 \hat{\mathbf R}_x
@@ -266,15 +266,28 @@ $$</p>
 \mathbf x[n]\mathbf x^{\mathrm H}[n].
 }
 $$</p>
-<p>这一步是三种算法共同的统计入口。</p>
+<p>这一步是三种算法共同的统计入口，<strong>不以实际接收向量零均值为前提</strong>。阵列处理文献也常把这个未中心化的 $\hat{\mathbf R}_x$ 称为“样本协方差”；为了与《现代数字信号处理》的严格定义不混淆，以下以公式本身为准。快拍平均要能代表所讨论的统计结构，还需选择近似稳定的处理窗口；相邻快拍若强相关，实际有效样本数可能小于 $N$。</p>
+<p>若研究任务确实需要<strong>中心化协方差</strong>，先计算 $\bar{\mathbf x}=N^{-1}\sum_{n=1}^N\mathbf x[n]$，再得到</p>
+<p>$$
+\hat{\mathbf C}_x
+=\frac1N\sum_{n=1}^N(\mathbf x[n]-\bar{\mathbf x})(\mathbf x[n]-\bar{\mathbf x})^{\mathrm H}
+=\hat{\mathbf R}_x-\bar{\mathbf x}\bar{\mathbf x}^{\mathrm H}.
+$$</p>
+<p>若 $N&gt;1$、快拍独立同分布、均值未知且目标是无偏估计总体协方差，中心化求和常用 $1/(N-1)$；这与上面的 $1/N$ 相关矩阵估计不是同一个约定。</p>
+<p><strong>为什么不一律先减均值？</strong> 设某一处理窗口内 $\mathbf x[n]=\mathbf a(\theta)c+\mathbf n[n]$，其中复幅值 $c$ 不变、噪声零均值且空间白，则</p>
+<p>$$
+\boldsymbol\mu_x=\mathbf a(\theta)c,\qquad
+\mathbf R_x=|c|^2\mathbf a(\theta)\mathbf a^{\mathrm H}(\theta)+\sigma_n^2\mathbf I,\qquad
+\mathbf C_x=\sigma_n^2\mathbf I.
+$$</p>
+<p>此时盲目中心化会把该稳定信号的方向信息一同消掉；反过来，若存在接收机直流偏置等无关均值项，未中心化的 $\mathbf R_x$ 又会把它计入。是否校准或去均值，要依据信号与干扰模型判断，而不是把“零均值”当作所有天线数据的物理定律。这个例子是教学补充，不是课件原始实验结果。</p>
 <h3 id="1-1-快拍数为什么重要">1.1 快拍数为什么重要</h3>
 <p>$N$ 很小时，$\hat{\mathbf R}_x$ 与真实 $\mathbf R_x$ 偏差较大：</p>
 <ul>
 <li>谱峰位置会抖动；</li>
 <li>小特征值估计不稳定；</li>
 <li>信号/噪声子空间分界变模糊；</li>
-<li>若 $N<m$，样本协方差最多只有秩 $n$，直接求逆可能出现问题。<="" li="">
-</m$，样本协方差最多只有秩></li></ul>
+<li>若快拍数 $N&lt;M$（$M$ 为阵元数），未中心化的 $\hat{\mathbf R}_x$ 秩至多为 $N$，必然奇异，不能直接求逆；中心化的 $\hat{\mathbf C}_x$ 秩还至多为 $N-1$。Capon/MVDR 可通过增加有效快拍数或对角加载处理病态估计。</li></ul>
 <p>课件 Page 59 的性能曲线正是在强调：<strong>算法公式本身不变，但协方差估得好不好，会直接决定实际性能。</strong></p>
 <hr/>
 <h2 id="2-cbf-最直接的空间匹配扫描">2. CBF：最直接的空间匹配扫描</h2>
@@ -439,7 +452,7 @@ $$</p>
 +\sigma_n^2\mathbf I
 $$</p>
 <p>出发。</p>
-<p>若有 $P$ 个互不相干/使 $\mathbf R_s$ 满秩的信源，并且 $P<m$，那么信号项< p="">
+<p>若 $\mathbf R_s$ 满秩（例如独立、零均值且功率均为正的 $P$ 个信源），并且 $P&lt;M$，那么信号项</p>
 <p>$$
 \mathbf A\mathbf R_s\mathbf A^{\mathrm H}
 $$</p>
