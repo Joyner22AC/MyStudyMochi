@@ -101,3 +101,12 @@ body.is-reading .shelf-back,body.is-reading .note-navigation-controls,body.is-re
 .note-actions #note-save{border-color:var(--book-accent);background:var(--book-accent);color:#fff}
 @media(max-width:760px){.reader-toolbar{grid-template-columns:auto minmax(55px,1fr) auto;gap:6px}.reader-controls .quiet-button{min-width:32px;width:32px;padding:0 3px}.reader-controls .appearance-toggle{font-size:14px}.reader-controls .return-position{position:fixed;top:58px;right:10px;width:auto;padding:0 10px;background:var(--book-paper);box-shadow:0 4px 15px rgba(0,0,0,.1)}.reader-controls #fullscreen-button{display:none}.reader-progress .progress-text{min-width:30px}.appearance-panel{top:62px;right:8px;max-height:calc(100dvh - 70px)}.reading-footer{bottom:8px;font-size:9px}}
 @media(max-width:390px){.reader-controls .lock-button{display:none}.reading-settings-grid{gap:15px 12px}.reader-progress input{min-width:35px}}
+
+/* A quiet, always-reachable fallback when EPUB iframe taps are swallowed. */
+.chrome-peek{position:absolute;z-index:16;top:env(safe-area-inset-top,0px);left:50%;display:grid;place-items:start center;width:72px;height:44px;padding:0;border:0;background:transparent;color:var(--book-muted);font-size:19px;line-height:19px;transform:translateX(-50%);opacity:.72;cursor:pointer;transition:opacity .18s ease}
+.chrome-peek::before{position:absolute;top:0;left:50%;width:40px;height:22px;border-radius:0 0 9px 9px;background:color-mix(in srgb,var(--book-paper) 83%,transparent);content:"";transform:translateX(-50%)}
+.chrome-peek span{position:relative}
+.chrome-peek:hover,.chrome-peek:focus-visible{color:var(--book-ink);opacity:1}
+.chrome-peek:focus-visible{outline:2px solid var(--book-accent);outline-offset:2px}
+.reading-app.chrome-visible .chrome-peek,.reading-app.toc-open .chrome-peek{opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.chrome-peek{transition:none}}

@@ -604,7 +604,17 @@
       if (!reader.classList.contains('toc-open') && appearancePanel.hidden && selectionToolbar.hidden && !reader.querySelector('.reader-toolbar :focus')) {
         reader.classList.remove('chrome-visible');
       }
-    }, 2600);
+    }, 6500);
+  }
+
+  function revealChromeFromPageTap(doc, x, y, target, selectionBefore = '') {
+    if (noteDialog.open || reader.classList.contains('toc-open')) return;
+    if (target?.closest?.('a,button,input,textarea,select,[role="button"]')) return;
+    const selectionAfter = doc.defaultView?.getSelection()?.toString().trim() || '';
+    if (selectionAfter && selectionAfter !== selectionBefore) return;
+    const width = doc.defaultView?.innerWidth || 0;
+    const height = doc.defaultView?.innerHeight || 0;
+    if (x > width * .15 && x < width * .85 && y > height * .12 && y < height * .88) showChrome();
   }
 
   function showPageFeedback() {
@@ -835,30 +845,36 @@
         wheelGestureTurned = true;
         turnPage(direction);
       }, {passive:false});
+      let contentPress = null;
+      doc.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'touch') return;
+        contentPress = {x:event.clientX, y:event.clientY, at:Date.now(),
+          selection:doc.defaultView?.getSelection()?.toString().trim() || ''};
+      }, {capture:true, passive:true});
       doc.addEventListener('pointerup', event => {
-        if (event.button !== 0 || !selectionToolbar.hidden || noteDialog.open) return;
-        if (doc.defaultView?.getSelection()?.toString().trim()) return;
-        if (event.target?.closest?.('a,button,input,textarea,select,[role="button"]')) return;
-        const width = doc.defaultView?.innerWidth || 0;
-        const height = doc.defaultView?.innerHeight || 0;
-        if (event.clientX > width * .28 && event.clientX < width * .72 &&
-            event.clientY > height * .18 && event.clientY < height * .82) {
-          if (reader.classList.contains('chrome-visible')) reader.classList.remove('chrome-visible');
-          else showChrome();
-        }
-      });
+        const press = contentPress;
+        contentPress = null;
+        if (event.pointerType === 'touch' || event.button !== 0 || !press ||
+            Date.now() - press.at > 700 || Math.hypot(event.clientX - press.x, event.clientY - press.y) > 14) return;
+        revealChromeFromPageTap(doc, event.clientX, event.clientY, event.target, press.selection);
+      }, {capture:true, passive:true});
       doc.addEventListener('keydown', handleReaderKeydown);
       doc.addEventListener('touchstart', event => {
         const point = event.changedTouches?.[0];
-        if (point) touchStart = {x:point.clientX, y:point.clientY, at:Date.now()};
+        if (point) touchStart = {x:point.clientX, y:point.clientY, at:Date.now(),
+          selection:doc.defaultView?.getSelection()?.toString().trim() || ''};
       }, {passive:true});
       doc.addEventListener('touchend', event => {
         const point = event.changedTouches?.[0];
-        if (!point || !touchStart || Date.now() - touchStart.at > 900) return;
-        const dx = point.clientX - touchStart.x;
-        const dy = point.clientY - touchStart.y;
+        const press = touchStart;
         touchStart = null;
+        if (!point || !press || Date.now() - press.at > 900) return;
+        const dx = point.clientX - press.x;
+        const dy = point.clientY - press.y;
         if (activeFlow === 'paginated' && Math.abs(dx) > 54 && Math.abs(dx) > Math.abs(dy) * 1.25) turnPage(dx > 0 ? -1 : 1);
+        else if (Math.hypot(dx, dy) <= 14 && Date.now() - press.at <= 700) {
+          revealChromeFromPageTap(doc, point.clientX, point.clientY, event.target, press.selection);
+        }
       }, {passive:true});
     });
     return rendition;
@@ -1075,6 +1091,7 @@
   byId('toc-backdrop').addEventListener('click', () => closeToc());
   byId('appearance-toggle').addEventListener('click', () => toggleAppearance());
   byId('appearance-close').addEventListener('click', () => closeAppearance(true));
+  byId('chrome-peek').addEventListener('click', showChrome);
   reader.addEventListener('pointerdown', event => {
     if (!appearancePanel.hidden && !appearancePanel.contains(event.target) &&
         !byId('appearance-toggle').contains(event.target)) closeAppearance();
