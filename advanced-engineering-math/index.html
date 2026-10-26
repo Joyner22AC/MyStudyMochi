@@ -54,6 +54,18 @@ body.note-navigation-ready .sidebar{scroll-margin-top:18px}
 body.note-toc-collapsed .sidebar{display:none!important}
 body.note-toc-collapsed .layout{grid-template-columns:minmax(0,1fr)}
 
+/* A quiet return-to-top affordance appears only after the reader has scrolled. */
+#note-back-to-top{
+  position:fixed;z-index:80;right:20px;bottom:76px;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;
+  border:1px solid rgba(135,151,164,.28);border-radius:50%;background:rgba(250,252,253,.42);
+  color:rgba(62,78,91,.72);box-shadow:none;backdrop-filter:blur(12px) saturate(1.15);-webkit-backdrop-filter:blur(12px) saturate(1.15);
+  font:400 19px/1 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;opacity:.64;
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease,opacity .16s ease
+}
+#note-back-to-top:hover{background:rgba(250,252,253,.78);border-color:rgba(111,133,149,.48);color:#344957;opacity:1}
+#note-back-to-top:focus-visible{outline:3px solid var(--note-ui-focus);outline-offset:3px}
+#note-back-to-top[hidden]{display:none!important}
+
 /* Optional readers stay available but recede visually until needed. */
 #manual-toggle,#study-toggle{
   position:fixed;z-index:90;bottom:max(20px,env(safe-area-inset-bottom));min-height:42px;padding:0 15px;border:1px solid rgba(210,220,228,.78);border-radius:14px;
@@ -116,6 +128,8 @@ html[data-theme="dark"] mjx-container{color:#e4eaf0}
 html[data-theme="dark"] .note-navigation-controls{border-color:rgba(81,91,102,.72);background:rgba(38,42,48,.70);box-shadow:0 4px 18px rgba(0,0,0,.18)}
 html[data-theme="dark"] .note-navigation-controls button,html[data-theme="dark"] .note-navigation-controls a{color:#e2e8ed}
 html[data-theme="dark"] .note-navigation-controls button:hover,html[data-theme="dark"] .note-navigation-controls a:hover{background:#303d48;color:#c5e5fa}
+html[data-theme="dark"] #note-back-to-top{background:rgba(38,42,48,.48);border-color:rgba(153,168,181,.24);color:rgba(211,220,228,.72)}
+html[data-theme="dark"] #note-back-to-top:hover{background:rgba(48,54,62,.78);border-color:rgba(169,184,197,.48);color:#edf2f6}
 html[data-theme="dark"] #manual-toggle,html[data-theme="dark"] #study-toggle{background:rgba(38,42,48,.72);border-color:#444b54;color:#e5e9ed;box-shadow:0 4px 18px rgba(0,0,0,.24)}
 html[data-theme="dark"] #manual-toggle:hover,html[data-theme="dark"] #study-toggle:hover{background:rgba(55,61,69,.94)}
 html[data-theme="dark"] #manual-panel,html[data-theme="dark"] #modern-dsp-learning-sidebar{background:#191c21;color:#e0e5ea}
@@ -133,6 +147,13 @@ html[data-theme="dark"] .study-flow li>strong,html[data-theme="dark"] .study-exe
 html[data-theme="dark"] .study-exercise-body strong{color:#d7e8f5}
 html[data-theme="dark"] .study-intro,html[data-theme="dark"] .study-flow li,html[data-theme="dark"] .study-exercises details,
 html[data-theme="dark"] .study-exercise-body .study-answer{background:#242a31;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-prompt{background:#222a31;border-color:#3b434c}
+html[data-theme="dark"] .study-solution-step{background:#20252b;border-color:#3b434c;color:#d5dce3}
+html[data-theme="dark"] .study-solution-step--formula{background:#222a31;border-color:#3b434c;border-left-color:#6f9fbe}
+html[data-theme="dark"] .study-solution-step--formula:before,html[data-theme="dark"] .study-solution-title{color:#9fc9e4}
+html[data-theme="dark"] .study-solution-step--conclusion{background:#202c34;border-color:#496478}
+html[data-theme="dark"] .study-solution-step--conclusion p{color:#d8eaf5}
+html[data-theme="dark"] .study-exercise-body .study-source{background:#292f36;color:#b9c7d1}
 html[data-theme="dark"] .study-bridge,html[data-theme="dark"] .study-warning{background:#332a22;color:#e5c8a8}
 html[data-theme="dark"] .study-exercise-body .study-check{background:#24312b;color:#d2e6d8}
 html[data-theme="dark"] .study-flow li p,html[data-theme="dark"] .study-exercise-body{color:#c4cdd5}
@@ -152,14 +173,130 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
   .note-toc-drawer-open .sidebar{display:block!important;position:fixed;z-index:105;inset:max(62px,calc(env(safe-area-inset-top) + 54px)) 10px max(10px,env(safe-area-inset-bottom));width:auto;height:auto;max-height:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--note-ui-border);border-radius:16px;background:var(--note-ui-paper);box-shadow:var(--note-ui-shadow)}
   #manual-toggle,#study-toggle{bottom:max(14px,env(safe-area-inset-bottom));min-height:42px;padding:0 13px}
   #manual-toggle{right:12px}#study-toggle{left:12px}
+  #note-back-to-top{right:12px;bottom:max(68px,calc(env(safe-area-inset-bottom) + 62px));width:34px;height:34px;min-width:34px;min-height:34px;font-size:18px}
 }
-@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle{transition:none}}
+@media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle,#note-back-to-top{transition:none}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
+
+/* The desk's paper-and-walnut palette continues through course catalogs and notes.
+   Keep scientific SVGs and figures in their original colors. */
+body:not(:has(#home-stage)){
+  --ink:#332d28;--muted:#70665b;--line:#ded3c2;--paper:#fffaf0;--soft:#f2ece1;
+  --blue:#795739;--blue2:#67513b;--shadow:0 12px 32px rgba(68,47,30,.08);
+  --note-ui-paper:#fffaf0;--note-ui-canvas:#f2ece1;--note-ui-ink:#332d28;
+  --note-ui-muted:#70665b;--note-ui-border:#ded3c2;--note-ui-accent:#795739;
+  --note-ui-accent-soft:#f0e4d2;--note-ui-focus:rgba(144,101,57,.48);
+  background:#eee6d8;color:#332d28;
+}
+body:not(:has(#home-stage)) .sidebar,
+body:not(:has(#home-stage)) .article,
+body:not(:has(#home-stage)) .card{
+  background:#fffaf0;border-color:#ded3c2;box-shadow:var(--shadow);
+}
+body:not(:has(#home-stage)) .article{background:#fffdf7}
+body:not(:has(#home-stage)) .brand,
+body:not(:has(#home-stage)) :is(h1,h2,h3,h4,h5,strong),
+body:not(:has(#home-stage)) .title,
+body:not(:has(#home-stage)) .card h2{color:#3b3029}
+body:not(:has(#home-stage)) :is(.eyebrow,.num){color:#8b6040}
+body:not(:has(#home-stage)) :is(.lead,.meta,.sub,.card p,.source-ref,figcaption,.formula-note,.footer,footer){color:#71675c}
+body:not(:has(#home-stage)) a{color:#745038}
+body:not(:has(#home-stage)) .toc a{color:#655a4f}
+body:not(:has(#home-stage)) .toc a:is(:hover,.active){background:#efe4d3;color:#60402a}
+body:not(:has(#home-stage)) .hero{background:linear-gradient(135deg,#f5ecdd,#fffaf0);border-color:#ded3c2}
+body:not(:has(#home-stage)) .card:hover{border-color:#bca181;background:#fffdf6}
+body:not(:has(#home-stage)) .chip{background:#f3eadc;border-color:#e1d0ba;color:#745238}
+body:not(:has(#home-stage)) :is(code,pre){background:#f3eee5;border-color:#e3d8c8;color:#49382d}
+body:not(:has(#home-stage)) :is(blockquote.callout,.source-panel){background:#f8f0e4;border-color:#d9c4aa;color:#564839}
+body:not(:has(#home-stage)) :is(th,td){border-color:#ded3c2}
+body:not(:has(#home-stage)) th{background:#f0e5d4;color:#513a2d}
+body:not(:has(#home-stage)) tr:nth-child(even) td{background:#faf5eb}
+body:not(:has(#home-stage)) .diagram{background:#fffdf8;border-color:#ded3c2}
+body:not(:has(#home-stage)) mjx-container{color:#332d28}
+body:not(:has(#home-stage)) .note-navigation-controls{
+  border-color:rgba(174,148,117,.42);background:rgba(255,250,240,.78);
+  box-shadow:0 4px 18px rgba(68,47,30,.07)
+}
+body:not(:has(#home-stage)) .note-navigation-controls :is(a,button){color:#49372b}
+body:not(:has(#home-stage)) .note-navigation-controls :is(a,button):hover{background:#f0e4d2;color:#65432c}
+body:not(:has(#home-stage)) :is(#manual-toggle,#study-toggle){background:rgba(255,250,240,.8);border-color:#ddceba;color:#49372b}
+body:not(:has(#home-stage)) :is(#manual-toggle,#study-toggle):hover{background:#fffaf0;border-color:#bca181}
+body:not(:has(#home-stage)) #note-back-to-top{background:rgba(255,250,240,.58);border-color:#d0c0ad;color:#6d5946}
+body:not(:has(#home-stage)) #note-back-to-top:hover{background:#fffaf0;color:#49372b}
+body:not(:has(#home-stage)) :is(.manual-header,.study-header){background:rgba(255,250,240,.86)}
+body:not(:has(#home-stage)) :is(#manual-panel,#modern-dsp-learning-sidebar){background:#f2ece1;color:#332d28}
+body:not(:has(#home-stage)) :is(#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button){background:#fffaf0;color:#49372b;border-color:#ded3c2}
+body:not(:has(#home-stage)) :is(.study-intro,.study-flow li,.study-exercises details,.study-prompt,.study-solution-step){background:#fffaf0;border-color:#ded3c2;color:#493c31}
+body:not(:has(#home-stage)) .study-solution-step--formula{border-left-color:#b58a5e}
+body:not(:has(#home-stage)) .study-solution-step--conclusion{background:#f4e8d5;border-color:#ceb391}
+body:not(:has(#home-stage)) #manual-status{background:#f4e8d5;color:#64513f}
+
+html[data-theme="dark"] body:not(:has(#home-stage)){
+  --ink:#e9dfcf;--muted:#b6aa99;--line:#4a4239;--paper:#292723;--soft:#24221f;
+  --blue:#d0af7c;--blue2:#c1a27a;--shadow:0 14px 36px rgba(0,0,0,.22);
+  --note-ui-paper:#292723;--note-ui-canvas:#24221f;--note-ui-ink:#e9dfcf;
+  --note-ui-muted:#b6aa99;--note-ui-border:#4a4239;--note-ui-accent:#d0af7c;
+  --note-ui-accent-soft:#39332c;--note-ui-focus:rgba(208,175,124,.62);
+  background:#211f1e!important;color:#e9dfcf!important;
+}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.sidebar,.article,.card){background:#292723;border-color:#4a4239;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) .article{background:#2b2925}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.brand,h1,h2,h3,h4,h5,strong,.title,.card h2){color:#f0e7d8}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.eyebrow,.num){color:#d1ad7b}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.lead,.meta,.sub,.card p,.source-ref,figcaption,.formula-note,.footer,footer){color:#baae9e}
+html[data-theme="dark"] body:not(:has(#home-stage)) a{color:#d6b98d}
+html[data-theme="dark"] body:not(:has(#home-stage)) .toc a{color:#c8baa7}
+html[data-theme="dark"] body:not(:has(#home-stage)) .toc a:is(:hover,.active){background:#39332c;color:#f3d7a9}
+html[data-theme="dark"] body:not(:has(#home-stage)) .hero{background:linear-gradient(135deg,#332f29,#292723);border-color:#4a4239}
+html[data-theme="dark"] body:not(:has(#home-stage)) .card:hover{background:#332e28;border-color:#8b7356}
+html[data-theme="dark"] body:not(:has(#home-stage)) .chip{background:#3a332a;border-color:#61503a;color:#e5caa0}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(code,pre){background:#34312c;border-color:#51483e;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(blockquote.callout,.source-panel){background:#342f28;border-color:#735b3e;color:#e1d2bc}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(th,td){border-color:#51483e}
+html[data-theme="dark"] body:not(:has(#home-stage)) th{background:#393329;color:#e9d5b3}
+html[data-theme="dark"] body:not(:has(#home-stage)) tr:nth-child(even) td{background:#302d28}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.diagram,figure.diagram){background:#f7faff;border-color:#cfd9e2}
+html[data-theme="dark"] body:not(:has(#home-stage)) figure.diagram figcaption{color:#4d5b66}
+html[data-theme="dark"] body:not(:has(#home-stage)) mjx-container{color:#eee4d5}
+html[data-theme="dark"] body:not(:has(#home-stage)) .note-navigation-controls{background:rgba(47,43,38,.82);border-color:#5b5045}
+html[data-theme="dark"] body:not(:has(#home-stage)) .note-navigation-controls :is(a,button){color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) .note-navigation-controls :is(a,button):hover{background:#40382d;color:#f1d3a5}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-toggle,#study-toggle,#note-back-to-top){background:rgba(47,43,38,.82);border-color:#5b5045;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel,#modern-dsp-learning-sidebar){background:#24221f;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.manual-header,.study-header){background:#2b2925;border-color:#4a4239}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel .manual-header,#manual-panel .manual-source,#manual-panel .manual-toolbar,#manual-panel .manual-footer,#modern-dsp-learning-sidebar .study-header,#modern-dsp-learning-sidebar .study-tabs,#modern-dsp-learning-sidebar .study-footer){background:#2b2925;border-color:#4a4239;color:#d7caba}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button){background:#39342d;border-color:#5b5045;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel input,#modern-dsp-learning-sidebar input){background:#322e29;border-color:#5b5045;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) #manual-status{background:#39342d;color:#d7caba}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.study-intro,.study-flow li,.study-exercises details,.study-exercise-body .study-answer,.study-prompt,.study-solution-step){background:#302c27;border-color:#50463a;color:#e3d8c8}
+html[data-theme="dark"] body:not(:has(#home-stage)) .study-solution-step--formula{border-left-color:#bc9361}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.study-solution-step--formula:before,.study-solution-title){color:#e0bf8f}
+html[data-theme="dark"] body:not(:has(#home-stage)) .study-solution-step--conclusion{background:#393125;border-color:#806347}
+html[data-theme="dark"] body:not(:has(#home-stage)) .study-solution-step--conclusion p{color:#f0dec1}
+@media print{
+  body:not(:has(#home-stage)){background:white!important;color:#222!important}
+  body:not(:has(#home-stage)) .article{background:white!important;color:#222!important;box-shadow:none}
+}
 </style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="article"><div class="note-navigation-controls note-navigation-catalog-controls" id="note-navigation-controls"><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div><header class="hero"><div class="eyebrow">学习笔记 · 2026-10-19更新</div><h1>高等工程数学</h1><p class="lead">对象 → 线性作用 → 内积几何 → 相似结构</p></header><div class="cards"><a class="card" href="高等工程数学_第一章_A_线性空间基与子空间.html"><h2>第一章A：线性空间、基与子空间</h2><p>坐标、换基、维数与直和</p></a><a class="card" href="高等工程数学_第一章_B_线性变换核值域与对角化.html"><h2>第一章B：线性变换、核和值域</h2><p>矩阵表示、特征与相似</p></a><a class="card" href="高等工程数学_第一章_C_内积空间初步.html"><h2>第一章C：内积空间初步</h2><p>长度、夹角与Cauchy–Schwarz</p></a><a class="card" href="高等工程数学_第一章_D_正交化与正交变换.html"><h2>第一章D：正交化与正交变换</h2><p>第4次课；QR、正交补、投影与反射</p></a><a class="card" href="高等工程数学_第二章_相似对角化_Jordan与初等因子.html"><h2>第二章：相似对角化、Jordan与初等因子</h2><p>第5次课；广义特征链、Smith形和勘误</p></a></div><p class="source-ref">依据已收到材料持续更新。新笔记公式已预渲染为SVG；旧笔记保留原有路径和内容。原始课件未上传到本次发布。</p></main></div><script id="note-navigation-script">(() => {
   const body = document.body;
   const toggle = document.getElementById('note-toc-toggle');
   const themeToggle = document.getElementById('note-theme-toggle');
+  const backToTop = document.getElementById('note-back-to-top');
   const sidebar = document.querySelector('.sidebar');
+  if (backToTop) {
+    const updateBackToTop = () => {
+      const visible = window.scrollY > 360;
+      backToTop.hidden = !visible;
+      backToTop.setAttribute('aria-hidden', String(!visible));
+      backToTop.tabIndex = visible ? 0 : -1;
+    };
+    updateBackToTop();
+    window.addEventListener('scroll', updateBackToTop, {passive:true});
+    backToTop.addEventListener('click', () => {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({top:0, behavior:reducedMotion ? 'auto' : 'smooth'});
+    });
+  }
   if (themeToggle) {
     const updateThemeButton = () => {
       const isDark = document.documentElement.dataset.theme === 'dark';

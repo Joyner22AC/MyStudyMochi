@@ -177,6 +177,106 @@ html[data-theme="dark"] #manual-resize::after,html[data-theme="dark"] .study-res
 }
 @media(prefers-reduced-motion:reduce){.note-navigation-controls button,.note-navigation-controls a,#manual-toggle,#study-toggle,#note-back-to-top{transition:none}}
 @media print{.note-navigation-controls,.note-toc-drawer-open::before{display:none!important}.note-navigation-ready .sidebar{display:none!important}}
+
+/* The desk's paper-and-walnut palette continues through course catalogs and notes.
+   Keep scientific SVGs and figures in their original colors. */
+body:not(:has(#home-stage)){
+  --ink:#332d28;--muted:#70665b;--line:#ded3c2;--paper:#fffaf0;--soft:#f2ece1;
+  --blue:#795739;--blue2:#67513b;--shadow:0 12px 32px rgba(68,47,30,.08);
+  --note-ui-paper:#fffaf0;--note-ui-canvas:#f2ece1;--note-ui-ink:#332d28;
+  --note-ui-muted:#70665b;--note-ui-border:#ded3c2;--note-ui-accent:#795739;
+  --note-ui-accent-soft:#f0e4d2;--note-ui-focus:rgba(144,101,57,.48);
+  background:#eee6d8;color:#332d28;
+}
+body:not(:has(#home-stage)) .sidebar,
+body:not(:has(#home-stage)) .article,
+body:not(:has(#home-stage)) .card{
+  background:#fffaf0;border-color:#ded3c2;box-shadow:var(--shadow);
+}
+body:not(:has(#home-stage)) .article{background:#fffdf7}
+body:not(:has(#home-stage)) .brand,
+body:not(:has(#home-stage)) :is(h1,h2,h3,h4,h5,strong),
+body:not(:has(#home-stage)) .title,
+body:not(:has(#home-stage)) .card h2{color:#3b3029}
+body:not(:has(#home-stage)) :is(.eyebrow,.num){color:#8b6040}
+body:not(:has(#home-stage)) :is(.lead,.meta,.sub,.card p,.source-ref,figcaption,.formula-note,.footer,footer){color:#71675c}
+body:not(:has(#home-stage)) a{color:#745038}
+body:not(:has(#home-stage)) .toc a{color:#655a4f}
+body:not(:has(#home-stage)) .toc a:is(:hover,.active){background:#efe4d3;color:#60402a}
+body:not(:has(#home-stage)) .hero{background:linear-gradient(135deg,#f5ecdd,#fffaf0);border-color:#ded3c2}
+body:not(:has(#home-stage)) .card:hover{border-color:#bca181;background:#fffdf6}
+body:not(:has(#home-stage)) .chip{background:#f3eadc;border-color:#e1d0ba;color:#745238}
+body:not(:has(#home-stage)) :is(code,pre){background:#f3eee5;border-color:#e3d8c8;color:#49382d}
+body:not(:has(#home-stage)) :is(blockquote.callout,.source-panel){background:#f8f0e4;border-color:#d9c4aa;color:#564839}
+body:not(:has(#home-stage)) :is(th,td){border-color:#ded3c2}
+body:not(:has(#home-stage)) th{background:#f0e5d4;color:#513a2d}
+body:not(:has(#home-stage)) tr:nth-child(even) td{background:#faf5eb}
+body:not(:has(#home-stage)) .diagram{background:#fffdf8;border-color:#ded3c2}
+body:not(:has(#home-stage)) mjx-container{color:#332d28}
+body:not(:has(#home-stage)) .note-navigation-controls{
+  border-color:rgba(174,148,117,.42);background:rgba(255,250,240,.78);
+  box-shadow:0 4px 18px rgba(68,47,30,.07)
+}
+body:not(:has(#home-stage)) .note-navigation-controls :is(a,button){color:#49372b}
+body:not(:has(#home-stage)) .note-navigation-controls :is(a,button):hover{background:#f0e4d2;color:#65432c}
+body:not(:has(#home-stage)) :is(#manual-toggle,#study-toggle){background:rgba(255,250,240,.8);border-color:#ddceba;color:#49372b}
+body:not(:has(#home-stage)) :is(#manual-toggle,#study-toggle):hover{background:#fffaf0;border-color:#bca181}
+body:not(:has(#home-stage)) #note-back-to-top{background:rgba(255,250,240,.58);border-color:#d0c0ad;color:#6d5946}
+body:not(:has(#home-stage)) #note-back-to-top:hover{background:#fffaf0;color:#49372b}
+body:not(:has(#home-stage)) :is(.manual-header,.study-header){background:rgba(255,250,240,.86)}
+body:not(:has(#home-stage)) :is(#manual-panel,#modern-dsp-learning-sidebar){background:#f2ece1;color:#332d28}
+body:not(:has(#home-stage)) :is(#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button){background:#fffaf0;color:#49372b;border-color:#ded3c2}
+body:not(:has(#home-stage)) :is(.study-intro,.study-flow li,.study-exercises details,.study-prompt,.study-solution-step){background:#fffaf0;border-color:#ded3c2;color:#493c31}
+body:not(:has(#home-stage)) .study-solution-step--formula{border-left-color:#b58a5e}
+body:not(:has(#home-stage)) .study-solution-step--conclusion{background:#f4e8d5;border-color:#ceb391}
+body:not(:has(#home-stage)) #manual-status{background:#f4e8d5;color:#64513f}
+
+html[data-theme="dark"] body:not(:has(#home-stage)){
+  --ink:#e9dfcf;--muted:#b6aa99;--line:#4a4239;--paper:#292723;--soft:#24221f;
+  --blue:#d0af7c;--blue2:#c1a27a;--shadow:0 14px 36px rgba(0,0,0,.22);
+  --note-ui-paper:#292723;--note-ui-canvas:#24221f;--note-ui-ink:#e9dfcf;
+  --note-ui-muted:#b6aa99;--note-ui-border:#4a4239;--note-ui-accent:#d0af7c;
+  --note-ui-accent-soft:#39332c;--note-ui-focus:rgba(208,175,124,.62);
+  background:#211f1e!important;color:#e9dfcf!important;
+}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.sidebar,.article,.card){background:#292723;border-color:#4a4239;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) .article{background:#2b2925}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.brand,h1,h2,h3,h4,h5,strong,.title,.card h2){color:#f0e7d8}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.eyebrow,.num){color:#d1ad7b}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.lead,.meta,.sub,.card p,.source-ref,figcaption,.formula-note,.footer,footer){color:#baae9e}
+html[data-theme="dark"] body:not(:has(#home-stage)) a{color:#d6b98d}
+html[data-theme="dark"] body:not(:has(#home-stage)) .toc a{color:#c8baa7}
+html[data-theme="dark"] body:not(:has(#home-stage)) .toc a:is(:hover,.active){background:#39332c;color:#f3d7a9}
+html[data-theme="dark"] body:not(:has(#home-stage)) .hero{background:linear-gradient(135deg,#332f29,#292723);border-color:#4a4239}
+html[data-theme="dark"] body:not(:has(#home-stage)) .card:hover{background:#332e28;border-color:#8b7356}
+html[data-theme="dark"] body:not(:has(#home-stage)) .chip{background:#3a332a;border-color:#61503a;color:#e5caa0}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(code,pre){background:#34312c;border-color:#51483e;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(blockquote.callout,.source-panel){background:#342f28;border-color:#735b3e;color:#e1d2bc}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(th,td){border-color:#51483e}
+html[data-theme="dark"] body:not(:has(#home-stage)) th{background:#393329;color:#e9d5b3}
+html[data-theme="dark"] body:not(:has(#home-stage)) tr:nth-child(even) td{background:#302d28}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.diagram,figure.diagram){background:#f7faff;border-color:#cfd9e2}
+html[data-theme="dark"] body:not(:has(#home-stage)) figure.diagram figcaption{color:#4d5b66}
+html[data-theme="dark"] body:not(:has(#home-stage)) mjx-container{color:#eee4d5}
+html[data-theme="dark"] body:not(:has(#home-stage)) .note-navigation-controls{background:rgba(47,43,38,.82);border-color:#5b5045}
+html[data-theme="dark"] body:not(:has(#home-stage)) .note-navigation-controls :is(a,button){color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) .note-navigation-controls :is(a,button):hover{background:#40382d;color:#f1d3a5}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-toggle,#study-toggle,#note-back-to-top){background:rgba(47,43,38,.82);border-color:#5b5045;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel,#modern-dsp-learning-sidebar){background:#24221f;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.manual-header,.study-header){background:#2b2925;border-color:#4a4239}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel .manual-header,#manual-panel .manual-source,#manual-panel .manual-toolbar,#manual-panel .manual-footer,#modern-dsp-learning-sidebar .study-header,#modern-dsp-learning-sidebar .study-tabs,#modern-dsp-learning-sidebar .study-footer){background:#2b2925;border-color:#4a4239;color:#d7caba}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel button,#manual-panel select,#manual-page,.study-header button,.study-tabs button,.study-exercises button){background:#39342d;border-color:#5b5045;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(#manual-panel input,#modern-dsp-learning-sidebar input){background:#322e29;border-color:#5b5045;color:#e9dfcf}
+html[data-theme="dark"] body:not(:has(#home-stage)) #manual-status{background:#39342d;color:#d7caba}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.study-intro,.study-flow li,.study-exercises details,.study-exercise-body .study-answer,.study-prompt,.study-solution-step){background:#302c27;border-color:#50463a;color:#e3d8c8}
+html[data-theme="dark"] body:not(:has(#home-stage)) .study-solution-step--formula{border-left-color:#bc9361}
+html[data-theme="dark"] body:not(:has(#home-stage)) :is(.study-solution-step--formula:before,.study-solution-title){color:#e0bf8f}
+html[data-theme="dark"] body:not(:has(#home-stage)) .study-solution-step--conclusion{background:#393125;border-color:#806347}
+html[data-theme="dark"] body:not(:has(#home-stage)) .study-solution-step--conclusion p{color:#f0dec1}
+@media print{
+  body:not(:has(#home-stage)){background:white!important;color:#222!important}
+  body:not(:has(#home-stage)) .article{background:white!important;color:#222!important;box-shadow:none}
+}
 </style></head><body><div class="note-navigation-controls" id="note-navigation-controls"><button aria-controls="note-sidebar" aria-expanded="true" aria-label="关闭目录" id="note-toc-toggle" type="button">目录</button><a aria-label="返回全部课程" href="../index.html" id="note-course-home">全部课程</a><button aria-label="切换到夜间模式" aria-pressed="false" class="note-theme-toggle" id="note-theme-toggle" type="button">夜间</button></div><div id="progress"></div><div class="layout"><aside class="sidebar" id="note-sidebar"><div class="brand">高等工程数学</div><nav class="toc"><a class="toc-main" href="#1-从内积走到可计算的几何">1. 从内积走到可计算的几何</a><a class="toc-main" href="#2-正交组为何自动线性无关">2. 正交组为何自动线性无关</a><a class="toc-main" href="#3-gram-schmidt-每次剔除已经解释的方向">3. Gram–Schmidt：每次剔除已经解释的方向</a><a class="toc-sub" href="#一个可以手算的正交化例子">一个可以手算的正交化例子</a><a class="toc-main" href="#4-子空间正交-正交补与投影">4. 子空间正交、正交补与投影</a><a class="toc-sub" href="#课件例题-求共同正交的单位向量">课件例题：求共同正交的单位向量</a><a class="toc-main" href="#5-正交变换-保持整个内积结构">5. 正交变换：保持整个内积结构</a><a class="toc-main" href="#6-householder-一次反射消去一串分量">6. Householder：一次反射消去一串分量</a><a class="toc-main" href="#7-本篇自检">7. 本篇自检</a></nav></aside><main class="article"><div class="course-nav"><a href="index.html">课程目录</a> · <a href="../index.html">所有课程</a></div><header class="hero"><div class="eyebrow">高等工程数学 · 2026-10-19</div><h1>第一章D：正交化、正交补与正交变换</h1><p class="lead">承接内积空间初步，推导Gram–Schmidt、QR、投影与Householder反射。</p><div class="meta"><span class="chip">来源可追溯</span><span class="chip">关键公式推导</span><span class="chip">公式已内嵌，可离线阅读</span></div></header><blockquote class="callout">
 <p>承接已完成的“内积空间初步”。本次36页课件实际展开到 Householder 反射；目录中的对称变换、酉空间等后续主题没有完整展开，本文只在需要时说明复数情形的记号。</p>
 </blockquote>

@@ -255,6 +255,49 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
 .home-reader-loading[hidden]{display:none!important}
 .home-reader-loading{position:absolute;z-index:1;inset:0;display:grid;place-items:center;padding:32px;background:#191b1c;color:#d8c8ae;font:13px/1.6 Georgia,"Songti SC",serif;letter-spacing:.05em;text-align:center;pointer-events:none}
 .shelf-unlock-form button:disabled{opacity:.7;cursor:progress;transform:none}
+
+/* A working lamp gives the desk one quiet, optional source of motion. */
+.desk-environment::after{position:absolute;z-index:0;inset:0;pointer-events:none;background:radial-gradient(ellipse 48% 43% at 22% 9%,rgba(255,218,144,.22),transparent 100%);opacity:1;content:"";transition:opacity .45s ease;animation:desk-lamplight 9s ease-in-out infinite}
+.desk-environment[data-lamp=off]::after{opacity:0;animation:none}
+.desk-environment[data-lamp=off]{background:repeating-linear-gradient(174deg,rgba(25,11,5,.045) 0 2px,transparent 2px 11px),linear-gradient(145deg,#69482f,#503329 72%,#422a22)}
+.desk-lamp{display:block;appearance:none;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer}
+.desk-lamp i{box-shadow:0 12px 28px rgba(255,205,121,.28);transition:background-color .3s ease,box-shadow .3s ease,transform .3s ease}
+.desk-lamp:hover i,.desk-lamp:focus-visible i{transform:rotate(-3deg)}
+.desk-lamp::after{position:absolute;top:59px;left:65px;width:12px;height:6px;border-radius:0 0 50% 50%;background:#f6d89b;box-shadow:0 0 14px 4px rgba(255,211,127,.58);content:"";transition:background-color .3s ease,box-shadow .3s ease}
+.desk-environment[data-lamp=off] .desk-lamp i{background:#827458;box-shadow:none}
+.desk-environment[data-lamp=off] .desk-lamp::after{background:#9c8d70;box-shadow:none}
+.lamp-hint{position:absolute;top:80px;left:116px;z-index:8;width:max-content;max-width:125px;padding:4px 8px;border:1px solid rgba(197,153,88,.45);border-radius:3px;background:#f4e7cb;color:#4d3728;font:10px/1.4 "Microsoft YaHei",sans-serif;opacity:0;transform:translateY(3px);transition:opacity .2s ease,transform .2s ease;pointer-events:none}
+.desk-lamp:is(:hover,:focus-visible) .lamp-hint{opacity:1;transform:translateY(0)}
+.desk-watermark{position:absolute;right:28px;bottom:10px;z-index:0;color:rgba(219,209,164,.28);font:italic 10px/1 Georgia,serif;letter-spacing:.24em;pointer-events:none}
+.desk-papers{z-index:1}
+.home-scene .desk-paper{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,background .3s ease}
+.home-scene .desk-paper:is(:hover,:focus-visible){transform:translateY(-9px) rotate(.4deg) scale(1.012)}
+.home-scene .desk-paper::before{transition:box-shadow .3s ease,transform .3s ease}
+.home-scene .desk-paper:is(:hover,:focus-visible)::before{box-shadow:0 5px 8px rgba(0,0,0,.18);transform:translateX(-50%) translateY(-2px)}
+.desk-cup{background:radial-gradient(circle at 37% 32%,#b97949 0,#804829 36%,#38251d 77%)}
+.desk-cup::before{box-shadow:inset 0 0 0 1px rgba(255,247,216,.08)}
+.desk-pen{background:linear-gradient(90deg,#c9aa72 0 8%,#222d2d 8% 60%,#394542 62% 74%,#d2b987 78% 100%)}
+@keyframes desk-lamplight{50%{filter:brightness(1.08)}}
+
+/* The cabinet reveals one real book and an intentionally empty place. */
+.cabinet{transition:box-shadow .65s ease}
+.shelf-scene[data-unlocked=true] .cabinet{box-shadow:inset 0 0 0 2px #9e734a,inset 0 20px 55px rgba(247,194,105,.11),0 26px 42px rgba(56,36,26,.22)}
+.cabinet::before{position:absolute;z-index:7;top:29%;left:0;width:10px;height:34px;border:1px solid #ac8253;border-radius:0 3px 3px 0;background:linear-gradient(90deg,#6b462f,#d2ae75,#8b603e);box-shadow:0 176px 0 -1px #b28b5e;content:"";pointer-events:none}
+.cabinet-door::before{position:absolute;top:34px;left:50%;width:78px;height:23px;display:grid;place-items:center;border:1px solid rgba(255,221,161,.55);border-radius:2px;background:linear-gradient(130deg,#96724b,#c6a06d 48%,#87613f);box-shadow:0 3px 7px rgba(30,18,12,.26);color:#3a2920;content:"M · 01";font:700 10px/1 Georgia,serif;letter-spacing:.15em;transform:translateX(-50%);pointer-events:none}
+.cabinet-books{background:radial-gradient(ellipse at 26% 13%,rgba(236,193,117,.16),transparent 70%)}
+.cabinet-books::before{position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,230,173,.12),transparent 42%);content:"";animation:cabinet-light .85s ease-out both}
+.shelf-bookend{position:relative;z-index:2;align-self:flex-end;width:23px;height:126px;margin:0 0 2px 5px;border-right:7px solid #b59968;border-bottom:9px solid #b59968;border-radius:2px 5px 3px 1px;box-shadow:4px 6px 9px rgba(0,0,0,.25);opacity:.78}
+.shelf-bookplate{position:absolute;right:15px;bottom:199px;color:#cbb690;font:italic 11px/1.35 Georgia,"Songti SC",serif;letter-spacing:.08em;opacity:.72}
+.shelf-book{transition:transform .31s cubic-bezier(.2,.8,.2,1),box-shadow .31s ease,opacity .4s ease}
+.shelf-book:is(:hover,:focus-visible){transform:translateY(-17px) translateX(6px) rotate(-2deg)}
+.shelf-book.is-pulling{transform:translateY(-140px) rotate(-12deg) scale(1.22)}
+.lock-glyph i{transform-origin:4px 26px;transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.shelf-scene[data-unlocked=true] .lock-glyph i{transform:translateY(-7px) rotate(-18deg)}
+.shelf-scene[data-unlocked=true] .cabinet-door{transition-delay:.18s,.38s}
+.cabinet-door{transition-delay:0s,0s}
+@keyframes cabinet-light{from{opacity:0}to{opacity:1}}
+@media(max-width:650px){.desk-lamp .lamp-hint{display:none}.desk-environment::after{background:radial-gradient(ellipse 70% 35% at 20% 7%,rgba(255,218,144,.16),transparent 100%)}.shelf-bookplate{right:12px;font-size:10px}.cabinet::before{box-shadow:0 140px 0 -1px #b28b5e}}
+@media(prefers-reduced-motion:reduce){.desk-environment::after,.cabinet-books::before{animation:none!important}}
 </style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="home-scene" data-cipher-href="bookshelf/books/justice-heart.epub.enc" data-reader-href="bookshelf/read.html" id="home-stage">
 <header class="home-masthead">
 <a aria-label="MyStudyMochi，回到主页顶部" class="home-brand" href="#home-stage"><span aria-hidden="true" class="brand-mark">M.</span><span>MyStudy<span class="brand-contrast">Mochi</span></span></a>
@@ -264,13 +307,13 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
 <div class="scene-grid">
 <section aria-labelledby="desk-title" class="desk-scene">
 <div class="scene-heading"><span class="scene-number">01 / THE DESK</span><h2 id="desk-title">学习笔记</h2><p>翻开桌上的一页手稿，继续追问。</p></div>
-<div class="desk-environment"><div aria-hidden="true" class="desk-lamp"><i></i><b></b></div><div aria-hidden="true" class="desk-cup"></div><div aria-hidden="true" class="desk-pen"></div><div class="desk-blotter"><div aria-hidden="true" class="blotter-ruling"></div><div class="cards desk-papers"><a class="card desk-paper" href="mmwave-radar/" style="--paper-number:1"><span class="paper-index">CASE FILE / 01</span><span class="paper-title">毫米波雷达基础</span><span class="paper-summary">6节：距离、相位、速度、系统设计、角度、检测与跟踪</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-dsp/" style="--paper-number:2"><span class="paper-index">CASE FILE / 02</span><span class="paper-title">现代数字信号处理</span><span class="paper-summary">随机信号 → Wiener/预测 → Kalman → LMS</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="array-signal-processing/" style="--paper-number:3"><span class="paper-index">CASE FILE / 03</span><span class="paper-title">阵列信号处理</span><span class="paper-summary">阵列几何 → 空间统计 → 子空间/似然方法</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="advanced-engineering-math/" style="--paper-number:4"><span class="paper-index">CASE FILE / 04</span><span class="paper-title">高等工程数学</span><span class="paper-summary">对象 → 线性作用 → 内积几何 → 相似结构</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-signal-processing/" style="--paper-number:5"><span class="paper-index">CASE FILE / 05</span><span class="paper-title">现代信号处理</span><span class="paper-summary">信号描述 → 统计与变换 → 采样硬件与恢复</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="radar-board/" style="--paper-number:6"><span class="paper-index">CASE FILE / 06</span><span class="paper-title">毫米波雷达系统解析</span><span class="paper-summary">硬件接口、固件数据流与信号处理</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a></div></div></div>
-<p class="scene-footnote">六套课程 · 21 份笔记 · 原始课件不在公开站点</p>
+<div class="desk-environment" data-lamp="on" id="desk-environment"><button aria-label="关闭书桌台灯" aria-pressed="true" class="desk-lamp" id="desk-lamp" title="点按切换桌灯" type="button"><i aria-hidden="true"></i><b aria-hidden="true"></b><span aria-hidden="true" class="lamp-hint">点按切换桌灯</span></button><div aria-hidden="true" class="desk-cup"></div><div aria-hidden="true" class="desk-pen"></div><div class="desk-blotter"><div aria-hidden="true" class="blotter-ruling"></div><div aria-hidden="true" class="desk-watermark">M. / FIELD NOTES</div><div class="cards desk-papers"><a class="card desk-paper" href="mmwave-radar/" style="--paper-number:1"><span class="paper-index">CASE FILE / 01</span><span class="paper-title">毫米波雷达基础</span><span class="paper-summary">6节：距离、相位、速度、系统设计、角度、检测与跟踪</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-dsp/" style="--paper-number:2"><span class="paper-index">CASE FILE / 02</span><span class="paper-title">现代数字信号处理</span><span class="paper-summary">随机信号 → Wiener/预测 → Kalman → LMS</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="array-signal-processing/" style="--paper-number:3"><span class="paper-index">CASE FILE / 03</span><span class="paper-title">阵列信号处理</span><span class="paper-summary">阵列几何 → 空间统计 → 子空间/似然方法</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="advanced-engineering-math/" style="--paper-number:4"><span class="paper-index">CASE FILE / 04</span><span class="paper-title">高等工程数学</span><span class="paper-summary">对象 → 线性作用 → 内积几何 → 相似结构</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-signal-processing/" style="--paper-number:5"><span class="paper-index">CASE FILE / 05</span><span class="paper-title">现代信号处理</span><span class="paper-summary">信号描述 → 统计与变换 → 采样硬件与恢复</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="radar-board/" style="--paper-number:6"><span class="paper-index">CASE FILE / 06</span><span class="paper-title">毫米波雷达系统解析</span><span class="paper-summary">硬件接口、固件数据流与信号处理</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a></div></div></div>
+<p class="scene-footnote">六套课程 · 笔记持续更新 · 原始课件不在公开站点</p>
 </section>
 <section aria-labelledby="personal-library-title" class="shelf-scene" data-unlocked="false" id="personal-library">
 <div class="scene-heading"><span class="scene-number">02 / THE LIBRARY</span><h2 id="personal-library-title">我的书架</h2><p>书藏在柜中，打开后再慢慢读。</p></div>
 <div aria-label="上锁的个人书架" class="cabinet">
-<div class="cabinet-books" hidden="" id="shelf-books" inert=""><div aria-hidden="true" class="cabinet-shelf-line"></div><button aria-label="抽出《正义之心》并进入阅读模式" class="shelf-book" id="open-home-book" type="button"><span class="book-spine-title">正义之心</span><span class="book-spine-author">乔纳森·海特</span></button><span aria-hidden="true" class="shelf-book-placeholder"></span><span aria-hidden="true" class="shelf-book-placeholder second"></span><span aria-hidden="true" class="shelf-ornament"></span></div>
+<div class="cabinet-books" hidden="" id="shelf-books" inert=""><div aria-hidden="true" class="cabinet-shelf-line"></div><button aria-label="抽出《正义之心》并进入阅读模式" class="shelf-book" id="open-home-book" type="button"><span class="book-spine-title">正义之心</span><span class="book-spine-author">乔纳森·海特</span></button><span aria-hidden="true" class="shelf-bookend"></span><span aria-hidden="true" class="shelf-bookplate">下一本，待入架</span><span aria-hidden="true" class="shelf-ornament"></span></div>
 <div class="cabinet-door" id="cabinet-door"><div aria-hidden="true" class="door-rail"></div><span aria-hidden="true" class="lock-glyph"><i></i></span><span class="door-title">私人藏书</span><span class="door-subtitle">ONLY OPEN WITH YOUR KEY</span>
 <form class="shelf-unlock-form" id="shelf-unlock-form"><label class="visually-hidden" for="shelf-key">书架解锁密钥</label><input autocomplete="off" id="shelf-key" placeholder="粘贴本机书架密钥" required="" spellcheck="false" type="password"/><button id="shelf-unlock-button" type="submit">打开书架 <span aria-hidden="true">↗</span></button></form>
 <label class="shelf-file-label" for="shelf-key-file">或选择本机密钥文件</label><input accept=".txt,text/plain" aria-label="选择本机书架密钥文件" class="visually-hidden" id="shelf-key-file" type="file"/><p aria-live="polite" id="shelf-status" role="status">密钥只在当前页面的内存中使用，不上传或保存。</p>
@@ -379,6 +422,8 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   'use strict';
   const stage = document.getElementById('home-stage');
   if (!stage) return;
+  const desk = document.getElementById('desk-environment');
+  const deskLamp = document.getElementById('desk-lamp');
   const shelf = document.getElementById('personal-library');
   const books = document.getElementById('shelf-books');
   const door = document.getElementById('cabinet-door');
@@ -403,6 +448,13 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   let readerReadyTimer = 0;
   let readerKeySent = false;
   let shelfEpoch = 0;
+
+  if (desk && deskLamp) deskLamp.addEventListener('click', () => {
+    const lit = desk.dataset.lamp !== 'off';
+    desk.dataset.lamp = lit ? 'off' : 'on';
+    deskLamp.setAttribute('aria-pressed', lit ? 'false' : 'true');
+    deskLamp.setAttribute('aria-label', lit ? '打开书桌台灯' : '关闭书桌台灯');
+  });
 
   function decodeKey(encoded) {
     if (!/^[A-Za-z0-9_-]{43}$/.test(encoded)) throw new Error('InvalidKey');
