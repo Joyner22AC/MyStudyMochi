@@ -110,3 +110,6 @@ body.is-reading .shelf-back,body.is-reading .note-navigation-controls,body.is-re
 .chrome-peek:focus-visible{outline:2px solid var(--book-accent);outline-offset:2px}
 .reading-app.chrome-visible .chrome-peek,.reading-app.toc-open .chrome-peek{opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.chrome-peek{transition:none}}
+
+/* Embedded exit belongs to the auto-hiding toolbar, including narrow phones. */
+html.book-embedded .reader-controls .lock-button{display:inline-flex;width:34px;min-width:34px;padding:0;font-size:20px}

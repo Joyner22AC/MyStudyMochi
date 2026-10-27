@@ -33,6 +33,13 @@
     new URLSearchParams(location.search).get('embedded') === '1');
   const embeddedStatus = byId('embedded-status');
   const embeddedStatusText = byId('embedded-status-text');
+  if (embedded) {
+    const exit = byId('lock-button');
+    exit.textContent = '←';
+    exit.setAttribute('aria-label', '返回书桌');
+    exit.setAttribute('title', '返回书桌');
+    byId('lock-from-toc').textContent = '返回书桌';
+  }
 
   const status = byId('unlock-status');
   const readerStatus = byId('reader-status');
@@ -930,6 +937,7 @@
     showHighlights();
     reader.classList.add('chrome-visible');
     showChrome();
+    if (embedded) window.parent.postMessage({type:'mystudy:reader-opened'}, location.origin);
     readerStatus.textContent = '已打开。分页模式滚轮翻页；连续模式滚轮滚动。';
     setTimeout(() => { if (readerStatus.textContent.startsWith('已打开。')) readerStatus.textContent = ''; }, 2600);
     // Location generation can be expensive; do not block the first page on the progress index.
@@ -1199,12 +1207,14 @@
   });
 
   reader.addEventListener('pointermove', event => {
-    if (event.clientY < 82) showChrome();
+    if (event.clientY < 82 && !event.target?.closest?.('#chrome-peek')) showChrome();
   });
   reader.addEventListener('pointerdown', event => {
-    if (event.clientY < 82) showChrome();
+    if (event.clientY < 82 && !event.target?.closest?.('#chrome-peek')) showChrome();
   });
-  reader.addEventListener('focusin', showChrome);
+  reader.addEventListener('focusin', event => {
+    if (!event.target?.closest?.('#chrome-peek')) showChrome();
+  });
 
   function handleReaderKeydown(event) {
     if (!rendition || event.altKey || event.ctrlKey || event.metaKey) return;
