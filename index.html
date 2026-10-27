@@ -298,13 +298,49 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
 @keyframes cabinet-light{from{opacity:0}to{opacity:1}}
 @media(max-width:650px){.desk-lamp .lamp-hint{display:none}.desk-environment::after{background:radial-gradient(ellipse 70% 35% at 20% 7%,rgba(255,218,144,.16),transparent 100%)}.shelf-bookplate{right:12px;font-size:10px}.cabinet::before{box-shadow:0 140px 0 -1px #b28b5e}}
 @media(prefers-reduced-motion:reduce){.desk-environment::after,.cabinet-books::before{animation:none!important}}
+
+/* DEsk-inspired spatial grammar: one room, one lamp, independent paper/book layers. */
+.scene-grid.study-room{position:relative;isolation:isolate;overflow:hidden;padding:25px clamp(18px,2.2vw,36px) 20px;border:1px solid rgba(104,75,51,.29);border-radius:23px;background:radial-gradient(ellipse at 21% 25%,rgba(255,245,223,.57),transparent 58%),repeating-linear-gradient(90deg,rgba(123,88,54,.025) 0 1px,transparent 1px 44px),linear-gradient(160deg,#eee5d5,#e3d4bd);box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 23px 46px rgba(71,47,30,.14)}
+.study-room::before{position:absolute;z-index:0;right:0;bottom:0;left:0;height:17%;border-top:6px solid #a88b69;background:repeating-linear-gradient(7deg,rgba(43,25,14,.065) 0 2px,transparent 2px 30px),linear-gradient(#a88160,#866046);box-shadow:0 -3px 12px rgba(74,48,29,.13),inset 0 7px 13px rgba(255,230,187,.19);content:"";pointer-events:none}
+.study-room::after{position:absolute;z-index:0;inset:0;background:radial-gradient(ellipse 75% 82% at 22% 23%,rgba(255,225,153,.32),transparent 74%);opacity:1;content:"";pointer-events:none;transition:opacity .45s ease}
+.study-room[data-lamp=off]::after{opacity:0}
+.study-room>.desk-scene,.study-room>.shelf-scene{position:relative;z-index:1}
+.study-room .scene-heading{padding:4px 0 0 13px;border-left:2px solid rgba(128,92,59,.37)}
+.study-room .scene-heading h2{color:#352c27}
+.study-room .scene-heading p,.study-room .scene-number{color:#655747}
+.study-room .scene-footnote{color:#493a2e}
+.study-room .desk-environment,.study-room .cabinet{box-shadow:inset 0 0 0 2px rgba(233,193,135,.5),inset 0 20px 36px rgba(255,220,164,.09),0 8px 1px rgba(70,43,26,.12),0 31px 37px rgba(45,26,17,.27)}
+.study-room[data-lamp=off] .cabinet{filter:brightness(.86)}
+.study-room .cabinet{transition:filter .45s ease,box-shadow .65s ease}
+.study-room .desk-blotter{box-shadow:0 20px 29px rgba(28,17,13,.38),inset 0 0 0 2px rgba(202,168,106,.5),inset 0 0 40px rgba(0,0,0,.15)}
+.home-scene .desk-paper{border-bottom-width:2px;box-shadow:1px 2px 0 #e1d7c3,2px 4px 0 rgba(229,217,193,.8),7px 12px 17px rgba(9,23,17,.24)}
+.home-scene .desk-paper:is(:hover,:focus-visible){box-shadow:1px 2px 0 #e1d7c3,2px 4px 0 rgba(229,217,193,.8),13px 28px 28px rgba(8,22,16,.37)}
+.home-scene .desk-paper::after{top:-1px;right:-1px;width:20px;height:20px;border:0;border-radius:0;background:linear-gradient(135deg,#f5ead5 18%,#c7b493 82%);clip-path:polygon(0 0,100% 0,100% 100%);transition:width .3s ease,height .3s ease}
+.home-scene .desk-paper:is(:hover,:focus-visible)::after{width:28px;height:28px}
+.paper-opening-veil{position:fixed;z-index:1800;inset:0;background:rgba(25,20,16,0);pointer-events:none;transition:background .36s ease}
+.paper-opening-veil.is-visible{background:rgba(25,20,16,.58)}
+.home-scene .paper-opening-sheet{position:fixed;z-index:1;margin:0;overflow:hidden;transform:none!important;pointer-events:none;transition:left .36s cubic-bezier(.2,.8,.2,1),top .36s cubic-bezier(.2,.8,.2,1),width .36s cubic-bezier(.2,.8,.2,1),height .36s cubic-bezier(.2,.8,.2,1);box-shadow:2px 5px 0 #e1d7c3,8px 24px 58px rgba(0,0,0,.38)}
+.home-reader-loading{display:flex;flex-direction:column;gap:22px}
+.opening-book{position:relative;display:block;width:90px;height:65px;perspective:500px}
+.opening-book::before,.opening-book::after{position:absolute;top:4px;width:44px;height:55px;border:1px solid #c6a77a;background:linear-gradient(120deg,#f3e6cc,#e0cba9);content:"";box-shadow:0 8px 17px rgba(0,0,0,.21)}
+.opening-book::before{left:1px;border-radius:5px 1px 1px 5px;transform-origin:right center;animation:book-leaf-left 1.4s ease-in-out infinite alternate}
+.opening-book::after{right:1px;border-radius:1px 5px 5px 1px;transform-origin:left center;animation:book-leaf-right 1.4s ease-in-out infinite alternate}
+@keyframes book-leaf-left{from{transform:rotateY(-18deg)}to{transform:rotateY(-54deg)}}
+@keyframes book-leaf-right{from{transform:rotateY(18deg)}to{transform:rotateY(54deg)}}
+html[data-theme=dark] .scene-grid.study-room{border-color:rgba(210,171,113,.27);background:radial-gradient(ellipse at 21% 25%,rgba(129,101,72,.24),transparent 58%),repeating-linear-gradient(90deg,rgba(221,180,122,.018) 0 1px,transparent 1px 44px),linear-gradient(160deg,#403830,#28231f);box-shadow:inset 0 1px 0 rgba(255,239,204,.09),0 24px 44px rgba(0,0,0,.28)}
+html[data-theme=dark] .study-room::before{border-top-color:#69503b;background:repeating-linear-gradient(7deg,rgba(0,0,0,.06) 0 2px,transparent 2px 30px),linear-gradient(#73533d,#523b31)}
+html[data-theme=dark] .study-room .scene-heading h2{color:#eee0c7}
+html[data-theme=dark] .study-room .scene-heading p,html[data-theme=dark] .study-room .scene-number,html[data-theme=dark] .study-room .scene-footnote{color:#d4bfa3}
+@media(max-width:940px){.scene-grid.study-room{padding:23px 18px 20px}.study-room::before{height:10%}}
+@media(max-width:650px){.scene-grid.study-room{padding:18px 10px 16px;border-radius:14px}.study-room .scene-heading{padding-left:10px}.study-room::before{height:7%}.cabinet-door::before{display:none}.opening-book{transform:scale(.8)}}
+@media(prefers-reduced-motion:reduce){.paper-opening-veil,.home-scene .paper-opening-sheet,.study-room::after,.study-room .cabinet{transition:none!important}.opening-book::before,.opening-book::after{animation:none!important}}
 </style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="home-scene" data-cipher-href="bookshelf/books/justice-heart.epub.enc" data-reader-href="bookshelf/read.html" id="home-stage">
 <header class="home-masthead">
 <a aria-label="MyStudyMochi，回到主页顶部" class="home-brand" href="#home-stage"><span aria-hidden="true" class="brand-mark">M.</span><span>MyStudy<span class="brand-contrast">Mochi</span></span></a>
 <div class="masthead-right"><span class="masthead-caption">一张书桌，一座书架</span><button aria-label="切换到夜间模式" class="note-theme-toggle home-theme" id="note-theme-toggle" type="button">夜间</button></div>
 </header>
 <div class="home-intro"><span class="overline">THE STUDY · 个人学习空间</span><h1>把好奇心，放在手边。</h1><p>在书桌上展开一份笔记，或到书架上读一本书。六门课程与个人藏书，各归其位。</p></div>
-<div class="scene-grid">
+<div class="scene-grid study-room" data-lamp="on" id="study-room">
 <section aria-labelledby="desk-title" class="desk-scene">
 <div class="scene-heading"><span class="scene-number">01 / THE DESK</span><h2 id="desk-title">学习笔记</h2><p>翻开桌上的一页手稿，继续追问。</p></div>
 <div class="desk-environment" data-lamp="on" id="desk-environment"><button aria-label="关闭书桌台灯" aria-pressed="true" class="desk-lamp" id="desk-lamp" title="点按切换桌灯" type="button"><i aria-hidden="true"></i><b aria-hidden="true"></b><span aria-hidden="true" class="lamp-hint">点按切换桌灯</span></button><div aria-hidden="true" class="desk-cup"></div><div aria-hidden="true" class="desk-pen"></div><div class="desk-blotter"><div aria-hidden="true" class="blotter-ruling"></div><div aria-hidden="true" class="desk-watermark">M. / FIELD NOTES</div><div class="cards desk-papers"><a class="card desk-paper" href="mmwave-radar/" style="--paper-number:1"><span class="paper-index">CASE FILE / 01</span><span class="paper-title">毫米波雷达基础</span><span class="paper-summary">6节：距离、相位、速度、系统设计、角度、检测与跟踪</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-dsp/" style="--paper-number:2"><span class="paper-index">CASE FILE / 02</span><span class="paper-title">现代数字信号处理</span><span class="paper-summary">随机信号 → Wiener/预测 → Kalman → LMS</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="array-signal-processing/" style="--paper-number:3"><span class="paper-index">CASE FILE / 03</span><span class="paper-title">阵列信号处理</span><span class="paper-summary">阵列几何 → 空间统计 → 子空间/似然方法</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="advanced-engineering-math/" style="--paper-number:4"><span class="paper-index">CASE FILE / 04</span><span class="paper-title">高等工程数学</span><span class="paper-summary">对象 → 线性作用 → 内积几何 → 相似结构</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-signal-processing/" style="--paper-number:5"><span class="paper-index">CASE FILE / 05</span><span class="paper-title">现代信号处理</span><span class="paper-summary">信号描述 → 统计与变换 → 采样硬件与恢复</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="radar-board/" style="--paper-number:6"><span class="paper-index">CASE FILE / 06</span><span class="paper-title">毫米波雷达系统解析</span><span class="paper-summary">硬件接口、固件数据流与信号处理</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a></div></div></div>
@@ -324,7 +360,7 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
 </section>
 </div>
 <footer class="home-footer">MyStudyMochi <span aria-hidden="true">·</span> 给认真而不着急的学习。</footer>
-<div class="home-reader-overlay" hidden="" id="home-reader-overlay"><button id="home-reader-close" type="button">← 返回书桌</button><div aria-live="polite" class="home-reader-loading" hidden="" id="home-reader-loading" role="status">正在展开书页…</div><div class="home-reader-host" id="home-reader-host"></div></div>
+<div class="home-reader-overlay" hidden="" id="home-reader-overlay"><button id="home-reader-close" type="button">← 返回书桌</button><div aria-live="polite" class="home-reader-loading" hidden="" id="home-reader-loading" role="status"><span aria-hidden="true" class="opening-book"><i></i><b></b></span><span>正在展开书页…</span></div><div class="home-reader-host" id="home-reader-host"></div></div>
 </main></div><script id="note-navigation-script">(() => {
   const body = document.body;
   const toggle = document.getElementById('note-toc-toggle');
@@ -422,8 +458,10 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   'use strict';
   const stage = document.getElementById('home-stage');
   if (!stage) return;
+  const room = document.getElementById('study-room');
   const desk = document.getElementById('desk-environment');
   const deskLamp = document.getElementById('desk-lamp');
+  const papers = Array.from(stage.querySelectorAll('.desk-paper'));
   const shelf = document.getElementById('personal-library');
   const books = document.getElementById('shelf-books');
   const door = document.getElementById('cabinet-door');
@@ -448,13 +486,66 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   let readerReadyTimer = 0;
   let readerKeySent = false;
   let shelfEpoch = 0;
+  let paperTransition = null;
+  let paperNavigationTimer = 0;
 
   if (desk && deskLamp) deskLamp.addEventListener('click', () => {
     const lit = desk.dataset.lamp !== 'off';
     desk.dataset.lamp = lit ? 'off' : 'on';
+    if (room) room.dataset.lamp = desk.dataset.lamp;
     deskLamp.setAttribute('aria-pressed', lit ? 'false' : 'true');
     deskLamp.setAttribute('aria-label', lit ? '打开书桌台灯' : '关闭书桌台灯');
   });
+
+  function clearPaperTransition() {
+    clearTimeout(paperNavigationTimer);
+    paperNavigationTimer = 0;
+    paperTransition?.remove();
+    paperTransition = null;
+  }
+
+  function openPaper(paper) {
+    const rect = paper.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      location.assign(paper.href);
+      return;
+    }
+    const veil = document.createElement('div');
+    veil.className = 'paper-opening-veil';
+    veil.setAttribute('aria-hidden', 'true');
+    veil.inert = true;
+    const sheet = paper.cloneNode(true);
+    sheet.removeAttribute('href');
+    sheet.removeAttribute('style');
+    sheet.classList.add('paper-opening-sheet');
+    sheet.style.left = `${rect.left}px`;
+    sheet.style.top = `${rect.top}px`;
+    sheet.style.width = `${rect.width}px`;
+    sheet.style.height = `${rect.height}px`;
+    veil.append(sheet);
+    stage.append(veil);
+    paperTransition = veil;
+    const targetWidth = Math.min(760, window.innerWidth - 36);
+    const targetHeight = Math.min(540, window.innerHeight - 72);
+    requestAnimationFrame(() => {
+      if (paperTransition !== veil) return;
+      veil.classList.add('is-visible');
+      sheet.style.left = `${(window.innerWidth - targetWidth) / 2}px`;
+      sheet.style.top = `${(window.innerHeight - targetHeight) / 2}px`;
+      sheet.style.width = `${targetWidth}px`;
+      sheet.style.height = `${targetHeight}px`;
+    });
+    paperNavigationTimer = setTimeout(() => location.assign(paper.href), 380);
+  }
+
+  papers.forEach(paper => paper.addEventListener('click', event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey ||
+        event.shiftKey || event.altKey || paper.hasAttribute('download') ||
+        paper.target === '_blank') return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    event.preventDefault();
+    if (!paperTransition) openPaper(paper);
+  }));
 
   function decodeKey(encoded) {
     if (!/^[A-Za-z0-9_-]{43}$/.test(encoded)) throw new Error('InvalidKey');
@@ -641,8 +732,9 @@ html[data-theme=dark] .home-scene .desk-paper:is(:hover,:focus-visible){backgrou
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !overlay.hidden) closeReader();
   });
-  window.addEventListener('pagehide', () => relockShelf(false));
+  window.addEventListener('pagehide', () => { clearPaperTransition(); relockShelf(false); });
   window.addEventListener('pageshow', () => {
+    clearPaperTransition();
     if (!bookKey && shelf.dataset.unlocked === 'true') relockShelf(false);
   });
 })();
