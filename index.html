@@ -334,32 +334,6 @@ html[data-theme=dark] .study-room .scene-heading p,html[data-theme=dark] .study-
 @media(max-width:940px){.scene-grid.study-room{padding:23px 18px 20px}.study-room::before{height:10%}}
 @media(max-width:650px){.scene-grid.study-room{padding:18px 10px 16px;border-radius:14px}.study-room .scene-heading{padding-left:10px}.study-room::before{height:7%}.cabinet-door::before{display:none}.opening-book{transform:scale(.8)}}
 @media(prefers-reduced-motion:reduce){.paper-opening-veil,.home-scene .paper-opening-sheet,.study-room::after,.study-room .cabinet{transition:none!important}.opening-book::before,.opening-book::after{animation:none!important}}
-
-/* Authentic DEsk walnut/wear, baked offline. Crisp DOM interaction above it. */
-.home-scene .desk-environment,.home-scene .cabinet,.home-scene .cabinet-door{isolation:isolate}
-.material-surface{position:absolute;z-index:-1;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background-size:100% 100%;background-repeat:no-repeat}
-[data-materials=ready] .desk-environment>.material-surface{background-image:linear-gradient(130deg,rgba(255,220,156,.1),rgba(16,8,4,.22)),var(--desk-material);opacity:1}
-[data-materials=ready] .cabinet>.material-surface{background-image:linear-gradient(90deg,rgba(0,0,0,.45),transparent 34%,rgba(0,0,0,.3)),var(--cabinet-material);opacity:1}
-[data-materials=ready] .cabinet-door>.material-surface{inset:12px;border-radius:60px 60px 0 0;background-image:linear-gradient(100deg,rgba(255,221,161,.07),rgba(20,8,3,.24)),var(--cabinet-material);opacity:1;box-shadow:inset 0 0 25px rgba(18,8,4,.3)}
-[data-materials=ready] .desk-environment[data-lamp=off]>.material-surface{background-image:linear-gradient(rgba(18,12,8,.28),rgba(18,12,8,.28)),var(--desk-material)}
-html[data-theme=dark] [data-materials=ready] .material-surface{filter:brightness(.83)}
-[data-scene-quality=pixel] .material-surface{image-rendering:pixelated}
-.home-scene .desk-environment::after,.home-scene .cabinet-books::before{animation:none}
-.home-footer{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px 22px}
-.scene-quality-label{display:inline-flex;align-items:center;gap:7px;font:inherit;color:inherit}
-.scene-quality-label select{width:auto;min-height:32px;padding:3px 19px 3px 8px;border:1px solid currentColor;border-color:rgba(137,112,80,.28);border-radius:5px;background:transparent;color:inherit;font:inherit;cursor:pointer}
-.scene-quality-label select option{color:#3b3028;background:#f0e8d9}
-.scene-quality-label select:focus-visible,.scene-credit:focus-visible{outline:2px solid #94713e;outline-offset:4px}
-.home-footer .scene-credit{color:inherit;font-size:10px;text-decoration:underline;text-underline-offset:3px}
-[data-scene-quality=simple] .desk-environment,[data-scene-quality=simple] .cabinet,[data-scene-quality=simple] .desk-blotter{box-shadow:inset 0 0 0 1px rgba(231,199,148,.3),0 6px 12px rgba(26,15,9,.18)}
-[data-scene-quality=simple] .study-room::after,[data-scene-quality=simple] .desk-environment::after{display:none}
-[data-scene-quality=simple] .study-room .cabinet{filter:none;transition:none}
-[data-scene-quality=simple] .desk-paper{box-shadow:1px 2px 0 #d8cbb4,0 4px 6px rgba(0,0,0,.16)}
-[data-scene-quality=simple] .desk-paper:is(:hover,:focus-visible){box-shadow:1px 3px 0 #d8cbb4,0 7px 9px rgba(0,0,0,.2)}
-@media(max-width:650px){.home-footer{gap:8px 16px}.home-footer>span:first-child{flex-basis:100%}.scene-quality-label select{min-height:38px}}
-html[data-theme=dark] #home-stage .home-brand{color:#eddfc8}
-html[data-theme=dark] #home-stage .brand-contrast{color:#d2a578}
-html[data-theme=dark] #home-stage .shelf-actions a,html[data-theme=dark] #home-stage .shelf-actions button{color:#e4cba6}
 </style></head><body><div class="layout" style="grid-template-columns:minmax(0,1fr);max-width:980px"><main class="home-scene" data-cipher-href="bookshelf/books/justice-heart.epub.enc" data-reader-href="bookshelf/read.html" id="home-stage">
 <header class="home-masthead">
 <a aria-label="MyStudyMochi，回到主页顶部" class="home-brand" href="#home-stage"><span aria-hidden="true" class="brand-mark">M.</span><span>MyStudy<span class="brand-contrast">Mochi</span></span></a>
@@ -369,14 +343,14 @@ html[data-theme=dark] #home-stage .shelf-actions a,html[data-theme=dark] #home-s
 <div class="scene-grid study-room" data-lamp="on" id="study-room">
 <section aria-labelledby="desk-title" class="desk-scene">
 <div class="scene-heading"><span class="scene-number">01 / THE DESK</span><h2 id="desk-title">学习笔记</h2><p>翻开桌上的一页手稿，继续追问。</p></div>
-<div class="desk-environment" data-lamp="on" id="desk-environment"><span aria-hidden="true" class="material-surface"></span><button aria-label="关闭书桌台灯" aria-pressed="true" class="desk-lamp" id="desk-lamp" title="点按切换桌灯" type="button"><i aria-hidden="true"></i><b aria-hidden="true"></b><span aria-hidden="true" class="lamp-hint">点按切换桌灯</span></button><div aria-hidden="true" class="desk-cup"></div><div aria-hidden="true" class="desk-pen"></div><div class="desk-blotter"><div aria-hidden="true" class="blotter-ruling"></div><div aria-hidden="true" class="desk-watermark">M. / FIELD NOTES</div><div class="cards desk-papers"><a class="card desk-paper" href="mmwave-radar/" style="--paper-number:1"><span class="paper-index">CASE FILE / 01</span><span class="paper-title">毫米波雷达基础</span><span class="paper-summary">6节：距离、相位、速度、系统设计、角度、检测与跟踪</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-dsp/" style="--paper-number:2"><span class="paper-index">CASE FILE / 02</span><span class="paper-title">现代数字信号处理</span><span class="paper-summary">随机信号 → Wiener/预测 → Kalman → LMS</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="array-signal-processing/" style="--paper-number:3"><span class="paper-index">CASE FILE / 03</span><span class="paper-title">阵列信号处理</span><span class="paper-summary">阵列几何 → 空间统计 → 子空间/似然方法</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="advanced-engineering-math/" style="--paper-number:4"><span class="paper-index">CASE FILE / 04</span><span class="paper-title">高等工程数学</span><span class="paper-summary">对象 → 线性作用 → 内积几何 → 相似结构</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-signal-processing/" style="--paper-number:5"><span class="paper-index">CASE FILE / 05</span><span class="paper-title">现代信号处理</span><span class="paper-summary">信号描述 → 统计与变换 → 采样硬件与恢复</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="radar-board/" style="--paper-number:6"><span class="paper-index">CASE FILE / 06</span><span class="paper-title">毫米波雷达系统解析</span><span class="paper-summary">硬件接口、固件数据流与信号处理</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a></div></div></div>
+<div class="desk-environment" data-lamp="on" id="desk-environment"><button aria-label="关闭书桌台灯" aria-pressed="true" class="desk-lamp" id="desk-lamp" title="点按切换桌灯" type="button"><i aria-hidden="true"></i><b aria-hidden="true"></b><span aria-hidden="true" class="lamp-hint">点按切换桌灯</span></button><div aria-hidden="true" class="desk-cup"></div><div aria-hidden="true" class="desk-pen"></div><div class="desk-blotter"><div aria-hidden="true" class="blotter-ruling"></div><div aria-hidden="true" class="desk-watermark">M. / FIELD NOTES</div><div class="cards desk-papers"><a class="card desk-paper" href="mmwave-radar/" style="--paper-number:1"><span class="paper-index">CASE FILE / 01</span><span class="paper-title">毫米波雷达基础</span><span class="paper-summary">6节：距离、相位、速度、系统设计、角度、检测与跟踪</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-dsp/" style="--paper-number:2"><span class="paper-index">CASE FILE / 02</span><span class="paper-title">现代数字信号处理</span><span class="paper-summary">随机信号 → Wiener/预测 → Kalman → LMS</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="array-signal-processing/" style="--paper-number:3"><span class="paper-index">CASE FILE / 03</span><span class="paper-title">阵列信号处理</span><span class="paper-summary">阵列几何 → 空间统计 → 子空间/似然方法</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="advanced-engineering-math/" style="--paper-number:4"><span class="paper-index">CASE FILE / 04</span><span class="paper-title">高等工程数学</span><span class="paper-summary">对象 → 线性作用 → 内积几何 → 相似结构</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="modern-signal-processing/" style="--paper-number:5"><span class="paper-index">CASE FILE / 05</span><span class="paper-title">现代信号处理</span><span class="paper-summary">信号描述 → 统计与变换 → 采样硬件与恢复</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a><a class="card desk-paper" href="radar-board/" style="--paper-number:6"><span class="paper-index">CASE FILE / 06</span><span class="paper-title">毫米波雷达系统解析</span><span class="paper-summary">硬件接口、固件数据流与信号处理</span><span class="paper-open">翻开笔记 <span aria-hidden="true">↗</span></span></a></div></div></div>
 <p class="scene-footnote">六套课程 · 笔记持续更新 · 原始课件不在公开站点</p>
 </section>
 <section aria-labelledby="personal-library-title" class="shelf-scene" data-unlocked="false" id="personal-library">
 <div class="scene-heading"><span class="scene-number">02 / THE LIBRARY</span><h2 id="personal-library-title">我的书架</h2><p>书藏在柜中，打开后再慢慢读。</p></div>
-<div aria-label="上锁的个人书架" class="cabinet"><span aria-hidden="true" class="material-surface"></span>
+<div aria-label="上锁的个人书架" class="cabinet">
 <div class="cabinet-books" hidden="" id="shelf-books" inert=""><div aria-hidden="true" class="cabinet-shelf-line"></div><button aria-label="抽出《正义之心》并进入阅读模式" class="shelf-book" id="open-home-book" type="button"><span class="book-spine-title">正义之心</span><span class="book-spine-author">乔纳森·海特</span></button><span aria-hidden="true" class="shelf-bookend"></span><span aria-hidden="true" class="shelf-bookplate">下一本，待入架</span><span aria-hidden="true" class="shelf-ornament"></span></div>
-<div class="cabinet-door" id="cabinet-door"><span aria-hidden="true" class="material-surface"></span><div aria-hidden="true" class="door-rail"></div><span aria-hidden="true" class="lock-glyph"><i></i></span><span class="door-title">私人藏书</span><span class="door-subtitle">ONLY OPEN WITH YOUR KEY</span>
+<div class="cabinet-door" id="cabinet-door"><div aria-hidden="true" class="door-rail"></div><span aria-hidden="true" class="lock-glyph"><i></i></span><span class="door-title">私人藏书</span><span class="door-subtitle">ONLY OPEN WITH YOUR KEY</span>
 <form class="shelf-unlock-form" id="shelf-unlock-form"><label class="visually-hidden" for="shelf-key">书架解锁密钥</label><input autocomplete="off" id="shelf-key" placeholder="粘贴本机书架密钥" required="" spellcheck="false" type="password"/><button id="shelf-unlock-button" type="submit">打开书架 <span aria-hidden="true">↗</span></button></form>
 <label class="shelf-file-label" for="shelf-key-file">或选择本机密钥文件</label><input accept=".txt,text/plain" aria-label="选择本机书架密钥文件" class="visually-hidden" id="shelf-key-file" type="file"/><p aria-live="polite" id="shelf-status" role="status">密钥只在当前页面的内存中使用，不上传或保存。</p>
 </div>
@@ -385,7 +359,7 @@ html[data-theme=dark] #home-stage .shelf-actions a,html[data-theme=dark] #home-s
 <p aria-live="polite" class="scene-footnote" id="shelf-footnote" role="status">书目公开展示；书籍正文只以加密副本存放。</p>
 </section>
 </div>
-<footer class="home-footer"><span>MyStudyMochi · 给认真而不着急的学习。</span><label class="scene-quality-label" for="scene-quality">场景<select aria-describedby="scene-quality-status" id="scene-quality"><option value="auto">自动</option><option value="detail">细致</option><option value="pixel">像素</option><option value="simple">简化</option></select></label><span aria-live="polite" class="visually-hidden" id="scene-quality-status" role="status"></span><a class="scene-credit" href="scene-assets/NOTICE.html">材质致谢</a></footer>
+<footer class="home-footer">MyStudyMochi <span aria-hidden="true">·</span> 给认真而不着急的学习。</footer>
 <div class="home-reader-overlay" hidden="" id="home-reader-overlay"><button id="home-reader-close" type="button">← 返回书桌</button><div aria-live="polite" class="home-reader-loading" hidden="" id="home-reader-loading" role="status"><span aria-hidden="true" class="opening-book"><i></i><b></b></span><span>正在展开书页…</span></div><div class="home-reader-host" id="home-reader-host"></div></div>
 </main></div><script id="note-navigation-script">(() => {
   const body = document.body;
@@ -767,125 +741,5 @@ html[data-theme=dark] #home-stage .shelf-actions a,html[data-theme=dark] #home-s
     clearPaperTransition();
     if (!bookKey && shelf.dataset.unlocked === 'true') relockShelf(false);
   });
-})();
-</script><script id="scene-material-script">/* Prebaked DEsk-derived textures. Runtime has no WebGL, render loop, or book access. */
-(() => {
-  'use strict';
-  const stage = document.getElementById('home-stage');
-  const choice = document.getElementById('scene-quality');
-  const status = document.getElementById('scene-quality-status');
-  if (!stage || !choice || !status) return;
-  const textures = /* TEXTURES_BEGIN */{"detail": {"desk": "desk-detail-aa4ff6c1d68f.webp", "cabinet": "cabinet-detail-b9aac6654c59.webp"}, "lite": {"desk": "desk-lite-15af232a22d6.webp", "cabinet": "cabinet-lite-7f45ec135876.webp"}, "pixel": {"desk": "desk-pixel-5908a23949d3.webp", "cabinet": "cabinet-pixel-a557b1e29806.webp"}}/* TEXTURES_END */;
-  const allowed = ['auto', 'detail', 'pixel', 'simple'];
-  const preferenceKey = 'mystudy-scene-quality-v1';
-  const connection = navigator.connection;
-  let epoch = 0;
-  let activeURLs = [];
-  let idle;
-  let saved = 'auto';
-  try { saved = localStorage.getItem(preferenceKey) || 'auto'; } catch (_) { /* Private mode is supported. */ }
-  choice.value = allowed.includes(saved) ? saved : 'auto';
-
-  function resolveQuality() {
-    if (choice.value !== 'auto') return choice.value;
-    if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || '')) return 'simple';
-    if (matchMedia('(max-width: 650px)').matches || (navigator.deviceMemory && navigator.deviceMemory <= 4)) return 'lite';
-    return 'detail';
-  }
-  function loadImage(url, signal) {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
-      const abort = () => { image.src = ''; reject(new Error('Texture cancelled')); };
-      const done = callback => { signal.removeEventListener('abort', abort); callback(); };
-      signal.addEventListener('abort', abort, {once:true});
-      image.decoding = 'async';
-      image.onload = () => done(() => resolve(image));
-      image.onerror = () => done(() => reject(new Error('Texture unavailable')));
-      image.src = url;
-    });
-  }
-  async function loadTexture(url, signal, created) {
-    // Only the six content-hashed, public decorative images enter this cache.
-    // No service worker: pages, keys, decrypted text and reading data are untouched.
-    let cache;
-    try { if ('caches' in window) cache = await caches.open('mystudy-scene-materials-v1'); } catch (_) {}
-    let response;
-    try { response = await cache?.match(url); } catch (_) {}
-    const hit = Boolean(response);
-    if (!response) response = await fetch(url, {signal, cache:'default'});
-    if (!response.ok) throw new Error('Invalid texture response');
-    const copy = response.clone();
-    const blob = await response.blob();
-    if (signal.aborted) throw new Error('Texture cancelled');
-    if (blob.size > 300000) throw new Error('Texture too large');
-    // Some static hosts label WebP as octet-stream; verify the actual file header.
-    const header = new Uint8Array(await blob.slice(0,12).arrayBuffer());
-    if (String.fromCharCode(...header.slice(0,4)) !== 'RIFF' || String.fromCharCode(...header.slice(8,12)) !== 'WEBP') throw new Error('Invalid WebP');
-    if (signal.aborted) throw new Error('Texture cancelled');
-    const objectURL = URL.createObjectURL(blob);
-    created.push(objectURL);
-    try { await loadImage(objectURL, signal); }
-    catch (error) {
-      if (hit && !signal.aborted) { try { await cache?.delete(url); } catch (_) {} }
-      throw error;
-    }
-    if (!hit && !signal.aborted) { try { await cache?.put(url, copy); } catch (_) {} }
-    if (signal.aborted) throw new Error('Texture cancelled');
-    return objectURL;
-  }
-  async function applyQuality() {
-    const ticket = ++epoch;
-    const quality = resolveQuality();
-    // CSS scene remains interactive during download; stale completions cannot win.
-    stage.dataset.materials = 'fallback';
-    activeURLs.forEach(url => URL.revokeObjectURL(url));
-    activeURLs = [];
-    stage.dataset.sceneQuality = quality === 'lite' ? 'lite' : quality;
-    if (quality === 'simple') { status.textContent = '简化场景，所有功能仍可用。'; return; }
-    const files = textures[quality];
-    if (!files) { stage.dataset.sceneQuality = 'simple'; return; }
-    const urls = ['desk', 'cabinet'].map(name => new URL('scene-assets/' + files[name], document.baseURI).href);
-    let timer;
-    const controller = new AbortController();
-    const created = [];
-    let installed = false;
-    try {
-      const images = await Promise.race([
-        Promise.all(urls.map(url => loadTexture(url, controller.signal, created))),
-        new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error('Texture timeout')); }, 4000); })
-      ]);
-      if (ticket !== epoch) return;
-      stage.style.setProperty('--desk-material', `url("${images[0]}")`);
-      stage.style.setProperty('--cabinet-material', `url("${images[1]}")`);
-      activeURLs = created;
-      installed = true;
-      stage.dataset.materials = 'ready';
-      status.textContent = quality === 'pixel' ? '像素材质；文字保持清晰。' : '场景材质已就绪。';
-    } catch (_) {
-      if (ticket !== epoch) return;
-      stage.dataset.sceneQuality = 'simple';
-      status.textContent = '已切换轻量场景，笔记和书架仍可使用。';
-    } finally {
-      clearTimeout(timer);
-      if (!installed) { controller.abort(); created.forEach(url => URL.revokeObjectURL(url)); }
-    }
-  }
-  choice.addEventListener('change', () => {
-    if (idle != null) {
-      if ('requestIdleCallback' in window) cancelIdleCallback(idle);
-      else clearTimeout(idle);
-      idle = null;
-    }
-    try { localStorage.setItem(preferenceKey, choice.value); } catch (_) { /* Optional preference only. */ }
-    applyQuality();
-  });
-  connection?.addEventListener?.('change', () => { if (choice.value === 'auto') applyQuality(); });
-  const compact = matchMedia('(max-width: 650px)');
-  compact.addEventListener?.('change', () => { if (choice.value === 'auto') applyQuality(); });
-  stage.dataset.sceneQuality = resolveQuality();
-  // Below the useful interface: no texture work before first paint.
-  const start = () => { idle = null; applyQuality(); };
-  if ('requestIdleCallback' in window) idle = requestIdleCallback(start, {timeout:1000});
-  else idle = setTimeout(start, 300);
 })();
 </script></body></html>
