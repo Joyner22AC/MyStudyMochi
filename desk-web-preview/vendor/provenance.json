@@ -1,0 +1,6 @@
+{
+  "upstream": "https://github.com/fyzugx/DEsk",
+  "commit": "ec16818b69cba5f3049426df839e1596253032ca",
+  "room_glsl_lf_sha256": "707031a01a2b69257d24aa891b6cbe73ed7026f9d23870667a53f877e53af25a",
+  "port": "Complete unchanged room shader, generated constants and same SH integration. WebGL host and single-sample resolve are new. Drawer item culling bounds conservative; drawer interaction not exposed."
+}
