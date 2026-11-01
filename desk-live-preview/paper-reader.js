@@ -4,7 +4,9 @@ import {ViewMotion} from './motion.js';
 // Animate the real sheet in the room; hand off to the unchanged note only at rest.
 export function createPaperReader({getPaper,getCamera,courses,requestFrame,freezeView,reduced}){
  const travel=new ViewMotion(0,10),saved=new Map();
- let index=-1,base=null,phase='closed',ready=false,timer=null,returnFocus=null;
+ let index=-1,base=null,phase='closed',ready=false,timer=null,returnFocus=null,source='desk',paperParent=null;
+ const selected=()=>getPaper(index,source);
+ function bind(paper){paperParent=source==='drawer'?paper.parent:null;if(paperParent)paperParent.parent.attach(paper);return {object:paper,position:paper.position.clone(),quaternion:paper.quaternion.clone(),scale:paper.scale.clone()};}
  const host=document.createElement('section');host.id='paper-reader';host.hidden=true;
  host.setAttribute('role','dialog');host.setAttribute('aria-modal','true');host.setAttribute('aria-label','展开的学习笔记');
  host.innerHTML='<header class="paper-reader-bar"><button type="button" data-close aria-label="合上笔记，返回原来的书桌视角">← 放回书桌</button><span data-title></span><a data-direct target="_blank" rel="noopener">独立打开 ↗</a></header><div class="paper-reader-page"><p data-status role="status">正在展开笔记…</p><div data-failure hidden><p>这份笔记暂时没有打开。</p><button type="button" data-retry>重试</button><a data-backup target="_blank" rel="noopener">直接打开笔记 ↗</a></div></div>';
@@ -17,7 +19,7 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
  function busy(value){controls.forEach(el=>{el.inert=value;});document.body.classList.toggle('paper-reading',value);}
  function remember(){
   if(index<0||!ready)return;
-  try{saved.set(index,{href:frame.contentWindow.location.href,scroll:frame.contentWindow.scrollY});}catch{}
+  try{const entry={href:frame.contentWindow.location.href,scroll:frame.contentWindow.scrollY};saved.set(index,entry);window.dispatchEvent(new CustomEvent('desk:reading-progress',{detail:{kind:'course',index,...entry}}));}catch{}
  }
  function fail(){if(phase==='closed'||travel.target===0)return;ready=false;frame.hidden=true;status.hidden=true;failure.hidden=false;}
  function load(){
@@ -36,7 +38,7 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
   try{
    const doc=frame.contentDocument;
    if(!doc||/^(Error response|404(?:\b|:))/i.test(doc.title))return fail();
-   ready=true;status.hidden=true;failure.hidden=true;
+   ready=true;status.hidden=true;failure.hidden=true;frame.hidden=false;
    host.querySelector('[data-direct]').href=frame.contentWindow.location.href;
    // Same-origin navigation remains inside the original note, including encrypted courses.
    doc.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.defaultPrevented){closeReader();e.preventDefault();}});
@@ -48,21 +50,23 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
      e.preventDefault();closeReader();
     }
    });
-   const entry=saved.get(index);if(entry&&entry.href===frame.contentWindow.location.href)frame.contentWindow.scrollTo(0,entry.scroll);
+   const entry=saved.get(index);if(entry&&entry.href===frame.contentWindow.location.href){doc.documentElement.getBoundingClientRect();frame.contentWindow.scrollTo({top:entry.scroll,behavior:'instant'});}
    if(phase==='reading')frame.hidden=false;
   }catch{fail();}
  });
  frame.addEventListener('error',fail);close.addEventListener('click',closeReader);
+ window.addEventListener('pagehide',remember);
  host.querySelector('[data-retry]').addEventListener('click',load);
  document.addEventListener('keydown',e=>{
   if(phase==='closed')return;
   if(e.key==='Escape'){closeReader();e.preventDefault();}
   if(e.key==='Tab'&&phase!=='reading'){e.preventDefault();close.focus({preventScroll:true});}
  });
- function open(i){
-  if(phase!=='closed'||!getPaper(i))return;
-  freezeView();index=i;returnFocus=document.activeElement;
-  const paper=getPaper(index);base={object:paper,position:paper.position.clone(),quaternion:paper.quaternion.clone(),scale:paper.scale.clone()};
+ function open(i,options={}){
+  if(phase!=='closed'||!getPaper(i,options.source||'desk'))return;
+  freezeView();index=i;source=options.source||'desk';returnFocus=document.activeElement;
+  if(options.resume)saved.set(index,options.resume);
+  const paper=selected();base=bind(paper);
   phase='opening';busy(true);travel.setTarget(1);
   host.querySelector('[data-title]').textContent=courses[index].title;
   for(const selector of ['[data-direct]','[data-backup]'])host.querySelector(selector).href=courses[index].href;
@@ -72,9 +76,9 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
  function update(dt){
   if(phase==='closed')return;
   if(reduced.matches)travel.finish();else travel.step(dt);
-  const paper=getPaper(index),camera=getCamera();if(!paper||!camera)return;
+  const paper=selected(),camera=getCamera();if(!paper||!camera)return;
   // Rebind to rebuilt geometry on resize/orientation change, preserving progress.
-  if(base.object!==paper)base={object:paper,position:paper.position.clone(),quaternion:paper.quaternion.clone(),scale:paper.scale.clone()};
+  if(base.object!==paper)base=bind(paper);
   const t=travel.position,distance=12,forward=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
   const up=new THREE.Vector3(0,1,0).applyQuaternion(camera.quaternion);
   const end=camera.position.clone().addScaledVector(forward,distance);
@@ -100,13 +104,14 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
   }
   if(!travel.active&&travel.target===0){
    paper.position.copy(base.position);paper.quaternion.copy(base.quaternion);paper.scale.copy(base.scale);
+   if(paperParent)paperParent.attach(paper);paperParent=null;
    phase='closed';index=-1;base=null;host.hidden=true;busy(false);
    const focus=returnFocus?.isConnected&&returnFocus!==document.body?returnFocus:document.querySelector('#catalog-toggle');
    focus?.focus({preventScroll:true});
   }
  }
  return {open,update,close:closeReader,get active(){return phase!=='closed';},get moving(){return travel.active;},
-  owns:paper=>index>=0&&getPaper(index)===paper,
+  owns:paper=>index>=0&&selected()===paper,
   snapshot:()=>({phase,index,progress:travel.position,ready})};
 }
 

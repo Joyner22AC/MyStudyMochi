@@ -6,13 +6,14 @@ import {RoundedBoxGeometry} from './vendor/RoundedBoxGeometry.js';
  * Geometry simplification is deliberate: rasterized objects share one live space. */
 export function buildRoom(constants,aspect,courses,onDirty){
  const root=new THREE.Group();root.name='one-room';
+ const portrait=aspect<1;
  const pose=window.DeskCamera.at(0,aspect,constants),back=pose.zf,front=constants.RM_ZN;
  const shelfFront=pose.shzf,shelfBack=shelfFront-constants.RM_SH_D;
  const shelfWidth=pose.shhx;
- const groups={papers:[],book:null,doors:[],hitTargets:[]};
+ const groups={papers:[],book:null,doors:[],hitTargets:[],knobs:[],drawerCards:[]};
  const color=(hex,roughness=.65,metalness=0)=>new THREE.MeshStandardMaterial({color:hex,roughness,metalness});
  const walnut=color(0x69452b,.45),edgeWood=color(0x4d3020,.52),darkWood=color(0x38261b,.75);
- const brass=color(0xbba06a,.32,.7),felt=color(0x273b30,.9),leatherA=color(0x552d27,.7),leatherB=color(0x253a32,.7);
+ const brass=color(0xbba06a,.42,.55),felt=color(0x273b30,.9),leatherA=color(0x552d27,.8),leatherB=color(0x253a32,.8);
  const darkMetal=color(0x272929,.55,.3),glass=color(0x141a18,.28,.25),paperEdge=color(0xd8cdb2,.95);
  const materials={walnut,edgeWood,darkWood,brass,felt,leatherA,leatherB,darkMetal,glass,paperEdge};
  const geometryCache=new Map();
@@ -46,6 +47,11 @@ export function buildRoom(constants,aspect,courses,onDirty){
  const grain=textureLoader.load('materials/walnut.webp',onDirty,undefined,()=>{});
  grain.colorSpace=THREE.SRGBColorSpace;grain.wrapS=grain.wrapT=THREE.RepeatWrapping;grain.repeat.set(2,1);
  walnut.map=grain;walnut.color.set(0xe9d2b2);
+ walnut.roughness=.68;
+ const micro=document.createElement('canvas');micro.width=micro.height=64;const mctx=micro.getContext('2d'),pixels=mctx.createImageData(64,64);let microSeed=1827;
+ for(let i=0;i<pixels.data.length;i+=4){microSeed=(microSeed*1664525+1013904223)>>>0;const v=185+(microSeed%45);pixels.data.set([v,v,v,255],i);}mctx.putImageData(pixels,0,0);
+ const roughness=new THREE.CanvasTexture(micro);roughness.wrapS=roughness.wrapT=THREE.RepeatWrapping;roughness.repeat.set(9,3);
+ brass.roughnessMap=roughness;leatherA.bumpMap=roughness;leatherB.bumpMap=roughness;leatherA.bumpScale=leatherB.bumpScale=.018;
 
  box('floor',[125,.4,145],[0,-19.25,back-18],color(0x473b2d,.9));
  box('wall',[125,82,.5],[0,20,shelfBack-1],color(0x5b5243,.92));
@@ -54,10 +60,23 @@ export function buildRoom(constants,aspect,courses,onDirty){
  box('desk front rail',[31,.65,.55],[0,-.95,front-.35],edgeWood);
  box('desk rear panel',[30,4.2,.75],[0,-2.6,back+.6],edgeWood);
  for(const x of [-15.15,15.15])box('desk leg',[1.04,18.2,front-back-1.2],[x,-9.5,(front+back)/2+.4],edgeWood);
- box('drawer face',[26.4,2.6,.6],[0,-2.3,front+.9],walnut);
- box('drawer brass plate',[4.0,.75,.16],[0,-2.3,front+1.24],brass);
- const handle=box('drawer pull',[3.3,.25,.34],[0,-2.5,front+1.5],brass);
- // Closed drawer is present, but not advertised as a functional feature in this test.
+ const drawer=new THREE.Group();drawer.name='working drawer';drawer.position.set(0,0,front-.1);drawer.userData.baseZ=front-.1;drawer.userData.action='drawer';root.add(drawer);groups.drawer=drawer;
+ box('drawer face',[26.4,2.6,.6],[0,-2.3,0],walnut,drawer);
+ box('drawer brass plate',[4.0,.75,.16],[0,-2.3,.34],brass,drawer);
+ box('drawer pull',[3.3,.36,.6],[0,-2.3,.85],brass,drawer);
+ const drawerDepth=portrait?12:8;drawer.userData.depth=drawerDepth;drawer.userData.travel=portrait?11:7;
+ box('drawer lining',[25.8,.2,drawerDepth],[0,-2.68,-drawerDepth/2-.2],felt,drawer);
+ for(const x of [-13.1,13.1])box('drawer side',[.35,2,drawerDepth],[x,-1.8,-drawerDepth/2-.2],edgeWood,drawer);
+ box('drawer back',[26.4,2,.3],[0,-1.8,-drawerDepth-.1],edgeWood,drawer);
+ // Public course titles only. Recent-reading metadata selects which physical cards are visible.
+ [...courses.map((c,i)=>({title:c.title,kind:'course',index:i})),{title:'正义之心',kind:'book',index:0}].forEach(entry=>{
+  const card=new THREE.Group();card.name='recent reading card';card.visible=false;card.position.y=-2.5;
+  card.userData={action:'resume',...entry};
+  const cw=portrait?11.5:7.7,ch=portrait?3.2:2.8;
+  box('card edge',[cw,.05,ch],[0,0,0],paperEdge,card);
+  plane('paper face',cw,ch,[0,.04,0],[-Math.PI/2,0,0],textureLabel(entry.title,{width:1024,height:384,size:128}),card);
+  drawer.add(card);groups.drawerCards.push(card);
+ });
 
  const top=22.6,bottom=-15.4,center=(shelfFront+shelfBack)/2;
  box('shelf back',[shelfWidth*2,.5,top-bottom],[0,(top+bottom)/2,shelfBack],darkWood).rotation.x=Math.PI/2;
@@ -107,17 +126,18 @@ export function buildRoom(constants,aspect,courses,onDirty){
 
  // The console/post box keep source-inspired positions; decorative until explicitly implemented.
  const consoleX=-10.3,consoleZ=back+1.5;
- const consoleGroup=new THREE.Group();root.add(consoleGroup);
+ const consoleGroup=new THREE.Group();consoleGroup.userData.action='lighting';root.add(consoleGroup);groups.console=consoleGroup;
  box('console wooden case',[10.2,3.5,4.2],[0,1.75,0],edgeWood,consoleGroup);
  box('console panel',[9.3,.18,3.7],[0,3.57,0],darkMetal,consoleGroup);
  for(const [i,x] of [-3,-1.6,0,1.6,3.1].entries()){
-  cylinder('knob',i===2?.6:.35,.28,[x,3.82,.25],i%2?brass:darkMetal,consoleGroup);
-  cylinder('indicator',.10,.10,[x,4,.25],color(i%2?0x8c4930:0x85906a,.3),consoleGroup);
+  const knob=new THREE.Group();knob.position.set(x,3.82,.25);knob.userData.action=['lamp-power','brightness','warmth','sound','light-reset'][i];consoleGroup.add(knob);groups.knobs.push(knob);
+  cylinder('knob',i===2?.6:.35,.28,[0,0,0],i%2?brass:darkMetal,knob);
+  box('knob pointer',[.05,.035,.28],[0,.16,-.1],paperEdge,knob);
  }
  consoleGroup.scale.setScalar(.55);consoleGroup.position.set(consoleX,0,consoleZ);
  const postZ=back+1.5;
  const postGroup=new THREE.Group();root.add(postGroup);
- const post=color(0x842e21,.52);
+ const post=color(0x842e21,.82);
  box('post box',[4.4,4.6,3.0],[0,2.3,0],post,postGroup);
  box('post lid',[4.7,.4,3.3],[0,4.75,0],post,postGroup);
  box('letter slot',[3.4,.12,.10],[0,3.8,1.55],darkMetal,postGroup);
@@ -144,6 +164,8 @@ export function buildRoom(constants,aspect,courses,onDirty){
   // Rasterize at twice the design resolution; retain physical dimensions and layout.
   const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=1024;const ctx=canvas.getContext('2d');ctx.scale(2,2);
   ctx.fillStyle='#eee4c9';ctx.fillRect(0,0,768,512);
+  let seed=421+index;ctx.fillStyle='rgba(105,87,53,.055)';
+  for(let i=0;i<3800;i++){seed=(seed*1664525+1013904223)>>>0;const x=seed/4294967296*768;seed=(seed*1664525+1013904223)>>>0;ctx.fillRect(x,seed/4294967296*512,1.4,.4);}
   ctx.strokeStyle='rgba(107,91,57,.12)';ctx.lineWidth=1;
   for(let y=125;y<490;y+=48){ctx.beginPath();ctx.moveTo(42,y);ctx.lineTo(725,y);ctx.stroke();}
   ctx.fillStyle='#806a4b';ctx.font='22px Georgia';ctx.fillText(`FIELD NOTES / ${String(index+1).padStart(2,'0')}`,48,61);
@@ -159,7 +181,6 @@ export function buildRoom(constants,aspect,courses,onDirty){
   ctx.fillStyle='#c4b796';ctx.beginPath();ctx.moveTo(722,0);ctx.lineTo(768,0);ctx.lineTo(768,46);ctx.fill();
   const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=16;return map;
  }
- const portrait=aspect<1;
  courses.forEach((course,i)=>{
   const w=portrait?13.8:8.1,h=portrait?10.4:Math.min(5.5,(front-back-5.2)/2);
   const x=portrait?(i%2-.5)*15.7:(i%3-1)*9.7;
@@ -168,15 +189,26 @@ export function buildRoom(constants,aspect,courses,onDirty){
   const group=new THREE.Group();group.name='paper-'+i;group.position.set(x,.10,z);group.rotation.y=i%2?.018:-.026;
   box('paper thickness',[w,.048,h],[0,0,0],paperEdge,group);
   const sheet=plane('paper face',w,h,[0,.04,0],[-Math.PI/2,0,0],paperTexture(course,i),group);
-  sheet.castShadow=true;group.userData.action='course';group.userData.index=i;group.userData.baseY=.10;
+  // The solid paper edge casts the sheet's shadow; avoid a duplicate near-coplanar caster.
+  sheet.castShadow=false;group.userData.action='course';group.userData.index=i;group.userData.baseY=.10;
   groups.papers.push(group);groups.hitTargets.push(group);root.add(group);
  });
 
  const hemi=new THREE.HemisphereLight(0xd5cbb6,0x4d3c29,1.65);root.add(hemi);
- const lamp=new THREE.SpotLight(0xffe4b5,480,150,1.14,.52,1.6);
- lamp.name='single desk lamp';lamp.position.set(8,18,3.5);lamp.target.position.set(-1,0,back*.25);
- lamp.castShadow=true;lamp.shadow.mapSize.set(1024,1024);lamp.shadow.bias=-.0003;lamp.shadow.normalBias=.06;
+ const fixture=new THREE.Group();fixture.position.set(13.8,0,back+.9);fixture.name='brass desk lamp';fixture.userData.action='lamp-power';root.add(fixture);groups.lampFixture=fixture;
+ cylinder('lamp foot',1,.22,[0,.15,0],brass,fixture);
+ cylinder('lamp stem',.12,5.7,[0,3,0],brass,fixture);
+ cylinder('lamp joint',.28,.45,[0,5.85,0],brass,fixture);
+ const shade=new THREE.Group();shade.position.set(0,6.4,0);fixture.add(shade);
+ const targetPoint=new THREE.Vector3(-1,0,back*.15),source=new THREE.Vector3(13.8,6.4,back+.9);
+ shade.quaternion.setFromUnitVectors(new THREE.Vector3(0,-1,0),targetPoint.clone().sub(source).normalize());
+ const shell=new THREE.Mesh(new THREE.ConeGeometry(1.35,1.6,32,1,true),color(0x234d3d,.37,.15));shell.position.y=.1;shell.castShadow=true;shade.add(shell);
+ const bulbMat=new THREE.MeshStandardMaterial({color:0xffe7bc,emissive:0xffd49b,emissiveIntensity:1.4});
+ const bulb=new THREE.Mesh(new THREE.SphereGeometry(.25,16,12),bulbMat);bulb.position.y=-.35;shade.add(bulb);groups.bulb=bulb;
+ const lamp=new THREE.SpotLight(0xffe4b5,220,150,.95,.75,1.6);
+ lamp.name='single desk lamp';fixture.updateMatrixWorld(true);bulb.getWorldPosition(lamp.position);lamp.target.position.copy(targetPoint);
+ lamp.castShadow=true;lamp.shadow.mapSize.set(1024,1024);lamp.shadow.bias=-.0008;lamp.shadow.normalBias=.16;
  lamp.shadow.camera.near=1;lamp.shadow.camera.far=95;root.add(lamp,lamp.target);
  // No screenshot plane, no camera-frame sequence. Every visible surface is a mesh.
- return {root,...groups,pose,lamp,materials,meshCount:root.getObjectsByProperty('isMesh',true).length};
+ return {root,...groups,pose,lamp,hemi,materials,meshCount:root.getObjectsByProperty('isMesh',true).length};
 }
