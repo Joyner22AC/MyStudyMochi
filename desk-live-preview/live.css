@@ -3,3 +3,20 @@
 @media(max-width:650px){.topline{padding:13px 12px;font-size:11px}.topline span{display:none}.tools{gap:6px}.tools button{min-height:42px;padding:8px 10px}.view-control{bottom:20px;gap:7px;max-width:95vw}.view-control button{min-height:42px;white-space:nowrap}#view-position{width:95px}.hint{bottom:91px;left:14px;font-size:10px;max-width:90vw}.panel{padding:30px 22px}}
 @media(prefers-reduced-motion:reduce){.view-control{backdrop-filter:none}}
 #fallback{z-index:2}
+
+/* A dedicated toolbar row keeps controls out of the note text. */
+#paper-reader{position:fixed;inset:0;z-index:20;display:grid;grid-template-rows:auto minmax(0,1fr);pointer-events:none;color:#3f3429}
+.paper-reader-bar{display:flex;align-items:center;gap:18px;min-height:48px;padding:8px max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));background:#efe6d1;border-bottom:1px solid #b6a17f66;pointer-events:auto;box-shadow:0 2px 12px #0001}
+.paper-reader-bar button{border:1px solid #a48f6a66;border-radius:5px;background:transparent;padding:7px 11px;color:inherit;white-space:nowrap;font-size:13px}
+.paper-reader-bar span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;opacity:.7}.paper-reader-bar a{font-size:12px;white-space:nowrap}
+.paper-reader-page{position:relative;min-height:0;opacity:0;transition:opacity 180ms ease;background:#eee4c9;overflow:hidden;pointer-events:none}
+#paper-reader.is-readable .paper-reader-page{opacity:1;pointer-events:auto}
+.paper-reader-page iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#eee4c9}
+.paper-reader-page [data-status],.paper-reader-page [data-failure]{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-size:14px;line-height:2;padding:24px}
+.paper-reader-page [data-failure] button{padding:8px;margin:12px;border:1px solid #a48f6a;background:transparent;border-radius:4px;color:inherit}.paper-reader-page [data-failure] a{text-decoration:underline}
+.paper-reading .hint{visibility:hidden}
+@media(max-width:650px){.paper-reader-bar{gap:10px;min-height:48px}.paper-reader-bar span{display:none}.paper-reader-bar a{margin-left:auto}.paper-reader-bar button{min-height:40px}}
+@media(prefers-reduced-motion:reduce){.paper-reader-page{transition:none}}
+
+#paper-reader.is-closing .paper-reader-bar{visibility:hidden;pointer-events:none}
+#paper-reader.is-closing .paper-reader-page{position:fixed;left:0;top:0;right:auto;bottom:auto;transform-origin:0 0;transition:none;pointer-events:none;will-change:transform,opacity}

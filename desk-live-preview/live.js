@@ -1,16 +1,19 @@
 import * as THREE from './vendor/three.module.js';
 import {ViewMotion} from './motion.js';
 import {buildRoom} from './room.js';
+import {createPaperReader} from './paper-reader.js';
 
 const $=id=>document.getElementById(id);
 const canvas=$('scene'),courses=window.DESK_COURSES;
 const view=new ViewMotion(0,8.5),reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const modalOpen=()=>['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
+const modalOpen=()=>paperReader.active||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
 let renderer,room,camera,constants,lastTime=null,pending=0,disposed=false,drag=null,hovered=null,aspect=1;
 let frames=0,drawing=false,low=false,lastRenderMs=0,slowFrames=0,dirtyShadow=true;
 const scene=new THREE.Scene(),ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),samples=[];
 const lifts=courses.map(()=>new ViewMotion(0,14));
 const metrics={ready:false,failed:false,resting:false,contextLost:false};
+const paperReader=createPaperReader({getPaper:i=>room?.papers[i],getCamera:()=>camera,courses,requestFrame,reduced,
+ freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
 
 function requestFrame(){if(!pending&&!disposed&&!metrics.contextLost)pending=requestAnimationFrame(frame);}
 function pose(){
@@ -31,15 +34,16 @@ function frame(now){
  pending=0;if(!renderer||!room||disposed||metrics.contextLost)return;
  const dt=lastTime===null?1/60:Math.min(.05,Math.max(.001,(now-lastTime)/1000));lastTime=now;
  if(reduced.matches){view.finish();lifts.forEach(x=>x.finish());}else{view.step(dt);lifts.forEach(x=>x.step(dt));}
- room.papers.forEach((object,i)=>{const y=.1+lifts[i].position*.65;if(Math.abs(object.position.y-y)>.00001)dirtyShadow=true;object.position.y=y;});
+ room.papers.forEach((object,i)=>{if(paperReader.owns(object))return;const y=.1+lifts[i].position*.65;if(Math.abs(object.position.y-y)>.00001)dirtyShadow=true;object.position.y=y;});
  pose();
+ paperReader.update(dt);if(paperReader.moving)dirtyShadow=true;
  if(dirtyShadow){renderer.shadowMap.needsUpdate=true;dirtyShadow=false;}
  const start=performance.now();renderer.render(scene,camera);lastRenderMs=performance.now()-start;
  // Adapt render resolution/shadow cost, never quantize camera progress or drop objects.
  if(lastRenderMs>28)slowFrames++;else slowFrames=Math.max(0,slowFrames-1);
  if(slowFrames>=10&&!low){low=true;room.lamp.shadow.mapSize.set(512,512);room.lamp.shadow.map?.dispose();room.lamp.shadow.map=null;dirtyShadow=true;}
  frames++;if(samples.length>=600)samples.shift();samples.push({at:now,position:view.position,velocity:view.velocity});
- metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag;
+ metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag&&!paperReader.moving;
  // Reduce only motion cost on slow devices, then redraw sharp text once settled.
  const desiredRatio=low&&!metrics.resting?1:Math.min(devicePixelRatio,2);
  if(renderer.getPixelRatio()!==desiredRatio){renderer.setPixelRatio(desiredRatio);renderer.setSize(innerWidth,innerHeight,false);requestFrame();}
@@ -80,7 +84,7 @@ function hover(object){
 }
 function action(object){
  if(!object)return;
- if(object.userData.action==='course')location.assign(courses[object.userData.index].href);
+ if(object.userData.action==='course')paperReader.open(object.userData.index);
  if(object.userData.action==='library'){
   if($('personal-library').dataset.unlocked==='true')$('open-home-book').click();
   else showModal('key-overlay',$('shelf-key'));
@@ -110,6 +114,12 @@ canvas.addEventListener('wheel',e=>{
 },{passive:false});
 $('view-desk').addEventListener('click',()=>target(0));$('view-shelf').addEventListener('click',()=>target(1));
 $('view-position').addEventListener('input',e=>target(Number(e.target.value)));
+// The accessible course list opens the same physical sheet; unsupported WebGL keeps normal links.
+$('catalog-overlay').addEventListener('click',e=>{
+ const a=e.target.closest('a[href]');if(!a||!metrics.ready||e.ctrlKey||e.metaKey||e.shiftKey)return;
+ const i=courses.findIndex(c=>new URL(c.href,location.href).href===a.href);if(i<0)return;
+ e.preventDefault();hideModal('catalog-overlay');paperReader.open(i);
+});
 
 function showModal(id,focus){$(id).hidden=false;focus?.focus({preventScroll:true});}
 function hideModal(id,returnTo){$(id).hidden=true;returnTo?.focus({preventScroll:true});}
@@ -150,7 +160,7 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{paperReadability:()=>
  }
  return {index:paper.userData.index,clear,total,blockers:[...blockers],textureWidth:sheet.material.map.image.width};
 }),snapshot:()=>({
- ...metrics,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,
+ ...metrics,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,paperReader:paperReader.snapshot(),
  meshCount:room?.meshCount||0,rendererObjects:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,
  pixelRatio:renderer?.getPixelRatio()||0,lastRenderMs,quality:low?'light':'normal',samples:samples.map(s=>({...s})),
  paperPositions:room?.papers.map(p=>p.position.toArray()),paperVisible:room?.papers.map(p=>p.visible),
