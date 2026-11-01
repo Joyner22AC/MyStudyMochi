@@ -6,7 +6,7 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
  const travel=new ViewMotion(0,10),saved=new Map();
  let index=-1,base=null,phase='closed',ready=false,timer=null,returnFocus=null,source='desk',paperParent=null;
  const selected=()=>getPaper(index,source);
- function bind(paper){paperParent=source==='drawer'?paper.parent:null;if(paperParent)paperParent.parent.attach(paper);return {object:paper,position:paper.position.clone(),quaternion:paper.quaternion.clone(),scale:paper.scale.clone()};}
+ function bind(paper){paperParent=source!=='desk'?paper.parent:null;if(paperParent)paperParent.parent.attach(paper);return {object:paper,position:paper.position.clone(),quaternion:paper.quaternion.clone(),scale:paper.scale.clone()};}
  const host=document.createElement('section');host.id='paper-reader';host.hidden=true;
  host.setAttribute('role','dialog');host.setAttribute('aria-modal','true');host.setAttribute('aria-label','展开的学习笔记');
  host.innerHTML='<header class="paper-reader-bar"><button type="button" data-close aria-label="合上笔记，返回原来的书桌视角">← 放回书桌</button><span data-title></span><a data-direct target="_blank" rel="noopener">独立打开 ↗</a></header><div class="paper-reader-page"><p data-status role="status">正在展开笔记…</p><div data-failure hidden><p>这份笔记暂时没有打开。</p><button type="button" data-retry>重试</button><a data-backup target="_blank" rel="noopener">直接打开笔记 ↗</a></div></div>';
@@ -45,8 +45,8 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
    doc.addEventListener('click',e=>{
     const anchor=e.target.closest('a[href]');if(!anchor||anchor.target==='_blank'||e.ctrlKey||e.metaKey)return;
     const url=new URL(anchor.href,frame.contentWindow.location.href);
-    const home=new URL('../',location.href),localHome=new URL('../学习笔记_课程总入口.html',location.href);
-    if(url.origin===location.origin&&(url.pathname===home.pathname||url.pathname===localHome.pathname)){
+    const home=new URL('../',location.href),localHome=new URL('../学习笔记_课程总入口.html',location.href),indexHome=new URL('../index.html',location.href);
+    if(url.origin===location.origin&&(url.pathname===home.pathname||url.pathname===localHome.pathname||url.pathname===indexHome.pathname)){
      e.preventDefault();closeReader();
     }
    });
@@ -65,6 +65,7 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
  function open(i,options={}){
   if(phase!=='closed'||!getPaper(i,options.source||'desk'))return;
   freezeView();index=i;source=options.source||'desk';returnFocus=document.activeElement;
+  const place=source==='folder'?'活页夹':source==='drawer'?'抽屉':'书桌';close.textContent='← 放回'+place;close.setAttribute('aria-label','合上笔记，放回'+place);
   if(options.resume)saved.set(index,options.resume);
   const paper=selected();base=bind(paper);
   phase='opening';busy(true);travel.setTarget(1);

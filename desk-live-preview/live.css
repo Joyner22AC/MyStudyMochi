@@ -41,3 +41,14 @@
 @media(max-width:650px){.tools{gap:4px}.tools button{padding:8px 7px;font-size:11px}.drawer-caption{width:max-content;max-width:94vw;font-size:11px}.drawer-caption span{max-width:190px}.drawer-caption button{min-height:40px}}
 
 .drawer-open .hint{visibility:hidden}
+
+.catalog-course{display:flex;gap:12px;align-items:center;border-bottom:1px solid #baab8c66}.catalog-course a{flex:1;border:0}.open-folder{font-size:11px;border:1px solid #ae987844;background:transparent;color:#5f4b30;border-radius:4px;padding:8px;min-height:40px;white-space:nowrap;cursor:pointer}
+.folder-toolbar{position:fixed;z-index:9;left:0;right:0;top:0;display:flex;align-items:center;gap:14px;padding:12px 18px;background:#241b13df;color:#eadcc4;backdrop-filter:blur(8px);font-size:12px}.folder-toolbar button,.folder-pagination button{padding:9px 12px;border:1px solid #a78a5e66;background:#382a1ac9;color:inherit;border-radius:4px;font:inherit;cursor:pointer}.folder-toolbar [data-course]{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.folder-pagination{position:fixed;z-index:9;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;color:#e7d6b5;background:#21190fe6;padding:6px 10px;border-radius:5px;font-size:12px}
+.folder-list{position:fixed;z-index:10;right:20px;top:74px;max-height:70vh;overflow:auto;box-shadow:0 12px 50px #0008}.folder-list button{display:block;width:100%;border:0;border-bottom:1px solid #ae997655;background:transparent;padding:14px 0;text-align:left;font:inherit;font-size:14px;color:inherit;cursor:pointer}
+.folder-open .hint,.folder-open .shelf-actions{visibility:hidden}
+@media(max-width:650px){.folder-toolbar{gap:7px;padding:10px;font-size:11px;flex-wrap:wrap}.folder-toolbar [data-course]{order:-1;flex-basis:100%;text-align:center}.folder-toolbar button{min-height:40px;flex:1}.folder-list{left:12px;right:12px;top:106px;width:auto;padding:22px;max-height:65dvh}.folder-pagination{bottom:22px}.folder-pagination button{min-width:44px;min-height:44px}}
+
+.folder-open .view-control,.folder-open .topline,.folder-open .drawer-caption{visibility:hidden}
+
+.open-folder,.folder-toolbar button{min-height:44px}

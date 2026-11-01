@@ -4,13 +4,13 @@ import {RoundedBoxGeometry} from './vendor/RoundedBoxGeometry.js';
 /* Mesh reconstruction of DEsk's room layout, not its SDF ray tracer.
  * Dimensions / camera are derived from ec16818b; see vendor/DESK-LICENSE.txt.
  * Geometry simplification is deliberate: rasterized objects share one live space. */
-export function buildRoom(constants,aspect,courses,onDirty){
+export function buildRoom(constants,aspect,courses,onDirty,chapterIndex=[]){
  const root=new THREE.Group();root.name='one-room';
  const portrait=aspect<1;
  const pose=window.DeskCamera.at(0,aspect,constants),back=pose.zf,front=constants.RM_ZN;
  const shelfFront=pose.shzf,shelfBack=shelfFront-constants.RM_SH_D;
  const shelfWidth=pose.shhx;
- const groups={papers:[],book:null,doors:[],hitTargets:[],knobs:[],drawerCards:[]};
+ const groups={papers:[],book:null,doors:[],hitTargets:[],knobs:[],drawerCards:[],binders:[],chapterSheets:[]};
  const color=(hex,roughness=.65,metalness=0)=>new THREE.MeshStandardMaterial({color:hex,roughness,metalness});
  const walnut=color(0x69452b,.45),edgeWood=color(0x4d3020,.52),darkWood=color(0x38261b,.75);
  const brass=color(0xbba06a,.42,.55),felt=color(0x273b30,.9),leatherA=color(0x552d27,.8),leatherB=color(0x253a32,.8);
@@ -84,12 +84,25 @@ export function buildRoom(constants,aspect,courses,onDirty){
  for(const y of [bottom,-2.6,8.8,20.6])box('shelf board',[shelfWidth*2,.8,constants.RM_SH_D],[0,y,center],walnut);
  box('shelf cornice',[shelfWidth*2+1.8,1.8,constants.RM_SH_D+1.3],[0,21.8,center+.25],edgeWood);
  box('shelf top bevel',[shelfWidth*2+1.2,.4,constants.RM_SH_D+1.0],[0,22.8,center+.25],walnut);
- for(const [i,row] of constants.binders.entries()){
-  const [x,hw,h,lean,labelY]=row;
+ for(const [i,row] of constants.binders.slice(0,6).entries()){
+  const x=-14.2+i*2.4,hw=1.02,h=9.4,lean=0,labelY=5;
   const binder=new THREE.Group();binder.position.set(x,9.2,shelfFront-3.75);binder.rotation.z=-lean;
-  box('binder cover',[hw*2,h,6.4],[0,h/2,0],i%2?leatherB:leatherA,binder);
+  binder.name='course binder '+i;binder.userData={action:'binder',index:i,hw,height:h};
+  box('binder back',[.16,h,6.4],[-hw,h/2,0],i%2?leatherB:leatherA,binder);
+  box('binder paper edges',[hw*1.5,h-.25,6.1],[0,h/2,0],paperEdge,binder);
+  const cover=new THREE.Group();cover.position.set(hw,0,3.25);binder.add(cover);binder.userData.cover=cover;
+  box('binder front cover',[.16,h,6.4],[0,h/2,-3.25],i%2?leatherB:leatherA,cover);
   box('binder spine',[hw*2-.08,h-.2,.16],[0,h/2,3.25],i%2?leatherB:leatherA,binder);
-  plane('blank label',hw*1.3,2.8,[0,labelY,3.35],[0,0,0],textureLabel('·',{width:192,height:192,size:45}),binder);
+  const title=courses[i].title;
+  plane('course spine label',hw*1.3,6.3,[0,labelY,3.35],[0,0,0],textureLabel(title,{width:256,height:1024,size:Math.min(112,900/(title.length+1)),vertical:true}),binder);
+  for(const y of [1.5,4.7,8]){const ring=new THREE.Mesh(new THREE.TorusGeometry(.42,.055,8,24),brass);ring.rotation.x=Math.PI/2;ring.position.set(.75,y,3.2);binder.add(ring);}
+  const sheets=(chapterIndex[i]||[]).map((entry,j)=>{
+   const leaf=new THREE.Group();leaf.name='chapter sheet '+i+'-'+j;leaf.visible=false;leaf.userData={action:'chapter',index:i,chapter:j,entry};
+   // The paper lives inside the closed binder, then unfolds above its covers.
+   plane('paper face',1,1,[0,0,0],[0,Math.PI/2,0],chapterTexture(entry.title),leaf);
+   binder.add(leaf);return leaf;
+  });
+  groups.binders.push(binder);groups.chapterSheets.push(sheets);
   root.add(binder);
  }
  // One actual book; the unlabelled binders remain scenery, not invented book entries.
@@ -109,10 +122,11 @@ export function buildRoom(constants,aspect,courses,onDirty){
  groups.hitTargets.push(book);root.add(book);
 
  // Hinged doors guard the real upper book bay. They are geometry, including hit occlusion.
+ const bayLeft=.6,bayRight=shelfWidth-.55,bayWidth=(bayRight-bayLeft)/2;
  for(const side of [-1,1]){
   const door=new THREE.Group();door.name=side<0?'left cabinet door':'right cabinet door';
-  door.position.set(side*(shelfWidth-.55),8.95,shelfFront+.55);door.userData.side=side;door.userData.action='cabinet';
-  const span=shelfWidth-.8,cx=-side*span/2;
+  door.position.set(side<0?bayLeft:bayRight,8.95,shelfFront+.55);door.userData.side=side;door.userData.action='cabinet';
+  const span=bayWidth-.12,cx=-side*span/2;
   box('door opaque panel',[span,11.2,.20],[cx,5.7,0],felt,door);
   for(const x of [cx-span/2+.2,cx+span/2-.2])box('door stile',[.42,11.6,.5],[x,5.7,.12],edgeWood,door);
   for(const y of [.1,11.3])box('door rail',[span,.48,.5],[cx,y,.12],walnut,door);
@@ -122,6 +136,15 @@ export function buildRoom(constants,aspect,courses,onDirty){
   cylinder('cabinet lock cylinder',.24,.12,[0,0,0],brass,lock).rotation.x=Math.PI/2;
   box('key slot',[.055,.27,.035],[0,0,.08],darkMetal,lock);
   root.add(door);groups.doors.push(door);groups.hitTargets.push(door);
+ }
+
+ function chapterTexture(title){
+  const compact=portrait||innerHeight<500,canvas=document.createElement('canvas');canvas.width=1024;canvas.height=compact?224:512;const ctx=canvas.getContext('2d');
+  const height=canvas.height;ctx.fillStyle='#eee5ce';ctx.fillRect(0,0,1024,height);ctx.strokeStyle='#c9b890';ctx.lineWidth=3;ctx.strokeRect(18,18,988,height-36);
+  ctx.fillStyle='#8a7050';ctx.font=`${compact?22:34}px Georgia`;ctx.fillText('CHAPTER / STUDY NOTES',55,compact?43:70);
+  ctx.fillStyle='#30291f';ctx.font=`${compact?54:72}px "Microsoft YaHei",sans-serif`;let line='',y=compact?103:170;
+  for(const ch of title){if(ctx.measureText(line+ch).width>910){ctx.fillText(line,55,y);line='';y+=compact?65:92;}if(y>height-35)break;line+=ch;}if(y<=height-35)ctx.fillText(line,55,y);
+  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=16;return texture;
  }
 
  // The console/post box keep source-inspired positions; decorative until explicitly implemented.

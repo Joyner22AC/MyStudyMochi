@@ -4,23 +4,30 @@ import {buildRoom} from './room.js';
 import {createPaperReader} from './paper-reader.js';
 import {createCabinet} from './cabinet.js';
 import {createDeskTools} from './desk-tools.js';
+import {createBinders} from './binders.js';
 
 const $=id=>document.getElementById(id);
 const canvas=$('scene'),courses=window.DESK_COURSES;
 const view=new ViewMotion(0,8.5),reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const modalOpen=()=>paperReader.active||cabinet.active||deskTools.panelOpen||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
-let renderer,room,camera,constants,lastTime=null,pending=0,disposed=false,drag=null,hovered=null,aspect=1;
+const modalOpen=()=>paperReader.active||cabinet.active||deskTools.panelOpen||(binders.active&&!binders.choosing)||binders.listOpen||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
+let renderer,room,camera,constants,chapters=[],lastTime=null,pending=0,disposed=false,drag=null,hovered=null,aspect=1;
 let frames=0,drawing=false,low=false,lastRenderMs=0,slowFrames=0,dirtyShadow=true;
 const scene=new THREE.Scene(),ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),samples=[];
 const lifts=courses.map(()=>new ViewMotion(0,14));
 const metrics={ready:false,failed:false,resting:false,contextLost:false};
-const paperReader=createPaperReader({getPaper:(i,source)=>source==='drawer'?room?.drawerCards.find(c=>c.userData.kind==='course'&&c.userData.index===i):room?.papers[i],getCamera:()=>camera,courses,requestFrame,reduced,
+const paperReader=createPaperReader({getPaper:(i,source)=>source==='folder'?binders.getPage(i):source==='drawer'?room?.drawerCards.find(c=>c.userData.kind==='course'&&c.userData.index===i):room?.papers[i],getCamera:()=>camera,courses,requestFrame,reduced,
  freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
 const deskTools=createDeskTools({courses,getRoom:()=>room,getView:()=>({progress:view.position,target:view.target}),requestView:target,requestFrame,reduced,
  isReading:()=>paperReader.active||cabinet.active,openCourse:(i,options)=>paperReader.open(i,options),openBook:()=>cabinet.open()});
 const cabinet=createCabinet({getRoom:()=>room,getCamera:()=>camera,getView:()=>({progress:view.position,target:view.target}),
  requestView:target,requestFrame,reduced,showKey:()=>showModal('key-overlay',$('shelf-key')),
  freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
+const binders=createBinders({courses,getChapters:()=>chapters,getRoom:()=>room,getCamera:()=>camera,getView:()=>({progress:view.position,target:view.target}),requestView:target,requestFrame,reduced,getReader:()=>paperReader,
+ freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
+document.querySelectorAll('#catalog-overlay a').forEach((a,i)=>{
+ const button=document.createElement('button');button.type='button';button.className='open-folder';button.textContent='展开章节';button.setAttribute('aria-label','展开'+courses[i].title+'活页夹');
+ button.addEventListener('click',()=>{hideModal('catalog-overlay');if(metrics.ready)binders.open(i);else location.assign(a.href);});const row=document.createElement('div');row.className='catalog-course';a.before(row);row.append(a,button);
+});
 
 function requestFrame(){metrics.resting=false;if(!pending&&!disposed&&!metrics.contextLost)pending=requestAnimationFrame(frame);}
 function pose(){
@@ -33,6 +40,7 @@ function pose(){
   p.eye=[11.0*t,start.eye[1]+(17-start.eye[1])*t,start.eye[2]+(p.shzf+31-start.eye[2])*t];
   p.ww=[0,-Math.cos(pitch),-Math.sin(pitch)];p.vv=[0,Math.sin(pitch),-Math.cos(pitch)];
  }
+ p.eye[0]-=(aspect<.85?20:8)*binders.cameraFocus*view.position;
  camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(p.fovy*.5));camera.aspect=aspect;
  camera.position.set(...p.eye);camera.up.set(...p.vv);
  const drawerOffset=deskTools.drawerPosition*(1-view.position);
@@ -46,17 +54,20 @@ function frame(now){
  if(reduced.matches){view.finish();lifts.forEach(x=>x.finish());}else{view.step(dt);lifts.forEach(x=>x.step(dt));}
  room.papers.forEach((object,i)=>{if(paperReader.owns(object))return;const y=.1+lifts[i].position*.65;if(Math.abs(object.position.y-y)>.00001)dirtyShadow=true;object.position.y=y;});
  deskTools.update(dt);if(deskTools.moving)dirtyShadow=true;
+ binders.step(dt);
  pose();
+ binders.update();if(binders.moving)dirtyShadow=true;
  paperReader.update(dt);if(paperReader.moving)dirtyShadow=true;
  cabinet.update(dt);if(cabinet.moving)dirtyShadow=true;
  deskTools.refreshUI();
+ binders.refreshUI();
  if(dirtyShadow){renderer.shadowMap.needsUpdate=true;dirtyShadow=false;}
  const start=performance.now();renderer.render(scene,camera);lastRenderMs=performance.now()-start;
  // Adapt render resolution/shadow cost, never quantize camera progress or drop objects.
  if(lastRenderMs>28)slowFrames++;else slowFrames=Math.max(0,slowFrames-1);
  if(slowFrames>=10&&!low){low=true;room.lamp.shadow.mapSize.set(512,512);room.lamp.shadow.map?.dispose();room.lamp.shadow.map=null;dirtyShadow=true;}
  frames++;if(samples.length>=600)samples.shift();samples.push({at:now,position:view.position,velocity:view.velocity});
- metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag&&!paperReader.moving&&!cabinet.moving&&!deskTools.moving;
+ metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag&&!paperReader.moving&&!cabinet.moving&&!deskTools.moving&&!binders.moving;
  // Reduce only motion cost on slow devices, then redraw sharp text once settled.
  const desiredRatio=low&&!metrics.resting?1:Math.min(devicePixelRatio,2);
  if(renderer.getPixelRatio()!==desiredRatio){renderer.setPixelRatio(desiredRatio);renderer.setSize(innerWidth,innerHeight,false);requestFrame();}
@@ -72,7 +83,7 @@ function resize(){
  if(!renderer||!constants)return;
  aspect=innerWidth/innerHeight;
  const old=room;
- room=buildRoom(constants,aspect,courses,()=>{dirtyShadow=true;requestFrame();});
+ room=buildRoom(constants,aspect,courses,()=>{dirtyShadow=true;requestFrame();},chapters);
  if(old){scene.remove(old.root);const geos=new Set(),mats=new Set(),textures=new Set();old.root.traverse(o=>{if(o.geometry)geos.add(o.geometry);if(o.material)mats.add(o.material);});geos.forEach(g=>g.dispose());mats.forEach(m=>{Object.values(m).forEach(value=>{if(value?.isTexture)textures.add(value);});m.dispose();});textures.forEach(t=>t.dispose());old.lamp.shadow.map?.dispose();}
  scene.add(room.root);
  renderer.setSize(innerWidth,innerHeight,false);camera.aspect=aspect;dirtyShadow=true;requestFrame();
@@ -95,10 +106,13 @@ function hover(object){
  if(hovered===object)return;
  hovered=object;lifts.forEach((lift,i)=>lift.setTarget(object===room.papers[i]?1:0));
  cabinet.hover(object===room.book);
+ binders.hover(object);
  canvas.style.cursor=['brightness','warmth','drawer'].includes(object?.userData.action)?'ns-resize':object?'pointer':'grab';requestFrame();
 }
 function action(object){
  if(!object)return;
+ if(binders.active){if(object.userData.action==='chapter')binders.choose(object.userData.chapter);return;}
+ if(object.userData.action==='binder')binders.open(object.userData.index);
  if(object.userData.action==='course')paperReader.open(object.userData.index);
  if(object.userData.action==='library')cabinet.open();
  if(object.userData.action==='cabinet')cabinet.requestCabinet();
@@ -121,7 +135,7 @@ canvas.addEventListener('pointermove',e=>{
   if(drag.moved){
    if(drag.control==='drawer')deskTools.dragDrawer(drag.value+(e.clientY-drag.y)/160);
    else if(drag.control)deskTools.adjust(drag.control,drag.value+(drag.y-e.clientY)/120);
-   else target(drag.progress+(drag.y-e.clientY)/innerHeight*1.75);
+   else if(!binders.active)target(drag.progress+(drag.y-e.clientY)/innerHeight*1.75);
    hover(null);canvas.style.cursor='grabbing';
   }
  }else if(metrics.ready)hover(hit(e));
@@ -191,7 +205,9 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{hitAt:(x,y)=>{const o
  }
  return {index:paper.userData.index,clear,total,blockers:[...blockers],textureWidth:sheet.material.map.image.width};
 }),snapshot:()=>({
- ...metrics,aspect,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,drag:drag?{control:drag.control,moved:drag.moved,y:drag.y,value:drag.value}:null,paperReader:paperReader.snapshot(),cabinet:cabinet.snapshot(),deskTools:deskTools.snapshot(),
+ ...metrics,aspect,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,drag:drag?{control:drag.control,moved:drag.moved,y:drag.y,value:drag.value}:null,paperReader:paperReader.snapshot(),cabinet:cabinet.snapshot(),deskTools:deskTools.snapshot(),binders:binders.snapshot(),
+ chapterCenters:room?.chapterSheets.flat().filter(p=>p.visible).map(p=>{const q=p.getWorldPosition(new THREE.Vector3()).project(camera);return {course:p.userData.index,chapter:p.userData.chapter,x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}),
+ binderCenters:room?.binders.map(p=>{const q=p.localToWorld(new THREE.Vector3(0,4.7,3.4)).project(camera);return {x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}),
  drawerCards:room?.drawerCards.filter(c=>c.visible).map(c=>{const q=c.getWorldPosition(new THREE.Vector3()).project(camera);return {kind:c.userData.kind,index:c.userData.index,x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}),
  lightPower:room?.lamp.intensity,controlCenters:room?[...room.knobs,room.lampFixture,room.drawer].map(o=>{const point=o===room.drawer?new THREE.Vector3(0,-2.3,.9):o===room.lampFixture?new THREE.Vector3(0,.15,0):new THREE.Vector3(0,.2,0);const q=o.localToWorld(point).project(camera);return {action:o.userData.action,x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}):[],
  bookCenter:room?.book?(()=>{const q=room.book.localToWorld(new THREE.Vector3(0,4.55,3.3)).project(camera);return {x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};})():null,
@@ -205,6 +221,7 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{hitAt:(x,y)=>{const o
 (async()=>{
  try{
   const response=await fetch('scene-constants.json');if(!response.ok)throw Error('Missing scene constants');constants=await response.json();
+  try{const res=await fetch('chapters.json');const data=res.ok?await res.json():null;if(!Array.isArray(data)||data.length!==6||data.some(rows=>!Array.isArray(rows)||!rows.length))throw Error('Missing chapters');chapters=data;}catch{chapters=courses.map(c=>[{title:'打开课程目录',href:c.href,directoryOnly:true}]);}
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance',alpha:false});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0x262019,1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.10;
