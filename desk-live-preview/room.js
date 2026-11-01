@@ -84,19 +84,23 @@ export function buildRoom(constants,aspect,courses,onDirty){
  groups.hitTargets.push(book);root.add(book);
 
  // The console/post box keep source-inspired positions; decorative until explicitly implemented.
- const consoleX=-10.3,consoleZ=back+3.1;
- box('console wooden case',[10.2,3.5,4.2],[consoleX,1.75,consoleZ],edgeWood);
- box('console panel',[9.3,.18,3.7],[consoleX,3.57,consoleZ],darkMetal);
+ const consoleX=-10.3,consoleZ=back+1.5;
+ const consoleGroup=new THREE.Group();root.add(consoleGroup);
+ box('console wooden case',[10.2,3.5,4.2],[0,1.75,0],edgeWood,consoleGroup);
+ box('console panel',[9.3,.18,3.7],[0,3.57,0],darkMetal,consoleGroup);
  for(const [i,x] of [-3,-1.6,0,1.6,3.1].entries()){
-  const dial=cylinder('knob',i===2?.6:.35,.28,[consoleX+x,3.82,consoleZ+.25],i%2?brass:darkMetal);
-  cylinder('indicator',.10,.10,[consoleX+x,4,consoleZ+.25],color(i%2?0x8c4930:0x85906a,.3));
+  cylinder('knob',i===2?.6:.35,.28,[x,3.82,.25],i%2?brass:darkMetal,consoleGroup);
+  cylinder('indicator',.10,.10,[x,4,.25],color(i%2?0x8c4930:0x85906a,.3),consoleGroup);
  }
- const postZ=back+3.4;
+ consoleGroup.scale.setScalar(.55);consoleGroup.position.set(consoleX,0,consoleZ);
+ const postZ=back+1.5;
+ const postGroup=new THREE.Group();root.add(postGroup);
  const post=color(0x842e21,.52);
- box('post box',[4.4,4.6,3.0],[10,2.3,postZ],post);
- box('post lid',[4.7,.4,3.3],[10,4.75,postZ],post);
- box('letter slot',[3.4,.12,.10],[10,3.8,postZ+1.55],darkMetal);
- box('post badge',[1.6,.6,.12],[10,2.0,postZ+1.57],brass);
+ box('post box',[4.4,4.6,3.0],[0,2.3,0],post,postGroup);
+ box('post lid',[4.7,.4,3.3],[0,4.75,0],post,postGroup);
+ box('letter slot',[3.4,.12,.10],[0,3.8,1.55],darkMetal,postGroup);
+ box('post badge',[1.6,.6,.12],[0,2.0,1.57],brass,postGroup);
+ postGroup.scale.setScalar(.55);postGroup.position.set(10,0,postZ);
 
  const clockZ=back+1.1;
  box('clock case',[10.3,.8,1.85],[.5,.4,clockZ],edgeWood);
@@ -115,12 +119,13 @@ export function buildRoom(constants,aspect,courses,onDirty){
  }
 
  function paperTexture(course,index){
-  const canvas=document.createElement('canvas');canvas.width=768;canvas.height=512;const ctx=canvas.getContext('2d');
+  // Rasterize at twice the design resolution; retain physical dimensions and layout.
+  const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=1024;const ctx=canvas.getContext('2d');ctx.scale(2,2);
   ctx.fillStyle='#eee4c9';ctx.fillRect(0,0,768,512);
   ctx.strokeStyle='rgba(107,91,57,.12)';ctx.lineWidth=1;
   for(let y=125;y<490;y+=48){ctx.beginPath();ctx.moveTo(42,y);ctx.lineTo(725,y);ctx.stroke();}
   ctx.fillStyle='#806a4b';ctx.font='22px Georgia';ctx.fillText(`FIELD NOTES / ${String(index+1).padStart(2,'0')}`,48,61);
-  ctx.fillStyle='#171713';ctx.font='bold 46px "Songti SC",SimSun,serif';
+  ctx.fillStyle='#171713';ctx.font='600 46px "Microsoft YaHei","PingFang SC",sans-serif';
   let line='',y=165;
   for(const ch of course.title){if(ctx.measureText(line+ch).width>665){ctx.fillText(line,48,y);line='';y+=64;}line+=ch;}ctx.fillText(line,48,y);
   ctx.font='600 25px "Microsoft YaHei",sans-serif';ctx.fillStyle='#343127';
@@ -130,16 +135,17 @@ export function buildRoom(constants,aspect,courses,onDirty){
   ctx.font='21px "Microsoft YaHei",sans-serif';ctx.fillText('取起手稿 · 开始阅读',48,462);
   // The corner is part of the sheet surface; paper has its own thickness and live shadow.
   ctx.fillStyle='#c4b796';ctx.beginPath();ctx.moveTo(722,0);ctx.lineTo(768,0);ctx.lineTo(768,46);ctx.fill();
-  const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=8;return map;
+  const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=16;return map;
  }
  const portrait=aspect<1;
  courses.forEach((course,i)=>{
-  const w=portrait?13.8:8.1,h=portrait?10.4:5.5;
+  const w=portrait?13.8:8.1,h=portrait?10.4:Math.min(5.5,(front-back-5.2)/2);
   const x=portrait?(i%2-.5)*15.7:(i%3-1)*9.7;
-  const z=portrait?back+13.5+Math.floor(i/2)*13.7:Math.floor(i/3)*6.5-4.6;
+  // Reserve a rear band for scenery; adapt both paper rows to available desk depth.
+  const z=portrait?back+13.5+Math.floor(i/2)*13.7:back+4.2+h/2+Math.floor(i/3)*(h+.7);
   const group=new THREE.Group();group.name='paper-'+i;group.position.set(x,.10,z);group.rotation.y=i%2?.018:-.026;
   box('paper thickness',[w,.048,h],[0,0,0],paperEdge,group);
-  const sheet=plane('paper face',w,h,[0,.026,0],[-Math.PI/2,0,0],paperTexture(course,i),group);
+  const sheet=plane('paper face',w,h,[0,.04,0],[-Math.PI/2,0,0],paperTexture(course,i),group);
   sheet.castShadow=true;group.userData.action='course';group.userData.index=i;group.userData.baseY=.10;
   groups.papers.push(group);groups.hitTargets.push(group);root.add(group);
  });

@@ -37,9 +37,12 @@ function frame(now){
  const start=performance.now();renderer.render(scene,camera);lastRenderMs=performance.now()-start;
  // Adapt render resolution/shadow cost, never quantize camera progress or drop objects.
  if(lastRenderMs>28)slowFrames++;else slowFrames=Math.max(0,slowFrames-1);
- if(slowFrames>=10&&!low){low=true;renderer.setPixelRatio(.85);renderer.setSize(innerWidth,innerHeight,false);room.lamp.shadow.mapSize.set(512,512);room.lamp.shadow.map?.dispose();room.lamp.shadow.map=null;dirtyShadow=true;}
+ if(slowFrames>=10&&!low){low=true;room.lamp.shadow.mapSize.set(512,512);room.lamp.shadow.map?.dispose();room.lamp.shadow.map=null;dirtyShadow=true;}
  frames++;if(samples.length>=600)samples.shift();samples.push({at:now,position:view.position,velocity:view.velocity});
  metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag;
+ // Reduce only motion cost on slow devices, then redraw sharp text once settled.
+ const desiredRatio=low&&!metrics.resting?1:Math.min(devicePixelRatio,2);
+ if(renderer.getPixelRatio()!==desiredRatio){renderer.setPixelRatio(desiredRatio);renderer.setSize(innerWidth,innerHeight,false);requestFrame();}
  document.body.dataset.view=view.position<.0001?'desk':view.position>.9999?'shelf':'moving';
  $('view-position').value=view.position;
  if(!metrics.resting||dirtyShadow)requestFrame();else lastTime=null;
@@ -134,7 +137,19 @@ canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();metrics.contex
 canvas.addEventListener('webglcontextrestored',()=>{metrics.contextLost=false;$('context-warning').hidden=true;dirtyShadow=true;requestFrame();});
 
 // Read-only diagnostics for motion/idle validation, no key or book contents exposed.
-Object.defineProperty(window,'deskLiveDiagnostics',{value:{snapshot:()=>({
+Object.defineProperty(window,'deskLiveDiagnostics',{value:{paperReadability:()=>room.papers.map(paper=>{
+ const sheet=paper.getObjectByName('paper face'),{width,height}=sheet.geometry.parameters;
+ let clear=0,total=0;const blockers=new Set();
+ for(const u of [-.9,-.5,0,.5,.9])for(const v of [-.9,-.5,0,.5,.9]){
+  const point=sheet.localToWorld(new THREE.Vector3(u*width/2,v*height/2,0));
+  const projected=point.clone().project(camera);total++;
+  ray.set(camera.position,point.clone().sub(camera.position).normalize());
+  const first=ray.intersectObject(room.root,true)[0]?.object;
+  if((first===sheet||first?.parent===paper)&&Math.abs(projected.x)<=1&&Math.abs(projected.y)<=1)clear++;
+  else blockers.add(first?.name||'outside');
+ }
+ return {index:paper.userData.index,clear,total,blockers:[...blockers],textureWidth:sheet.material.map.image.width};
+}),snapshot:()=>({
  ...metrics,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,
  meshCount:room?.meshCount||0,rendererObjects:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,
  pixelRatio:renderer?.getPixelRatio()||0,lastRenderMs,quality:low?'light':'normal',samples:samples.map(s=>({...s})),
@@ -147,7 +162,7 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{snapshot:()=>({
  try{
   const response=await fetch('scene-constants.json');if(!response.ok)throw Error('Missing scene constants');constants=await response.json();
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance',alpha:false});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.35));renderer.setClearColor(0x262019,1);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0x262019,1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.10;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
   camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,240);
