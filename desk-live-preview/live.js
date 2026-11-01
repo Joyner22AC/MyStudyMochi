@@ -2,17 +2,21 @@ import * as THREE from './vendor/three.module.js';
 import {ViewMotion} from './motion.js';
 import {buildRoom} from './room.js';
 import {createPaperReader} from './paper-reader.js';
+import {createCabinet} from './cabinet.js';
 
 const $=id=>document.getElementById(id);
 const canvas=$('scene'),courses=window.DESK_COURSES;
 const view=new ViewMotion(0,8.5),reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const modalOpen=()=>paperReader.active||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
+const modalOpen=()=>paperReader.active||cabinet.active||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
 let renderer,room,camera,constants,lastTime=null,pending=0,disposed=false,drag=null,hovered=null,aspect=1;
 let frames=0,drawing=false,low=false,lastRenderMs=0,slowFrames=0,dirtyShadow=true;
 const scene=new THREE.Scene(),ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),samples=[];
 const lifts=courses.map(()=>new ViewMotion(0,14));
 const metrics={ready:false,failed:false,resting:false,contextLost:false};
 const paperReader=createPaperReader({getPaper:i=>room?.papers[i],getCamera:()=>camera,courses,requestFrame,reduced,
+ freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
+const cabinet=createCabinet({getRoom:()=>room,getCamera:()=>camera,getView:()=>({progress:view.position,target:view.target}),
+ requestView:target,requestFrame,reduced,showKey:()=>showModal('key-overlay',$('shelf-key')),
  freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
 
 function requestFrame(){if(!pending&&!disposed&&!metrics.contextLost)pending=requestAnimationFrame(frame);}
@@ -23,7 +27,7 @@ function pose(){
  if(aspect<.85){
   const start=window.DeskCamera.at(0,aspect,constants),t=view.position;
   const pitch=Math.atan2(32,11)*t;
-  p.eye=[5.0*t,start.eye[1]+(17-start.eye[1])*t,start.eye[2]+(p.shzf+31-start.eye[2])*t];
+  p.eye=[11.0*t,start.eye[1]+(17-start.eye[1])*t,start.eye[2]+(p.shzf+31-start.eye[2])*t];
   p.ww=[0,-Math.cos(pitch),-Math.sin(pitch)];p.vv=[0,Math.sin(pitch),-Math.cos(pitch)];
  }
  camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(p.fovy*.5));camera.aspect=aspect;
@@ -37,13 +41,14 @@ function frame(now){
  room.papers.forEach((object,i)=>{if(paperReader.owns(object))return;const y=.1+lifts[i].position*.65;if(Math.abs(object.position.y-y)>.00001)dirtyShadow=true;object.position.y=y;});
  pose();
  paperReader.update(dt);if(paperReader.moving)dirtyShadow=true;
+ cabinet.update(dt);if(cabinet.moving)dirtyShadow=true;
  if(dirtyShadow){renderer.shadowMap.needsUpdate=true;dirtyShadow=false;}
  const start=performance.now();renderer.render(scene,camera);lastRenderMs=performance.now()-start;
  // Adapt render resolution/shadow cost, never quantize camera progress or drop objects.
  if(lastRenderMs>28)slowFrames++;else slowFrames=Math.max(0,slowFrames-1);
  if(slowFrames>=10&&!low){low=true;room.lamp.shadow.mapSize.set(512,512);room.lamp.shadow.map?.dispose();room.lamp.shadow.map=null;dirtyShadow=true;}
  frames++;if(samples.length>=600)samples.shift();samples.push({at:now,position:view.position,velocity:view.velocity});
- metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag&&!paperReader.moving;
+ metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag&&!paperReader.moving&&!cabinet.moving;
  // Reduce only motion cost on slow devices, then redraw sharp text once settled.
  const desiredRatio=low&&!metrics.resting?1:Math.min(devicePixelRatio,2);
  if(renderer.getPixelRatio()!==desiredRatio){renderer.setPixelRatio(desiredRatio);renderer.setSize(innerWidth,innerHeight,false);requestFrame();}
@@ -80,15 +85,14 @@ function hit(event){
 function hover(object){
  if(hovered===object)return;
  hovered=object;lifts.forEach((lift,i)=>lift.setTarget(object===room.papers[i]?1:0));
+ cabinet.hover(object===room.book);
  canvas.style.cursor=object?'pointer':'grab';requestFrame();
 }
 function action(object){
  if(!object)return;
  if(object.userData.action==='course')paperReader.open(object.userData.index);
- if(object.userData.action==='library'){
-  if($('personal-library').dataset.unlocked==='true')$('open-home-book').click();
-  else showModal('key-overlay',$('shelf-key'));
- }
+ if(object.userData.action==='library')cabinet.open();
+ if(object.userData.action==='cabinet')cabinet.requestCabinet();
 }
 canvas.addEventListener('pointerdown',e=>{
  if(e.button!==0||modalOpen()||!metrics.ready)return;
@@ -126,7 +130,7 @@ function hideModal(id,returnTo){$(id).hidden=true;returnTo?.focus({preventScroll
 $('catalog-toggle').addEventListener('click',()=>showModal('catalog-overlay',$('catalog-close')));
 $('catalog-close').addEventListener('click',()=>hideModal('catalog-overlay',$('catalog-toggle')));
 $('key-close').addEventListener('click',()=>hideModal('key-overlay',$('library-toggle')));
-$('library-toggle').addEventListener('click',()=>{target(1);action({userData:{action:'library'}});});
+$('library-toggle').addEventListener('click',()=>cabinet.requestCabinet());
 for(const id of ['catalog-overlay','key-overlay'])$(id).addEventListener('click',e=>{if(e.target===$(id))hideModal(id,$('catalog-toggle'));});
 document.addEventListener('keydown',e=>{
  const id=['key-overlay','catalog-overlay'].find(id=>!$(id).hidden);
@@ -160,7 +164,8 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{paperReadability:()=>
  }
  return {index:paper.userData.index,clear,total,blockers:[...blockers],textureWidth:sheet.material.map.image.width};
 }),snapshot:()=>({
- ...metrics,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,paperReader:paperReader.snapshot(),
+ ...metrics,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,paperReader:paperReader.snapshot(),cabinet:cabinet.snapshot(),
+ bookCenter:room?.book?(()=>{const q=room.book.localToWorld(new THREE.Vector3(0,4.55,3.3)).project(camera);return {x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};})():null,
  meshCount:room?.meshCount||0,rendererObjects:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,
  pixelRatio:renderer?.getPixelRatio()||0,lastRenderMs,quality:low?'light':'normal',samples:samples.map(s=>({...s})),
  paperPositions:room?.papers.map(p=>p.position.toArray()),paperVisible:room?.papers.map(p=>p.visible),

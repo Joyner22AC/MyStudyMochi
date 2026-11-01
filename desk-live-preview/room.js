@@ -9,7 +9,7 @@ export function buildRoom(constants,aspect,courses,onDirty){
  const pose=window.DeskCamera.at(0,aspect,constants),back=pose.zf,front=constants.RM_ZN;
  const shelfFront=pose.shzf,shelfBack=shelfFront-constants.RM_SH_D;
  const shelfWidth=pose.shhx;
- const groups={papers:[],book:null,hitTargets:[]};
+ const groups={papers:[],book:null,doors:[],hitTargets:[]};
  const color=(hex,roughness=.65,metalness=0)=>new THREE.MeshStandardMaterial({color:hex,roughness,metalness});
  const walnut=color(0x69452b,.45),edgeWood=color(0x4d3020,.52),darkWood=color(0x38261b,.75);
  const brass=color(0xbba06a,.32,.7),felt=color(0x273b30,.9),leatherA=color(0x552d27,.7),leatherB=color(0x253a32,.7);
@@ -25,12 +25,13 @@ export function buildRoom(constants,aspect,courses,onDirty){
   const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,height,24),mat);
   mesh.name=name;mesh.position.set(...pos);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
  }
- function textureLabel(text,{width=512,height=192,background='#e5d8b7',ink='#3b3024',size=44}={}){
+ function textureLabel(text,{width=512,height=192,background='#e5d8b7',ink='#3b3024',size=44,vertical=false}={}){
   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
   const ctx=canvas.getContext('2d');ctx.fillStyle=background;ctx.fillRect(0,0,width,height);
   ctx.strokeStyle='rgba(82,60,36,.24)';ctx.lineWidth=3;ctx.strokeRect(12,12,width-24,height-24);
   ctx.fillStyle=ink;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`${size}px "Songti SC",SimSun,serif`;
-  ctx.fillText(text,width/2,height/2,width-38);
+  if(vertical){const chars=[...text],step=height/(chars.length+1);chars.forEach((ch,i)=>ctx.fillText(ch,width/2,step*(i+1),width-38));}
+  else ctx.fillText(text,width/2,height/2,width-38);
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   texture.anisotropy=4;return texture;
  }
@@ -76,12 +77,33 @@ export function buildRoom(constants,aspect,courses,onDirty){
  const book=new THREE.Group();book.name='actual encrypted book';book.position.set(16.02,9.2,shelfFront-3.55);
  const bookMat=color(0x172737,.55);
  box('book pages',[1.8,8.6,5.8],[0,4.5,0],paperEdge,book);
- for(const x of [-1.02,1.02])box('book board',[.18,9.1,6.1],[x,4.55,0],bookMat,book);
+ box('book back board',[.18,9.1,6.1],[-1.02,4.55,0],bookMat,book);
+ const cover=new THREE.Group();cover.position.set(1.02,0,3.1);book.add(cover);
+ box('book front board',[.18,9.1,6.1],[0,4.55,-3.1],bookMat,cover);
+ plane('book cover title',5.4,8.2,[.11,4.55,-3.1],[0,Math.PI/2,0],textureLabel('正义之心',{width:768,height:1024,size:128,background:'#172737',ink:'#ddc58c'}),cover);
+ groups.bookCover=cover;
+ groups.bookPage=plane('open book page',5.7,8.6,[.94,4.55,0],[0,Math.PI/2,0],textureLabel('正义之心',{width:768,height:1024,size:112,background:'#eee4c9',ink:'#302a23'}),book);
  box('book spine',[2.14,9.1,.3],[0,4.55,3.1],bookMat,book);
  for(const y of [1.3,3.1,6.6,8])box('gilt band',[2.2,.07,.06],[0,y,3.29],brass,book);
- const bookLabel=plane('book title',1.5,3.3,[0,4.9,3.29],[0,0,0],textureLabel('藏书',{width:192,height:384,size:49,background:'#172737',ink:'#ddc58c'}),book);
+ plane('book title',1.5,5.4,[0,4.9,3.29],[0,0,0],textureLabel('正义之心',{width:256,height:768,size:112,vertical:true,background:'#172737',ink:'#f3dfaa'}),book);
  book.userData.action='library';book.userData.baseZ=book.position.z;groups.book=book;
  groups.hitTargets.push(book);root.add(book);
+
+ // Hinged doors guard the real upper book bay. They are geometry, including hit occlusion.
+ for(const side of [-1,1]){
+  const door=new THREE.Group();door.name=side<0?'left cabinet door':'right cabinet door';
+  door.position.set(side*(shelfWidth-.55),8.95,shelfFront+.55);door.userData.side=side;door.userData.action='cabinet';
+  const span=shelfWidth-.8,cx=-side*span/2;
+  box('door opaque panel',[span,11.2,.20],[cx,5.7,0],felt,door);
+  for(const x of [cx-span/2+.2,cx+span/2-.2])box('door stile',[.42,11.6,.5],[x,5.7,.12],edgeWood,door);
+  for(const y of [.1,11.3])box('door rail',[span,.48,.5],[cx,y,.12],walnut,door);
+  for(const y of [1,10.4])cylinder('cabinet hinge',.18,.8,[0,y,.22],brass,door);
+  cylinder('door handle',.25,.16,[-side*(span-.8),5.6,.43],brass,door).rotation.x=Math.PI/2;
+  const lock=new THREE.Group();lock.position.set(-side*(span-.8),7.0,.43);door.add(lock);door.userData.lock=lock;
+  cylinder('cabinet lock cylinder',.24,.12,[0,0,0],brass,lock).rotation.x=Math.PI/2;
+  box('key slot',[.055,.27,.035],[0,0,.08],darkMetal,lock);
+  root.add(door);groups.doors.push(door);groups.hitTargets.push(door);
+ }
 
  // The console/post box keep source-inspired positions; decorative until explicitly implemented.
  const consoleX=-10.3,consoleZ=back+1.5;

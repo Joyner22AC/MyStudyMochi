@@ -20,3 +20,15 @@
 
 #paper-reader.is-closing .paper-reader-bar{visibility:hidden;pointer-events:none}
 #paper-reader.is-closing .paper-reader-page{position:fixed;left:0;top:0;right:auto;bottom:auto;transform-origin:0 0;transition:none;pointer-events:none;will-change:transform,opacity}
+
+.shelf-actions{position:fixed;z-index:4;bottom:94px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;max-width:95vw;white-space:nowrap}
+.shelf-actions button,.book-return{font:12px system-ui;background:#2c251be6;border:1px solid #a58b5c80;color:#e7d7b9;border-radius:5px;padding:10px 13px;cursor:pointer}
+.shelf-actions [data-state]{font-size:11px}.book-return{position:fixed;z-index:32;top:max(18px,env(safe-area-inset-top));left:18px}
+.book-in-hand .hint{visibility:hidden}.book-scene-reader{opacity:0;background:transparent;transition:opacity 240ms ease}.book-scene-reader.book-shown{opacity:1;background:#181c20}.book-scene-reader:not(.book-shown) .home-reader-host{visibility:hidden}
+@media(max-width:650px){.shelf-actions{bottom:92px;gap:6px}.shelf-actions button,.book-return{min-height:44px}.book-return{top:12px;left:12px}}
+@media(prefers-reduced-motion:reduce){.book-scene-reader{transition:none}}
+
+.shelf-actions{flex-wrap:wrap;justify-content:center}.shelf-actions [data-state]:not(:empty){flex-basis:100%;max-width:340px;white-space:normal;text-align:center;line-height:1.6;text-shadow:0 1px 4px #000}
+.book-in-hand #home-reader-close{visibility:hidden}
+
+.shelf-actions{width:max-content;max-width:calc(100vw - 24px)}body[data-view="shelf"] .hint{visibility:hidden}
