@@ -40,6 +40,8 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
    if(!doc||/^(Error response|404(?:\b|:))/i.test(doc.title))return fail();
    ready=true;status.hidden=true;failure.hidden=true;frame.hidden=false;
    host.querySelector('[data-direct]').href=frame.contentWindow.location.href;
+   // A successful original-page load is a visit, never an automatic completion.
+   window.dispatchEvent(new CustomEvent('desk:chapter-opened',{detail:{kind:'course',index,href:frame.contentWindow.location.href}}));
    // Same-origin navigation remains inside the original note, including encrypted courses.
    doc.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.defaultPrevented){closeReader();e.preventDefault();}});
    doc.addEventListener('click',e=>{
@@ -117,7 +119,7 @@ export function createPaperReader({getPaper,getCamera,courses,requestFrame,freez
 }
 
 // Homography from a rectangular reading surface to the projected sheet's four corners.
-function projectiveTransform(corners,width,height){
+export function projectiveTransform(corners,width,height){
  const rows=[];
  [[0,0],[1,0],[1,1],[0,1]].forEach(([u,v],i)=>{
   const [x,y]=corners[i];rows.push([u,v,1,0,0,0,-x*u,-x*v,x],[0,0,0,u,v,1,-y*u,-y*v,y]);

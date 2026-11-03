@@ -5,11 +5,13 @@ import {createPaperReader} from './paper-reader.js';
 import {createCabinet} from './cabinet.js';
 import {createDeskTools} from './desk-tools.js';
 import {createBinders} from './binders.js';
+import {createStudyJournal} from './study-journal.js';
 
 const $=id=>document.getElementById(id);
 const canvas=$('scene'),courses=window.DESK_COURSES;
 const view=new ViewMotion(0,8.5),reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const modalOpen=()=>paperReader.active||cabinet.active||deskTools.panelOpen||(binders.active&&!binders.choosing)||binders.listOpen||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
+const modalOpen=()=>journal?.active||paperReader.active||cabinet.active||deskTools.panelOpen||(binders.active&&!binders.choosing)||binders.listOpen||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden;
+let journal=null;
 let renderer,room,camera,constants,chapters=[],lastTime=null,pending=0,disposed=false,drag=null,hovered=null,aspect=1;
 let frames=0,drawing=false,low=false,lastRenderMs=0,slowFrames=0,dirtyShadow=true;
 const scene=new THREE.Scene(),ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),samples=[];
@@ -24,6 +26,9 @@ const cabinet=createCabinet({getRoom:()=>room,getCamera:()=>camera,getView:()=>(
  freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
 const binders=createBinders({courses,getChapters:()=>chapters,getRoom:()=>room,getCamera:()=>camera,getView:()=>({progress:view.position,target:view.target}),requestView:target,requestFrame,reduced,getReader:()=>paperReader,
  freezeView:()=>{view.setTarget(view.position);view.finish();drag=null;}});
+function initializeJournal(){journal||=createStudyJournal({courses,getChapters:()=>chapters,getRoom:()=>metrics.contextLost?null:room,getCamera:()=>camera,getView:()=>({progress:view.position,target:view.target}),requestView:target,requestFrame,reduced,
+ isBusy:()=>paperReader.active||cabinet.active||deskTools.panelOpen||binders.active||['key-overlay','catalog-overlay'].some(id=>!$(id).hidden)||!$('home-reader-overlay').hidden,
+ openCourse:(i,options)=>{if(metrics.ready&&!metrics.contextLost&&room)paperReader.open(i,options);else location.assign(options?.resume?.href||courses[i].href);}});}
 document.querySelectorAll('#catalog-overlay a').forEach((a,i)=>{
  const button=document.createElement('button');button.type='button';button.className='open-folder';button.textContent='展开章节';button.setAttribute('aria-label','展开'+courses[i].title+'活页夹');
  button.addEventListener('click',()=>{hideModal('catalog-overlay');if(metrics.ready)binders.open(i);else location.assign(a.href);});const row=document.createElement('div');row.className='catalog-course';a.before(row);row.append(a,button);
@@ -59,6 +64,7 @@ function frame(now){
  binders.update();if(binders.moving)dirtyShadow=true;
  paperReader.update(dt);if(paperReader.moving)dirtyShadow=true;
  cabinet.update(dt);if(cabinet.moving)dirtyShadow=true;
+ journal?.update(dt);if(journal?.moving)dirtyShadow=true;
  deskTools.refreshUI();
  binders.refreshUI();
  if(dirtyShadow){renderer.shadowMap.needsUpdate=true;dirtyShadow=false;}
@@ -67,7 +73,7 @@ function frame(now){
  if(lastRenderMs>28)slowFrames++;else slowFrames=Math.max(0,slowFrames-1);
  if(slowFrames>=10&&!low){low=true;room.lamp.shadow.mapSize.set(512,512);room.lamp.shadow.map?.dispose();room.lamp.shadow.map=null;dirtyShadow=true;}
  frames++;if(samples.length>=600)samples.shift();samples.push({at:now,position:view.position,velocity:view.velocity});
- metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag&&!paperReader.moving&&!cabinet.moving&&!deskTools.moving&&!binders.moving;
+ metrics.resting=!view.active&&!lifts.some(x=>x.active)&&!drag&&!paperReader.moving&&!cabinet.moving&&!deskTools.moving&&!binders.moving&&!journal?.moving;
  // Reduce only motion cost on slow devices, then redraw sharp text once settled.
  const desiredRatio=low&&!metrics.resting?1:Math.min(devicePixelRatio,2);
  if(renderer.getPixelRatio()!==desiredRatio){renderer.setPixelRatio(desiredRatio);renderer.setSize(innerWidth,innerHeight,false);requestFrame();}
@@ -107,6 +113,7 @@ function hover(object){
  hovered=object;lifts.forEach((lift,i)=>lift.setTarget(object===room.papers[i]?1:0));
  cabinet.hover(object===room.book);
  binders.hover(object);
+ journal?.hover(['memo','calendar'].includes(object?.userData.action)?object.userData.action:null);
  canvas.style.cursor=['brightness','warmth','drawer'].includes(object?.userData.action)?'ns-resize':object?'pointer':'grab';requestFrame();
 }
 function action(object){
@@ -120,6 +127,7 @@ function action(object){
  if(['lamp-power','brightness','warmth','sound','light-reset'].includes(object.userData.action))deskTools.lights(object.userData.action);
  if(object.userData.action==='drawer')deskTools.toggleDrawer();
  if(object.userData.action==='resume')deskTools.resume(object);
+ if(['memo','calendar'].includes(object.userData.action))journal?.open(object.userData.action);
 }
 canvas.addEventListener('pointerdown',e=>{
  if(e.button!==0||modalOpen()||!metrics.ready)return;
@@ -205,7 +213,8 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{hitAt:(x,y)=>{const o
  }
  return {index:paper.userData.index,clear,total,blockers:[...blockers],textureWidth:sheet.material.map.image.width};
 }),snapshot:()=>({
- ...metrics,aspect,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,drag:drag?{control:drag.control,moved:drag.moved,y:drag.y,value:drag.value}:null,paperReader:paperReader.snapshot(),cabinet:cabinet.snapshot(),deskTools:deskTools.snapshot(),binders:binders.snapshot(),
+ ...metrics,aspect,progress:view.position,target:view.target,velocity:view.velocity,renderedFrames:frames,drag:drag?{control:drag.control,moved:drag.moved,y:drag.y,value:drag.value}:null,paperReader:paperReader.snapshot(),cabinet:cabinet.snapshot(),deskTools:deskTools.snapshot(),binders:binders.snapshot(),journal:journal?.snapshot(),
+ journalCenters:room?['memo','calendar'].map(kind=>{const face=room[kind].getObjectByName('journal face'),q=face.getWorldPosition(new THREE.Vector3()).project(camera);return {kind,x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}):[],
  chapterCenters:room?.chapterSheets.flat().filter(p=>p.visible).map(p=>{const q=p.getWorldPosition(new THREE.Vector3()).project(camera);return {course:p.userData.index,chapter:p.userData.chapter,x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}),
  binderCenters:room?.binders.map(p=>{const q=p.localToWorld(new THREE.Vector3(0,4.7,3.4)).project(camera);return {x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}),
  drawerCards:room?.drawerCards.filter(c=>c.visible).map(c=>{const q=c.getWorldPosition(new THREE.Vector3()).project(camera);return {kind:c.userData.kind,index:c.userData.index,x:(q.x+1)*innerWidth/2,y:(1-q.y)*innerHeight/2};}),
@@ -222,6 +231,7 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{hitAt:(x,y)=>{const o
  try{
   const response=await fetch('scene-constants.json');if(!response.ok)throw Error('Missing scene constants');constants=await response.json();
   try{const res=await fetch('chapters.json');const data=res.ok?await res.json():null;if(!Array.isArray(data)||data.length!==6||data.some(rows=>!Array.isArray(rows)||!rows.length))throw Error('Missing chapters');chapters=data;}catch{chapters=courses.map(c=>[{title:'打开课程目录',href:c.href,directoryOnly:true}]);}
+  initializeJournal();
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance',alpha:false});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0x262019,1);
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.10;
@@ -229,6 +239,7 @@ Object.defineProperty(window,'deskLiveDiagnostics',{value:{hitAt:(x,y)=>{const o
   camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,240);
   resize();metrics.ready=true;clearTimeout(window.deskLiveBootTimer);$('loading').hidden=true;$('fallback').hidden=true;requestFrame();
  }catch(error){
+  initializeJournal();
   metrics.failed=true;$('loading').hidden=true;$('fallback').hidden=false;
   $('view-desk').disabled=true;$('view-shelf').disabled=true;$('view-position').disabled=true;
   // Unsupported WebGL falls back honestly to navigation, never a fake cut-frame animation.

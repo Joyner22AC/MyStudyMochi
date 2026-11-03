@@ -167,10 +167,25 @@ export function buildRoom(constants,aspect,courses,onDirty,chapterIndex=[]){
  box('post badge',[1.6,.6,.12],[0,2.0,1.57],brass,postGroup);
  postGroup.scale.setScalar(.55);postGroup.position.set(10,0,postZ);
 
- const clockZ=back+1.1;
- box('clock case',[10.3,.8,1.85],[.5,.4,clockZ],edgeWood);
- const clockTexture=textureLabel('MY STUDY',{width:768,height:160,size:65,background:'#181d19',ink:'#c77f50'});
- const clock=plane('clock display',9.3,1.25,[.5,.82,clockZ],[-Math.PI/2,0,0],clockTexture);
+ // A tear-off calendar and a leather-backed memo pad share the clear rear band.
+ const journalSurfaces=[];
+ for(const [kind,x,width,height] of [['calendar',-3.45,portrait?6:4.5,portrait?3:2.65],['memo',3.3,portrait?6:4.5,portrait?3:2.65]]){
+  const item=new THREE.Group();item.name=kind==='memo'?'learning memo pad':'learning desk calendar';item.position.set(x,.16,back+(portrait?6.2:1.9));item.userData={action:kind,baseY:.16};
+  box('journal backing',[width+.18,.16,height+.14],[0,0,0],kind==='memo'?leatherB:edgeWood,item);
+  box('journal pages',[width,.1,height],[0,.11,0],paperEdge,item);
+  const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=640;const ctx=canvas.getContext('2d');
+  const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=16;
+  function paint(date,todos,questions){ctx.fillStyle=kind==='memo'?'#e6dcb9':'#efe5cc';ctx.fillRect(0,0,1024,640);ctx.fillStyle='#897351';ctx.font='26px Georgia';ctx.textAlign='center';ctx.fillText(kind==='memo'?'THOUGHTS / TO DO':'ONE DAY AT A TIME',512,89);
+   ctx.fillStyle='#302a20';ctx.font='500 82px "Microsoft YaHei",sans-serif';
+   if(kind==='memo'){ctx.fillText('学习便签',512,270);ctx.strokeStyle='#ac967044';for(let y=360;y<580;y+=70){ctx.beginPath();ctx.moveTo(80,y);ctx.lineTo(944,y);ctx.stroke();}ctx.font='32px "Microsoft YaHei"';ctx.fillText(todos||questions?`${todos} 件待办 · ${questions} 个问题`:'留一张，给明天的自己',512,530);}
+   else{ctx.fillStyle='#a34b34';ctx.font='180px Georgia';ctx.fillText(String(date.getDate()),512,345);ctx.fillStyle='#4a3b2a';ctx.font='40px "Microsoft YaHei"';ctx.fillText(`${date.getFullYear()} / ${date.getMonth()+1}`,512,465);ctx.font='30px "Microsoft YaHei"';ctx.fillText('翻开学习台历',512,570);}map.needsUpdate=true;
+  }
+  paint(new Date(),0,0);journalSurfaces.push(paint);
+  plane('journal face',width,height,[0,.17,0],[-Math.PI/2,0,0],map,item);
+  for(const rx of [-width*.28,width*.28]){const ring=new THREE.Mesh(new THREE.TorusGeometry(.17,.04,8,16),brass);ring.rotation.y=Math.PI/2;ring.position.set(rx,.18,-height/2+.12);item.add(ring);}
+  root.add(item);groups[kind]=item;groups.hitTargets.push(item);
+ }
+ groups.refreshJournalSurfaces=(date,todos,questions)=>journalSurfaces.forEach(paint=>paint(date,todos,questions));
  // Lower shelf clock and two writing pads are actual volumes, not baked pixels.
  box('shelf clock case',[4.5,4.7,1.4],[4.6,.15,shelfFront-2.5],edgeWood);
  plane('clock face',3.6,3.6,[4.6,.3,shelfFront-1.77],[0,0,0],textureLabel('12 · 6',{width:256,height:256,size:37}));
